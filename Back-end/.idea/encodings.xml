@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/kanbanMicroServices/boardServices/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kanbanMicroServices/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kanbanMicroServices/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kanbanMicroServices/taskServices/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kanbanMicroServices/userAuthenticationServices/src/main/java" charset="UTF-8" />
+  </component>
+</project>
