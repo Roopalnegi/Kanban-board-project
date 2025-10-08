@@ -6,3 +6,6 @@ A full-stack Kanban Board project that allows users to create, update, and manag
 
 
 # hello 
+# Component 
+
+# seeing sample 
