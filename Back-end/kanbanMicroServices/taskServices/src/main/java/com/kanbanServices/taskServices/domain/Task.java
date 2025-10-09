@@ -19,6 +19,7 @@ public class Task
     private String title;                  // name of the task
     private String task_description;       // detailed info about task
     private Long columnId;                 // reference to which Kanban column
+    private Long previousColumnId;         // reference to which restore task from archive column
     private Long boardId;                  // reference to which board (project / team)
     private String priority;               // low, high, medium
     private String assignedTo;             // employee name
@@ -28,6 +29,7 @@ public class Task
     private LocalDate createdAt;       // when the task was created
     @LastModifiedDate
     private LocalDate updatedAt;       // when it was last modified
+    private String comments;           // comments on tasks
 
 
     // empty constructor
@@ -36,18 +38,20 @@ public class Task
 
 
     // parameterized constructor
-    public Task(String taskId, String title, String task_description, Long columnId, Long boardId, String priority, String assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt)
+    public Task(String taskId, String title, String task_description, Long columnId, Long previousColumnId, Long boardId, String priority, String assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
     {
         this.taskId = taskId;
         this.title = title;
         this.task_description = task_description;
         this.columnId = columnId;
+        this.previousColumnId = previousColumnId;
         this.boardId = boardId;
         this.priority = priority;
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.comments = comments;
     }
 
 
@@ -60,6 +64,8 @@ public class Task
     public void setTask_description(String task_description) {this.task_description = task_description;}
     public Long getColumnId() {return columnId;}
     public void setColumnId(Long columnId) {this.columnId = columnId;}
+    public Long getPreviousColumnId() {return previousColumnId;}
+    public void setPreviousColumnId(Long previousColumnId) {this.previousColumnId = previousColumnId;}
     public Long getBoardId() {return boardId;}
     public void setBoardId(Long boardId) {this.boardId = boardId;}
     public String getPriority() {return priority;}
@@ -72,23 +78,25 @@ public class Task
     public void setCreatedAt(LocalDate createdAt) {this.createdAt = createdAt;}
     public LocalDate getUpdatedAt() {return updatedAt;}
     public void setUpdatedAt(LocalDate updatedAt) {this.updatedAt = updatedAt;}
-
-
+    public String getComments() {return comments;}
+    public void setComments(String comments) {this.comments = comments;}
 
     // toString()
     @Override
     public String toString() {
         return "Task{" +
-                "id='" + taskId + '\'' +
+                "taskId='" + taskId + '\'' +
                 ", title='" + title + '\'' +
                 ", task_description='" + task_description + '\'' +
                 ", columnId=" + columnId +
+                ", previousColumnId=" + previousColumnId +
                 ", boardId=" + boardId +
                 ", priority='" + priority + '\'' +
                 ", assignedTo='" + assignedTo + '\'' +
                 ", dueDate=" + dueDate +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", comments=" + comments +
                 '}';
     }
 

@@ -17,6 +17,7 @@ public class RequestHelper
         return role;
     }
 
+    // check if user is admin
     public void checkAdminRole(HttpServletRequest request) throws AccessDeniedException
     {
         String role = getRole(request);
@@ -25,6 +26,18 @@ public class RequestHelper
         {
             // 403 code
             throw new AccessDeniedException("Access denied: Only admin can perform the task");
+        }
+    }
+
+    // check if user is employee
+    public void checkEmployeeRole(HttpServletRequest request) throws AccessDeniedException
+    {
+        String role = getRole(request);
+
+        if(!"employee".equals(role))
+        {
+            // 403 code
+            throw new AccessDeniedException("Access denied: Only employee can perform the task");
         }
     }
 }

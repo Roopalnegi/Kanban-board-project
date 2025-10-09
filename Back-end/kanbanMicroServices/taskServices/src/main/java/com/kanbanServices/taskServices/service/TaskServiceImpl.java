@@ -5,6 +5,7 @@ import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -84,6 +85,37 @@ public class TaskServiceImpl implements TaskService
 
 
     @Override
+    public Task archiveTask(String taskId) throws TaskNotFoundException
+    {
+        // check if task exist or not
+        Task archiveTask = taskRepository.findByTaskId(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
+
+        // if exist , then store current column id into previous column id variable
+        archiveTask.setPreviousColumnId(archiveTask.getColumnId());
+
+        // updated now column id to archive column i.e. 4
+        archiveTask.setColumnId(4L);       // assuming archive column id is 4
+
+        return taskRepository.save(archiveTask);
+    }
+
+
+    @Override
+    public Task restoreTaskFromArchive(String taskId) throws TaskNotFoundException
+    {
+        // check if task exist or not
+        Task restoreTask = taskRepository.findByTaskId(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
+
+        restoreTask.setColumnId(restoreTask.getPreviousColumnId());
+        restoreTask.setPreviousColumnId(null);      // after restore, clean the previous column id
+
+        return taskRepository.save(restoreTask);
+    }
+
+
+    @Override
     public Boolean deleteTask(String taskId) throws TaskNotFoundException
     {
         if(taskRepository.findById(taskId).isEmpty())
@@ -108,7 +140,13 @@ public class TaskServiceImpl implements TaskService
 
 
     @Override
-    public Long countNoOfDaysBeforeDue(LocalDate dueDate)
+    public boolean writeComment(String comment,String taskid,  )
+    {
+
+    }
+
+    @Override
+    public Long countDaysBeforeDue(LocalDate dueDate)
     {
         // calculating current date
         LocalDate todayDate = LocalDate.now();
