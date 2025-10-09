@@ -4,10 +4,12 @@ import com.kanbanServices.userAuthenticationServices.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface IUserRepository extends JpaRepository<User,Long>
+public interface UserRepository extends JpaRepository<User,Long>
 {
-    // finder method to find user by emailId
-    public User findByEmailId(String emailId);
+    // finder method to find user by email
+    Optional<User> findByEmail(String email);
 
 }

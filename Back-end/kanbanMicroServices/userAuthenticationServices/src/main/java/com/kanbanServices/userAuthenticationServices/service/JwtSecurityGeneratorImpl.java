@@ -19,7 +19,7 @@ public class JwtSecurityGeneratorImpl implements SecurityTokenGenerator
         String jwtToken = null;
 
         jwtToken = Jwts.builder()
-                .setSubject(user.getEmailId())
+                .setSubject(user.getEmail())
                 .claim("role",user.getRole())
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, "secretKey123")

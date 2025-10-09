@@ -3,6 +3,7 @@ package com.kanbanServices.userAuthenticationServices.controller;
 
 import com.kanbanServices.userAuthenticationServices.domain.User;
 import com.kanbanServices.userAuthenticationServices.exception.InvalidPasswordException;
+import com.kanbanServices.userAuthenticationServices.exception.UserAlreadyExistsException;
 import com.kanbanServices.userAuthenticationServices.exception.UserNotFoundException;
 import com.kanbanServices.userAuthenticationServices.service.IUserService;
 import com.kanbanServices.userAuthenticationServices.service.SecurityTokenGenerator;
@@ -31,7 +32,7 @@ public class UserController
 
    // method to login
    @PostMapping("/login")
-   public ResponseEntity<?> loginUser(@RequestBody User user) throws UserNotFoundException,InvalidPasswordException
+   public ResponseEntity<?> loginUser(@RequestBody User user)
    {
        try
        {
@@ -44,7 +45,7 @@ public class UserController
        catch(UserNotFoundException e)
        {
            // 404 -- NOT FOUND
-           return new ResponseEntity<>("User not found with email : " + user.getEmailId(),HttpStatus.NOT_FOUND);
+           return new ResponseEntity<>("User not found with email : " + user.getEmail(),HttpStatus.NOT_FOUND);
        }
        catch (InvalidPasswordException e)
        {
@@ -57,4 +58,28 @@ public class UserController
            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
        }
    }
+
+
+    // method to register
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User newUser)
+    {
+        try
+        {
+            User foundUser = userService.registerUser(newUser);
+            return new ResponseEntity<>(foundUser,HttpStatus.OK);      // 200 OK -- success
+
+        }
+        catch(UserAlreadyExistsException e)
+        {
+            // 409 -- CONFLICT
+            return new ResponseEntity<>("User already exists  with email : " + newUser.getEmail(),HttpStatus.CONFLICT);
+        }
+        catch (Exception e)
+        {
+            // 500 -- INTERNAL SERVER ERROR
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

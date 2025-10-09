@@ -37,19 +37,19 @@ public class UserControllerTest
     private UserController userController;
 
     private MockMvc mockMvc;
-    private User user;
+    private User user1;
 
     @BeforeEach
     public void setUp()
     {
-       user = new User(null,"user@gmail.com", "password", "user");
+       user1 = new User(null,"user1","user1@gmail.com", "password1", "employee");
        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @AfterEach
     public void tearDown()
     {
-        user = null;
+        user1 = null;
         mockMvc = null;
     }
 
@@ -58,13 +58,13 @@ public class UserControllerTest
     public void testLoginUser_Success() throws Exception
     {
         // mock userService and token generator
-        when(userService.loginUser(any())).thenReturn(user);
+        when(userService.loginUser(any())).thenReturn(user1);
         when(securityTokenGenerator.generateToken(any(User.class)))
                 .thenReturn(Map.of("token", "dummyToken", "message", "User logged-in successfully"));
 
         mockMvc.perform(post("/api/v1/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonToString(user)))
+                .content(jsonToString(user1)))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -81,7 +81,7 @@ public class UserControllerTest
 
         mockMvc.perform(post("/api/v1/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonToString(user)))
+                        .content(jsonToString(user1)))
                 .andExpect(status().isNotFound())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -97,7 +97,7 @@ public class UserControllerTest
 
         mockMvc.perform(post("/api/v1/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonToString(user)))
+                        .content(jsonToString(user1)))
                 .andExpect(status().isUnauthorized())
                 .andDo(MockMvcResultHandlers.print());
 

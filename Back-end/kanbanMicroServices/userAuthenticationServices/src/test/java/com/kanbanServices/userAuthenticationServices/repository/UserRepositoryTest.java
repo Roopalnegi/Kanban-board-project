@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -16,12 +18,12 @@ public class UserRepositoryTest
     private User user1;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     public void setUp()
     {
-        user1 = new User(null, "user1@gmail.com", "password1", "user");
+        user1 = new User(null, "user1","user1@gmail.com", "password1", "employee");
     }
 
     @AfterEach
@@ -39,11 +41,11 @@ public class UserRepositoryTest
         userRepository.save(user1);
 
         // find the user by emailId
-        User foundUser = userRepository.findByEmailId("user1@gmail.com");
+        User foundUser = userRepository.findByEmail("user1@gmail.com").get();
 
         // Assertions
         Assertions.assertNotNull(foundUser);
-        Assertions.assertEquals("user1@gmail.com", foundUser.getEmailId());
+        Assertions.assertEquals("user1@gmail.com", foundUser.getEmail());
         Assertions.assertEquals("password1", foundUser.getPassword());
 
     }
@@ -54,10 +56,10 @@ public class UserRepositoryTest
     {
 
         // find the user by emailId (noone@gmail.com is not exist in DB)
-        User foundUser = userRepository.findByEmailId("noone@gmail.com");
+        Optional<User> foundUser = userRepository.findByEmail("noone@gmail.com");
 
         // Assertions
-        Assertions.assertNull(foundUser);
+        Assertions.assertTrue(foundUser.isEmpty());
 
     }
 

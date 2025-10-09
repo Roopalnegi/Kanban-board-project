@@ -2,8 +2,9 @@ package com.kanbanServices.userAuthenticationServices.service;
 
 import com.kanbanServices.userAuthenticationServices.domain.User;
 import com.kanbanServices.userAuthenticationServices.exception.InvalidPasswordException;
+import com.kanbanServices.userAuthenticationServices.exception.UserAlreadyExistsException;
 import com.kanbanServices.userAuthenticationServices.exception.UserNotFoundException;
-import com.kanbanServices.userAuthenticationServices.repository.IUserRepository;
+import com.kanbanServices.userAuthenticationServices.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements IUserService
 {
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(IUserRepository userRepository)
+    public UserServiceImpl(UserRepository userRepository)
     {
         this.userRepository = userRepository;
     }
@@ -24,14 +25,10 @@ public class UserServiceImpl implements IUserService
     @Override
     public User loginUser(User user) throws UserNotFoundException, InvalidPasswordException
     {
-        // find user by its emailId
-        User foundUser = userRepository.findByEmailId(user.getEmailId());
-
         // if user not found
-        if(foundUser == null)
-        {
-            throw new UserNotFoundException("User not found with email : " + user.getEmailId());
-        }
+        User foundUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email : " + user.getEmail()));
+
 
         // if user found, check password
         if(!foundUser.getPassword().equals(user.getPassword()))
@@ -43,8 +40,16 @@ public class UserServiceImpl implements IUserService
         return foundUser;
     }
 
-
-
+    @Override
+    public User registerUser(User newUser) throws UserAlreadyExistsException
+    {
+        // check if user already exists or not
+        if(userRepository.findByEmail(newUser.getEmail()).isPresent())
+        {
+            throw new UserAlreadyExistsException("User Already Exists");
+        }
+        return userRepository.save(newUser);
+    }
 
 
 }
