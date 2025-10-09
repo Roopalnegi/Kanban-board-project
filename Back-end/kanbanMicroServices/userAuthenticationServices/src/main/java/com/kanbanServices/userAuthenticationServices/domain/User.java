@@ -49,7 +49,7 @@ public class User
         return "User{" +
                 "userId=" + userId +
                 ", userName='" + username + '\'' +
-                ", emailId='" + email + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';

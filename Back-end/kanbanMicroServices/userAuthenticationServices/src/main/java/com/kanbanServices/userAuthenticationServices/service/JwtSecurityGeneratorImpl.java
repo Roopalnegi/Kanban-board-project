@@ -22,7 +22,7 @@ public class JwtSecurityGeneratorImpl implements SecurityTokenGenerator
                 .setSubject(user.getEmail())
                 .claim("role",user.getRole())
                 .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, "secretKey123")
+                .signWith(SignatureAlgorithm.HS256, "kabanprojectsecretkey@123")
                 .compact();
 
         Map<String,String> map = new HashMap<>();
