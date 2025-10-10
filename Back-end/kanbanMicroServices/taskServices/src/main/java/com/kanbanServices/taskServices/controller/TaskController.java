@@ -181,7 +181,7 @@ public class TaskController
     {
         try
         {
-            Task restoreTask = taskService.restoreTaskFromArchive(taskId)
+            Task restoreTask = taskService.restoreTaskFromArchive(taskId);
             return new ResponseEntity<>(restoreTask,HttpStatus.OK);
         }
         catch (TaskNotFoundException e)
