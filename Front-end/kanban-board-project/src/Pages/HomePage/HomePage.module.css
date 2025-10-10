@@ -1,0 +1,42 @@
+.stackContainer
+{
+    margin: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+
+/* When screen width <= 768px (typical tablet/mobile) */
+@media (max-width: 768px) 
+{
+  .stackContainer 
+  {
+    flex-direction: column; /* stack vertically */
+    text-align: center; /* center text on small screens */
+  }
+
+}
+
+
+.boxContainer
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3cm;
+
+}
+
+.button
+{
+    margin-top: 25px;
+    padding: 10px;
+    width: 200px;
+    border-radius: 50px;
+    font-weight: 700;
+    
+}

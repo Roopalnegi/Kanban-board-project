@@ -3,11 +3,20 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import AppThemeProvider from "./AppTheme/Theme.jsx";
+import {SnackbarProvider} from 'notistack';
+import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <SnackbarProvider maxSnack={3}>
+        <AppThemeProvider>
+          <App />
+        </AppThemeProvider>
+      </SnackbarProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

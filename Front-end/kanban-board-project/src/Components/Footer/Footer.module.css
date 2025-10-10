@@ -1,0 +1,33 @@
+.footer-bar
+{
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  padding: 20px;
+  position: fixed;          /* to fixed position of footer*/
+  bottom: 0;                 /* keep footer at the bottom */
+  width: 100%;
+}
+
+
+.footer-links 
+{
+  list-style: none;         /* remove bullets */
+  padding: 0;
+  margin: 0;
+  display: flex;            
+  gap: 1.5rem;              
+}
+
+.footer-links a 
+{
+  text-decoration: none;    /* remove underline */
+  color: inherit;           /* take parent color */
+  font-weight: 500;
+}
+
+.footer-links a:hover 
+{
+  text-decoration: underline;
+}
+
