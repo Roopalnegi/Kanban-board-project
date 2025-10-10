@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import Header from "./Components/Header/Header.jsx";
+import Footer from "./Components/Footer/Footer.jsx";
+import InfoPage from "./Pages/InfoPage/InfoPage.jsx";
+import LoginForm from "./Forms/Login/LoginForm.jsx";
+import RegisterForm from "./Forms/Register/RegisterForm.jsx";
+import HomePage from "./Pages/HomePage/HomePage.jsx";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import {Box} from '@mui/material';
+
+import {Routes, Route} from 'react-router-dom';
+import {useState} from 'react';
+
+
+function App() 
+{
+  const[loginStatus, setLoginStatus] = useState(false);
+
+   return(
+         <>
+         
+           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} />  
+            
+            {/* Main content area between header & footer */} 
+           <Box component="main" sx={{ minHeight: "40vh", 
+                                       pt: "70px", // padding top = header height
+                                       pb: "70px", // padding bottom = footer height
+                                       backgroundColor: "#FFFFFF",
+                                    }}
+           >
+
+             <Routes>
+               <Route path = "/" element = {<HomePage/>} />
+               <Route path = "/login" element = {<LoginForm setLoginStatus={setLoginStatus}/>} />
+               <Route path = "/register" element = {<RegisterForm/>} />
+               <Route path = "/infopage" element = {<InfoPage/>} />
+             </Routes>
+
+          </Box>
+
+        <Footer/> 
+         </>
+         );
+  
 }
 
 export default App;
