@@ -2,7 +2,7 @@ import Header from "./Components/Header/Header.jsx";
 import Footer from "./Components/Footer/Footer.jsx";
 import InfoPage from "./Pages/InfoPage/InfoPage.jsx";
 import LoginForm from "./Forms/Login/LoginForm.jsx";
-import RegistrationForm from "./Forms/Register/RegisterForm.jsx";
+import RegisterForm from "./Forms/Register/RegisterForm.jsx";
 import HomePage from "./Pages/HomePage/HomePage.jsx";
 
 import {Box} from '@mui/material';
@@ -31,7 +31,7 @@ function App()
              <Routes>
                <Route path = "/" element = {<HomePage/>} />
                <Route path = "/login" element = {<LoginForm setLoginStatus={setLoginStatus}/>} />
-               <Route path = "/register" element = {<RegistrationForm/>} />
+               <Route path = "/register" element = {<RegisterForm/>} />
                <Route path = "/infopage" element = {<InfoPage/>} />
              </Routes>
 

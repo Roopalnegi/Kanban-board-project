@@ -30,7 +30,7 @@ function HomePage()
                   teams organized work efficiently by limiting the number of tasks, maximize productivity.
               </Typography>
               
-              <Button variant = "contained" size ="large" sx={{bgcolor: theme.colors.buttons}} className={styles.button}
+              <Button variant = "contained"  sx={{bgcolor: theme.colors.buttons, px: 4, py:1, mt:2}}
                      onClick = {()=> navigate("/register")}>
                 Get Started
               </Button>

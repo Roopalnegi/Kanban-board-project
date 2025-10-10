@@ -12,7 +12,22 @@ const theme = createTheme({
     cardBackground: "#F1F5F9",
     buttons: "#F5A623",
     bodyText: "#1E1E1E",
-    headerFooterSidebarText: "#FFFFFF"
+    headerFooterSidebarText: "#FFFFFF",
+  },
+  palette:
+  {
+    success: {main: "#4CAF50"},        // needed for notistack 
+    error:{main: "#F44336"},           // needed for notistack
+  },
+  components: 
+  {
+    MuiButton:
+    {
+       styleOverrides: 
+       {
+        root: {borderRadius: "30px",}
+       }
+    }
   }
 });
 
@@ -29,3 +44,6 @@ function AppThemeProvider({children})
 }
 
 export default AppThemeProvider;
+
+// usually, Mui components have their own internal styles , which higher precedence than CSS file, so some properties may not be oveeridden
+// in this case, almost all buttons in the app will have rounded corners
