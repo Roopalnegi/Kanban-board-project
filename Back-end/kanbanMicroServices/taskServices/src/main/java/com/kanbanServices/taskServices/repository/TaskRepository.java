@@ -2,6 +2,7 @@ package com.kanbanServices.taskServices.repository;
 
 import com.kanbanServices.taskServices.domain.Task;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +26,18 @@ public interface TaskRepository extends MongoRepository<Task,String>
     // find task by priority
     List<Task> findByPriority(String priority);
 
+    // count active (non-archive) task assigned to a user
+    // assume done - 3 id and archive - 4
+    // db.task.countDocuments({ assignedTo: userEmail,
+    //                          columnId: {$nin :[3,4]} });
+    @Query(value = "{'assignedTo': ?0, 'columnId' : { $nin: [3,4]} }", count = true)
+    long countActiveTaskByAssignedTo(String userEmail);
+
 }
+
+
+/*
+value - actual mongo db query
+count - tell spring to count query not fetch data
+?0 - first method parameter
+ */

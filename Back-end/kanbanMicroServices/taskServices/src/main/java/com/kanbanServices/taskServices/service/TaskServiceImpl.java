@@ -34,6 +34,9 @@ public class TaskServiceImpl implements TaskService
            throw new TaskAlreadyExistsException("Tasks already exists with id : " + task.getTaskId());
        }
 
+       // check task limit for each employee
+       validateTaskAssignmentLimit(task);
+
        return taskRepository.save(task);
     }
 
@@ -72,13 +75,15 @@ public class TaskServiceImpl implements TaskService
     public Task updatedTask(String taskId, Task updatedTaskData) throws TaskNotFoundException
     {
         return taskRepository.findById(taskId)
-                .map(t -> {
-                                 t.setTitle(updatedTaskData.getTitle());
-                                 t.setTask_description(updatedTaskData.getTask_description());
-                                 t.setPriority(updatedTaskData.getPriority());
-                                 t.setAssignedTo(updatedTaskData.getAssignedTo());
-                                 t.setDueDate(updatedTaskData.getDueDate());
-                                 return taskRepository.save(t);
+                .map(existingTask -> {
+                                 existingTask.setTitle(updatedTaskData.getTitle());
+                                 existingTask.setTask_description(updatedTaskData.getTask_description());
+                                 existingTask.setPriority(updatedTaskData.getPriority());
+                                 existingTask.setAssignedTo(updatedTaskData.getAssignedTo());
+                                 // check task limit
+                                 validateTaskAssignmentLimit(existingTask);
+                                 existingTask.setDueDate(updatedTaskData.getDueDate());
+                                 return taskRepository.save(existingTask);
                                 })
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
     }
@@ -139,11 +144,6 @@ public class TaskServiceImpl implements TaskService
     }
 
 
-    @Override
-    public boolean writeComment(String comment,String taskid,  )
-    {
-
-    }
 
     @Override
     public Long countDaysBeforeDue(LocalDate dueDate)
@@ -154,6 +154,21 @@ public class TaskServiceImpl implements TaskService
         // for handling the situation here due date crossed current date -- return -1
         long days = ChronoUnit.DAYS.between(todayDate,dueDate);
         return days < 0 ? -1 : days;
+    }
+
+
+    // helper method to validate task assignment limits
+    private  void validateTaskAssignmentLimit(Task task)
+    {
+        for (String userEmail : task.getAssignedTo())
+        {
+            long taskCount = taskRepository.countActiveTaskByAssignedTo(userEmail);
+
+            if (taskCount >= 5)
+            {
+                throw new IllegalArgumentException("Can't assign task. Employee has reached its limit");
+            }
+        }
     }
 
 }

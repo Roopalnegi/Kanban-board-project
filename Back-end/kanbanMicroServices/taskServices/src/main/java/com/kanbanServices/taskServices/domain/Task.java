@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Document(collection = "Task")
@@ -22,7 +23,7 @@ public class Task
     private Long previousColumnId;         // reference to which restore task from archive column
     private Long boardId;                  // reference to which board (project / team)
     private String priority;               // low, high, medium
-    private String assignedTo;             // employee name
+    private List<String> assignedTo;             // employee name     // change to list
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;         // deadline for the task
     @CreatedDate
@@ -38,7 +39,7 @@ public class Task
 
 
     // parameterized constructor
-    public Task(String taskId, String title, String task_description, Long columnId, Long previousColumnId, Long boardId, String priority, String assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
+    public Task(String taskId, String title, String task_description, Long columnId, Long previousColumnId, Long boardId, String priority, List<String> assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
     {
         this.taskId = taskId;
         this.title = title;
@@ -70,8 +71,8 @@ public class Task
     public void setBoardId(Long boardId) {this.boardId = boardId;}
     public String getPriority() {return priority;}
     public void setPriority(String priority) {this.priority = priority;}
-    public String getAssignedTo() {return assignedTo;}
-    public void setAssignedTo(String assignedTo) {this.assignedTo = assignedTo;}
+    public List<String> getAssignedTo() {return assignedTo;}
+    public void setAssignedTo(List<String> assignedTo) {this.assignedTo = assignedTo;}
     public LocalDate getDueDate() {return dueDate;}
     public void setDueDate(LocalDate dueDate) {this.dueDate = dueDate;}
     public LocalDate getCreatedAt() {return createdAt;}
@@ -82,6 +83,7 @@ public class Task
     public void setComments(String comments) {this.comments = comments;}
 
     // toString()
+
     @Override
     public String toString() {
         return "Task{" +
@@ -92,17 +94,18 @@ public class Task
                 ", previousColumnId=" + previousColumnId +
                 ", boardId=" + boardId +
                 ", priority='" + priority + '\'' +
-                ", assignedTo='" + assignedTo + '\'' +
+                ", assignedTo=" + assignedTo +
                 ", dueDate=" + dueDate +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", comments=" + comments +
+                ", comments='" + comments + '\'' +
                 '}';
     }
 
 
+
    /*
-   LocalDateTime -- class in Java Date and Time API (java.time package)
+   LocalDate -- class in Java Date and Time API (java.time package)
                  -- represent date and time but without timezone
                  -- ex:- 2025-10-09T15:27:48.123 (before T - date and after T time)
 
