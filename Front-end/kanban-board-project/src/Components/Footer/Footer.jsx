@@ -1,6 +1,6 @@
 
 import React from "react";
-import TypoGraphy from '@mui/'
+
 
 import { Box, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';

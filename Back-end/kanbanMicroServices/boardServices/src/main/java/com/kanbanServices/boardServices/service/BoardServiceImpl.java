@@ -24,7 +24,7 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public Board createBoard(Board board) throws BoardAlredyExistsException {
         // check if task already exists by its title and boardId as two tasks can have same title but live in different boards
-        if(boardRepository.findByBoardIdAndBoardName(board.getBoardName(),board.getBoardId()).isPresent())
+        if(boardRepository.findByBoardIdAndBoardName(board.getBoardId(),board.getBoardName()).isPresent())
         {
             throw new BoardAlredyExistsException("Board already exists with id : " + board.getBoardId());
         }

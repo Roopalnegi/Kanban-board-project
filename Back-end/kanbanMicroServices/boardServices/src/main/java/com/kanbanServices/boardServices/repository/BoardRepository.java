@@ -13,7 +13,7 @@ public interface BoardRepository extends MongoRepository<Board,Integer> {
     //fetching all the details
     List<Board> findAll();
     //to avoid duplicate finding Board with id and name
-    Optional<Board> findByBoardIdAndBoardName(String name, int boardId);
+    Optional<Board> findByBoardIdAndBoardName( int boardId, String boardName);
 
     // find by id
     Optional<Board>findByBoardId(int boardId);

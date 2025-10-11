@@ -4,32 +4,41 @@ import com.kanbanServices.boardServices.domain.Board;
 import com.kanbanServices.boardServices.execption.BoardAlredyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
 import com.kanbanServices.boardServices.service.BoardService;
+import com.kanbanServices.boardServices.utility.RequestHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/board")
-@CrossOrigin(origins = "*")//allow ui(react) to call api
-public class
-BoardController {
+@CrossOrigin(origins = "http://localhost:3001")//allow ui(react) to call api
+public class BoardController {
 
     private final BoardService boardService;
+    private final RequestHelper requestHelper;
 
     @Autowired
-    public BoardController(BoardService boardService) {
+    public BoardController(BoardService boardService,RequestHelper requestHelper) {
         this.boardService = boardService;
+        this.requestHelper=requestHelper;
     }
-@PostMapping
-    public ResponseEntity<?>createBoard(@RequestBody Board board){
+
+    @PostMapping
+    public ResponseEntity<?>createBoard(@RequestBody Board board, HttpServletRequest request){
         try {
+            requestHelper.checkAdminRole(request);
             Board created=boardService.createBoard(board);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (BoardAlredyExistsException e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (AccessDeniedException e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.FORBIDDEN);
+        }
+        catch (BoardAlredyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.CONFLICT);
         }
     }
     @GetMapping("/{boardId}")
@@ -37,6 +46,7 @@ BoardController {
         try {
             Board board=boardService.getBoardById(boardId);
             return new ResponseEntity<>(board,HttpStatus.OK);
+
         }catch (BoardNotFoundExecption execption){
             return new ResponseEntity<>(execption.getMessage(),HttpStatus.NOT_FOUND);
         }
