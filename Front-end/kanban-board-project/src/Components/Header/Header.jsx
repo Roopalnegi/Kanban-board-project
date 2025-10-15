@@ -38,9 +38,9 @@ function Header({loginStatus, setLoginStatus, userData})
                       loginStatus ? (<>
                                        <li className={styles['user-info']}>
                                          <AccountCircleIcon className={styles['user-icon']}/> 
-                                         <span> {userData?.username} </span>
+                                         <span> Hi {userData?.username} </span>
                                        </li>
-                                       <li onClick = {logout}>Logout</li> 
+                                       <li onClick = {logout} className={styles['user-logout']}>Logout</li> 
                                     </>)
                                   : (<>
                                      <li><Link to = "/login">Login</Link></li> 

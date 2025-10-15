@@ -2,12 +2,12 @@ import {useState} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { TextField, Button, 
          Dialog, DialogActions, DialogContent, DialogTitle,
-         FormControl, Select, MenuItem, FormHelperText, 
          useTheme} from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {useNavigate} from 'react-router-dom';
 import {useSnackbar} from "notistack";
 import axios from 'axios';
+import OtpSection from '../../Components/OtpSection/OtpSection';
 
 function RegisterForm()
 {
@@ -20,7 +20,10 @@ function RegisterForm()
 
     const [formOpen, setFormOpen] = useState(true);
 
-    const {register,handleSubmit, trigger,control,reset,formState:{errors}} = useForm();
+    const {register,handleSubmit, trigger,watch, control,reset,formState:{errors}} = useForm();
+
+    // to disable register button, until OTP is verfied
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
 
 
     // function to handle login form submission
@@ -48,7 +51,7 @@ function RegisterForm()
     }
     catch(error)
     {
-        enqueueSnackbar(error.response?.data?.message || "Failed to Register !", {
+        enqueueSnackbar(error.response?.data  || "Failed to Register !", {
                                                                                   variant: "error",
                                                                                   autoHideDuration: 2000,   // 2 sec
                                                                                   anchorOrigin: {
@@ -62,7 +65,7 @@ function RegisterForm()
   };
 
 
-
+  
     return(
     <Dialog open={formOpen} onClose={() => setFormOpen(false)} fullWidth maxWidth="sm">
 
@@ -111,39 +114,35 @@ function RegisterForm()
         {/*Password field */}
         
         <TextField id="password" 
-                     label="Enter Password "
-                     type="password" 
-                     variant="outlined" 
-                     fullWidth
-                     {...register("password",{required: {value: true, message: "Password is required"},
-                                              minLength: {value: 8, message: "Password must contain at least 8 letter"},
-                                              pattern: {value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
-                                                       message: "Password must contain uppercase, lowercase, digit, and special character"
-                                                      },
-                                          })}
-                    onBlur={()=> trigger("password")}
-                    error = {!!errors.password}
-                    helperText={errors.password?.message}
+                   label="Enter Password "
+                   type="password" 
+                   variant="outlined" 
+                   fullWidth
+                   {...register("password",{required: {value: true, message: "Password is required"},
+                                            minLength: {value: 8, message: "Password must contain at least 8 letter"},
+                                            pattern: {value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
+                                                     message: "Password must contain uppercase, lowercase, digit, and special character"
+                                                    },
+                                        })}
+                   onBlur={()=> trigger("password")}
+                   error = {!!errors.password}
+                   helperText={errors.password?.message}
         />
          
-        {/* role drop down option */}
+        {/* role -- hidden field */}
             
         <Controller name= "role"
                     control={control}
-                    defaultValue=""
+                    defaultValue="employee"
                     rules = {{required: "Please Select Role"}}
-                    render={({field}) => (
-                                            <FormControl fullWidth error = {!!errors.role}>
-                                                      
-                                                 <Select {...field} displayEmpty>
-                                                     <MenuItem value = "">Select Role </MenuItem>
-                                                     <MenuItem value = "admin">Admin</MenuItem>
-                                                     <MenuItem value = "employee">Employee</MenuItem>
-                                                 </Select>
-                                                 {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
-                                            </FormControl>
-                                        )}
-      />
+                    render={({field}) => <input type = "hidden" {...field} />}
+        />
+
+
+
+        {/* OTP section*/}
+        <OtpSection email = {watch("email")} context = "register"
+                    isOtpVerified = {isOtpVerified} setIsOtpVerified = {setIsOtpVerified} />
             
 
       </DialogContent>
@@ -152,7 +151,7 @@ function RegisterForm()
       
       {/* buttons - submit and reset */}
 
-      <Button type = "submit" variant = "contained" sx = {{backgroundColor: theme.colors.buttons}}>
+      <Button type = "submit" variant = "contained" sx = {{backgroundColor: theme.colors.buttons}} disabled = {!isOtpVerified}>
         Register
       </Button>
       <Button type = "reset" variant = "contained" onClick = {()=> reset()} sx = {{backgroundColor: theme.colors.buttons}}>

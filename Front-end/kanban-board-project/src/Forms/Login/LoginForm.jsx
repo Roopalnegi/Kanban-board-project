@@ -3,10 +3,10 @@ import {useForm}from 'react-hook-form';
 import{useNavigate}from 'react-router-dom';
 import { useSnackbar} from 'notistack';
 import axios from 'axios';
-import{
-        Dialog, DialogContent, DialogTitle, TextField,DialogActions,
+import{Dialog, DialogContent, DialogTitle, TextField,DialogActions,
         useTheme,Button} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
+import OtpSection from "../../Components/OtpSection/OtpSection";
 
 
 
@@ -22,7 +22,11 @@ function LoginForm({setLoginStatus,setUserData})
   const[formOpen,setFormOpen]=useState(true);// controls visibility of login
   
   //intialize from handling
-  const{ register, handleSubmit, formState:{errors}, trigger, reset}=useForm();
+  const{ register, handleSubmit, formState:{errors}, trigger, watch, reset}=useForm();
+
+  // to disable register button, until OTP is verfied
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+
 
   //handle login from submission
   const  loginSubmit=async(useData)=>{
@@ -30,31 +34,30 @@ function LoginForm({setLoginStatus,setUserData})
     {
       //call backend login api
       const response=await axios.post("http://localhost:8081/api/v1/user/login",useData);
-      //get jwt token from response
+      
+      //destructure token + user 
+      const {token,user}=response.data;
 
-      const {token,message}=response.data;
-
-      setUserData(response.data);
-
-      //store token in localstorage
+      //save token in localstorage
       localStorage.setItem("token",token);
+
+      // update app state
+      setUserData(user);
+      setLoginStatus(true);
 
       // showing token on console
       console.log("token : ", token);
 
-      //update login status in app
-      setLoginStatus(true);
-
       //show sucess message
-      enqueueSnackbar(message||"login successfully",{
-                                                    variant:"success",
-                                                    autoHideDuration:2000, // redirect after 2 sec
-                                                    anchorOrigin:
-                                                    {
-                                                      vertical:"top",
-                                                      horizontal:'right'
-                                                    },
-                                                  });
+      enqueueSnackbar("login successfully",{
+                                               variant:"success",
+                                               autoHideDuration:2000, // redirect after 2 sec
+                                               anchorOrigin:
+                                               {
+                                                 vertical:"top",
+                                                 horizontal:"right"
+                                               },
+                                            });
       //close login form and redirect to dashboard
       setFormOpen(false);
       navigate('/');
@@ -77,6 +80,8 @@ function LoginForm({setLoginStatus,setUserData})
     }
   };
 
+
+
     return(
       <Dialog open={formOpen} onClose={()=>setFormOpen(false)} fullWidth maxWidth='sm'>
         {/*header of the dialog */}
@@ -85,25 +90,16 @@ function LoginForm({setLoginStatus,setUserData})
               {/* closeIcon */}
           <CancelIcon
                 sx={{cursor:'pointer',color:theme.palette.error.main}}
-                onClick={()=>setFormOpen(false)}
+                onClick={() => {setFormOpen(false); 
+                                    navigate("/");}} 
           />
         </DialogTitle>
 
-{/*login form */}
+          {/*login form */}
+
           <form onSubmit={handleSubmit( loginSubmit)}>
             <DialogContent sx={{display:'flex',flexDirection:"column",gap:"20px"}}>
 
-              {/* usernaneFeild */}
-              <TextField label="Enter userName"
-              variant="outlined"
-              fullWidth
-              {...register("username",{ required: {value: true, message: "Username is required"},
-                                             pattern:  {value : /^[A-Za-z][A-Za-z0-9_]*$/, message: "Username must start with letter"},
-                                           })}
-              onBlur={()=>trigger('userName')}
-              error={!!errors.useForm?.message}
-              helperText={errors.userName?.message}
-              />
               {/* EmailFeild */}
               <TextField
               label="Enter Email"
@@ -134,16 +130,24 @@ function LoginForm({setLoginStatus,setUserData})
               error={!!errors.password}
               helperText={errors.password?.message}
               />
+             
+             
+             {/* OTP section*/}
+             <OtpSection email = {watch("email")} context = "login"
+                         isOtpVerified = {isOtpVerified} setIsOtpVerified = {setIsOtpVerified} />
+
+
+
             </DialogContent>
 
  
             {/*button-sumbit and reset */}
 
             <DialogActions sx={{ my: 2 }}>
-          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.palette.primary.main }}>
+          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.colors.buttons }} disabled = {!isOtpVerified}>
             Login
           </Button>
-          <Button type="reset" variant="contained" onClick={() => reset()} sx={{ backgroundColor: theme.palette.secondary.main }}>
+          <Button type="reset" variant="contained" onClick={() => reset()} sx={{ backgroundColor: theme.colors.buttons }}>
             Reset
           </Button>
         </DialogActions>

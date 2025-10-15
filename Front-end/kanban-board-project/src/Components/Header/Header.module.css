@@ -43,3 +43,9 @@
   font-size: 1.5em; 
 }
 
+.user-logout:hover
+{
+  cursor: pointer;
+  text-decoration: underline;
+  color: inherit;
+}
