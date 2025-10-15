@@ -10,7 +10,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 
 
-function LoginForm({setLoginStatus}){
+function LoginForm({setLoginStatus,setUserData}){
   const theme=useTheme();
 
   const navigate=useNavigate();
@@ -30,17 +30,20 @@ function LoginForm({setLoginStatus}){
   }=useForm();
 
   //handle login from submission
-  const  loginSubmit=async(useData)=>{
+  const  loginSubmit=async(userData)=>{
     try
     {
       //call backend login api
-      const response=await axios.post("http://localhost:8081/api/v1/user/login",useData);
+      const response=await axios.post("http://localhost:8081/api/v1/user/login",userData);
       //get jwt token from response
 
       const {token,message}=response.data;
 
+      setUserData(response.data);
       //store token in localstorage
       localStorage.setItem("token",token);
+      // showing token on console
+      console.log("token : ", token);
 
       //update login status in app
       setLoginStatus(true);
@@ -55,9 +58,9 @@ function LoginForm({setLoginStatus}){
                                                       horizontal:'right'
                                                     },
                                                   });
-      //close login form and redirect to dashboard
-      setFormOpen(false);
-      navigate('/');
+       setTimeout(() => {
+         navigate('/');
+      }, 1000);  // Give some time for the snackbar to display
     }catch(error)
     {
       //show error message
@@ -86,7 +89,10 @@ function LoginForm({setLoginStatus}){
               {/* closeIcon */}
           <CancelIcon
                 sx={{cursor:'pointer',color:theme.palette.error.main}}
-                onClick={()=>setFormOpen(false)}
+                onClick={()=>{setFormOpen(false)
+                  navigate('/')
+                }}
+
           />
         </DialogTitle>
 
@@ -94,17 +100,6 @@ function LoginForm({setLoginStatus}){
           <form onSubmit={handleSubmit( loginSubmit)}>
             <DialogContent sx={{display:'flex',flexDirection:"column",gap:"20px"}}>
 
-              {/* usernaneFeild */}
-              <TextField label="Enter userName"
-              variant="outlined"
-              fullWidth
-              {...register("username",{ required: {value: true, message: "Username is required"},
-                                             pattern:  {value : /^[A-Za-z][A-Za-z0-9_]*$/, message: "Username must start with letter"},
-                                           })}
-              onBlur={()=>trigger('userName')}
-              error={!!errors.useForm?.message}
-              helperText={errors.userName?.message}
-              />
               {/* EmailFeild */}
               <TextField
               label="Enter Email"
@@ -141,10 +136,10 @@ function LoginForm({setLoginStatus}){
             {/*button-sumbit and reset */}
 
             <DialogActions sx={{ my: 2 }}>
-          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.palette.primary.main }}>
+          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.colors.buttons }}>
             Login
           </Button>
-          <Button type="reset" variant="contained" onClick={() => reset()} sx={{ backgroundColor: theme.palette.secondary.main }}>
+          <Button type="reset" variant="contained" onClick={() => reset()} sx={{ backgroundColor: theme.colors.buttons }}>
             Reset
           </Button>
         </DialogActions>

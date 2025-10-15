@@ -1,17 +1,20 @@
 import {Box,useTheme} from '@mui/material';
 import {useNavigate,Link} from 'react-router-dom';
 import styles from './Header.module.css';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-function Header({loginStatus, setLoginStatus})
+function Header({loginStatus,userData, setLoginStatus})
 {
    
   const theme = useTheme();
+
 
   const navigate = useNavigate();
 
   const logout = () => {
     setLoginStatus(false);
-    localStorage.removeItem("token");           // clear JWT token from localStorage
+    localStorage.removeItem("token");   // clear JWT token from localStorage
+    console.log("token is removed");
     navigate("/");
    };
     
@@ -32,10 +35,19 @@ function Header({loginStatus, setLoginStatus})
 
                 <Box component="nav" className={styles['header-links']}>
                   <ul>
-                    <li><Link to = "/login">Login</Link></li>  
-                    {
-                      loginStatus ? <li onClick = {logout}>Logout</li>  
-                                  : <li><Link to = "/register">Register</Link></li>
+                     {
+                      loginStatus ? (<>
+                                       <li className={styles['user-info']}>
+                                         <AccountCircleIcon className={styles['user-icon']}/> 
+                                         <span>{userData?.username || "User"}</span>
+
+                                       </li>
+                                       <li onClick = {logout}>Logout</li> 
+                                    </>)
+                                  : (<>
+                                     <li><Link to = "/login">Login</Link></li> 
+                                     <li><Link to = "/register">Register</Link></li>
+                                     </>)
                                      
                     }
                   </ul>

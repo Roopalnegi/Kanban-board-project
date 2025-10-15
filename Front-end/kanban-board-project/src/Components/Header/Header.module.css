@@ -9,7 +9,6 @@
   width: 100%;
 }
 
-
 .header-links ul
 {
   display: flex;
@@ -18,16 +17,23 @@
   padding: 0;
   list-style: none;
 }
-
-.header-links a 
+.header-links li a 
 {
   text-decoration: none;    /* remove underline */
   color: inherit;           /* take parent color */
   font-weight: 500;
 }
-
 .header-links a:hover 
 {
   text-decoration: underline;
 }
-
+.user-info 
+{
+  display: flex;
+  align-items: center;     
+  gap: 0.5rem;            
+}
+.user-icon 
+{
+  font-size: 1.5em; 
+}
