@@ -1,8 +1,11 @@
 package com.kanbanServices.boardServices.controller;
 
 import com.kanbanServices.boardServices.domain.Board;
+import com.kanbanServices.boardServices.domain.Column;
 import com.kanbanServices.boardServices.execption.BoardAlredyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
+import com.kanbanServices.boardServices.execption.ColumnAlreadyExistsException;
+import com.kanbanServices.boardServices.execption.ColumnNotFoundException;
 import com.kanbanServices.boardServices.service.BoardService;
 import com.kanbanServices.boardServices.utility.RequestHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,11 +26,14 @@ public class BoardController {
     private final RequestHelper requestHelper;
 
     @Autowired
-    public BoardController(BoardService boardService,RequestHelper requestHelper) {
+    public BoardController(BoardService boardService, RequestHelper requestHelper) {
         this.boardService = boardService;
         this.requestHelper=requestHelper;
     }
 
+    /*
+    *board endpoints
+    */
     @PostMapping
     public ResponseEntity<?>createBoard(@RequestBody Board board, HttpServletRequest request){
         try {
@@ -61,47 +67,64 @@ public class BoardController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
-
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Board>> getBoardsByStatus(@PathVariable String status) {
-        return new ResponseEntity<>(boardService.getBoardByStatus(status), HttpStatus.OK);
-    }
-
-    @GetMapping("/assignedTo/{assignedTo}")
-    public ResponseEntity<List<Board>> getBoardsByAssignedTo(@PathVariable String assignedTo) {
-        return new ResponseEntity<>(boardService.getBoardAssignedTo(assignedTo), HttpStatus.OK);
-    }
-
-
-    @PutMapping("/{boardId}/archive")
-    public ResponseEntity<?> moveToArchive(@PathVariable int boardId) {
+    /*
+    * columns end points
+    */
+    @PostMapping("/{boardId}columns")
+    public ResponseEntity<Board>createColumn(@PathVariable int boardId, @RequestBody Column column){
         try {
-            Board archivedBoard = boardService.moveToArchive(boardId);
-            return new ResponseEntity<>(archivedBoard, HttpStatus.OK);
-        } catch (BoardNotFoundExecption e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            Board uppdatedBoard=boardService.createBoardColumn(boardId,column);
+            return new ResponseEntity<>(uppdatedBoard,HttpStatus.CREATED);
+        }catch (BoardNotFoundExecption e){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }catch (ColumnAlreadyExistsException e){
+            return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+        }
+    }
+    @GetMapping("/columns/{columnId}")
+    public ResponseEntity<Column> getColumnById(@PathVariable int columnId) {
+        try {
+            Column column = boardService.getColumnById(columnId);
+            return new ResponseEntity<>(column, HttpStatus.OK);
+        } catch (ColumnNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-
-    @PutMapping("/{boardId}/restore")
-    public ResponseEntity<?> restoreFromArchive(@PathVariable int boardId) {
+    @GetMapping("/columns/name/{columnName}")
+    public ResponseEntity<Column> getColumnByName(@PathVariable String columnName) {
         try {
-            Board restoredBoard = boardService.restoreFromArchive(boardId);
-            return new ResponseEntity<>(restoredBoard, HttpStatus.OK);
-        } catch (BoardNotFoundExecption e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            Column column = boardService.getColumnByName(columnName);
+            return new ResponseEntity<>(column, HttpStatus.OK);
+        } catch (ColumnNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-
-    @GetMapping("/task/{taskId}")
-    public ResponseEntity<?> getBoardByTaskId(@PathVariable String taskId) {
-        Board board = boardService.getByTaskId(taskId);
-        if (board != null)
-            return new ResponseEntity<>(board, HttpStatus.OK);
-        else
-            return new ResponseEntity<>("No board found for task ID: " + taskId, HttpStatus.NOT_FOUND);
+    @GetMapping("/{boardId}/columns/position/{position}")
+    public ResponseEntity<List<Column>> getColumnsByPosition(
+            @PathVariable int boardId,
+            @PathVariable int position
+    ) {
+        List<Column> columns = boardService.getColumnsByPosition(boardId, position);
+        return new ResponseEntity<>(columns, HttpStatus.OK);
     }
+
+    // ===== Optional Checks ===== //
+
+    @GetMapping("/check/{boardId}")
+    public ResponseEntity<Boolean> checkBoardExists(@PathVariable int boardId) {
+        return new ResponseEntity<>(boardService.checkBoarExist(boardId), HttpStatus.OK);
+    }
+
+    @GetMapping("/columns/check/{columnId}")
+    public ResponseEntity<Boolean> checkColumnExists(@PathVariable int columnId) {
+        return new ResponseEntity<>(boardService.checkColumnExists(columnId), HttpStatus.OK);
+    }
+
+
+
+
+
+
 }
