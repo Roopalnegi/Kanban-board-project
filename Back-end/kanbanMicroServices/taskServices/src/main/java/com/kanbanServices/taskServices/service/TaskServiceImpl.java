@@ -5,7 +5,6 @@ import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

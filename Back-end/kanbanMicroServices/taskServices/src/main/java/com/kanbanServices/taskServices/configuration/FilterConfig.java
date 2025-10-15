@@ -5,14 +5,15 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+
 public class FilterConfig
 {
+    // since JwtFilter with FeignClient autowired, so register it as
     @Bean
-    public FilterRegistrationBean jwtFilter()
+    public FilterRegistrationBean<JwtFilter> jwtFilter(JwtFilter filter)
     {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new JwtFilter());
+        FilterRegistrationBean<JwtFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(filter);
         filterRegistrationBean.addUrlPatterns("/api/v1/task/*");
         return filterRegistrationBean;
     }

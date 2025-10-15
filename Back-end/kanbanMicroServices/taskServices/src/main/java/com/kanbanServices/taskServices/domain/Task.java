@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -12,7 +11,6 @@ import java.util.List;
 
 
 @Document(collection = "Task")
-@EnableMongoAuditing
 public class Task
 {
     @Id
@@ -58,7 +56,7 @@ public class Task
 
     // getters and setters
     public String getTaskId() {return taskId;}
-    public void setTaskId(String id) {this.taskId = taskId;}
+    public void setTaskId(String taskId) {this.taskId = taskId;}
     public String getTitle() {return title;}
     public void setTitle(String title) {this.title = title;}
     public String getTask_description() {return task_description;}

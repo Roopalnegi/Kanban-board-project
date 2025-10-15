@@ -1,17 +1,27 @@
 package com.kanbanServices.taskServices.filter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.kanbanServices.taskServices.proxy.UserAuthClient;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
+@Component
 public class JwtFilter extends GenericFilterBean
 {
+    private final UserAuthClient userAuthClient;
+
+    @Autowired
+    public JwtFilter(UserAuthClient userAuthClient)
+    {
+        this.userAuthClient = userAuthClient;
+    }
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
     {
@@ -28,24 +38,24 @@ public class JwtFilter extends GenericFilterBean
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             pw.println("Missing or Invalid Token");
             pw.close();
+            return;
         }
-        else
-        {
-            // decode the jwtToken
-            String jwtToken = authHeader.substring(7);
-            Claims claims = Jwts.parser()
-                                 .setSigningKey("kabanprojectsecretkey@123")
-                                 .parseClaimsJws(jwtToken)
-                                 .getBody();
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
 
-            // pass the username and role forward in the request
-            httpServletRequest.setAttribute("username", username);
-            httpServletRequest.setAttribute("role", role);
+        try
+        {
+            // call user authentication service via feign client
+            Map<String,String> userData = userAuthClient.validateToken(authHeader);
+
+            // pass email and role forward in the request
+            httpServletRequest.setAttribute("email", userData.get("email"));
+            httpServletRequest.setAttribute("role", userData.get("role"));
 
             // pass the claims in the request
             filterChain.doFilter(servletRequest,servletResponse);
+        }
+        catch(Exception e)
+        {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
     }
