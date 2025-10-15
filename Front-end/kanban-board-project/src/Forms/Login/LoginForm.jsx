@@ -10,24 +10,19 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 
 
-function LoginForm({setLoginStatus}){
+function LoginForm({setLoginStatus,setUserData})
+{
   const theme=useTheme();
 
   const navigate=useNavigate();
 
- const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
 
   const[formOpen,setFormOpen]=useState(true);// controls visibility of login
   
   //intialize from handling
-  const{
-      register,
-      handleSubmit,
-      formState:{errors},
-      trigger,
-      reset
-  }=useForm();
+  const{ register, handleSubmit, formState:{errors}, trigger, reset}=useForm();
 
   //handle login from submission
   const  loginSubmit=async(useData)=>{
@@ -39,8 +34,13 @@ function LoginForm({setLoginStatus}){
 
       const {token,message}=response.data;
 
+      setUserData(response.data);
+
       //store token in localstorage
       localStorage.setItem("token",token);
+
+      // showing token on console
+      console.log("token : ", token);
 
       //update login status in app
       setLoginStatus(true);
@@ -58,7 +58,8 @@ function LoginForm({setLoginStatus}){
       //close login form and redirect to dashboard
       setFormOpen(false);
       navigate('/');
-    }catch(error)
+    }
+    catch(error)
     {
       //show error message
       enqueueSnackbar(
@@ -79,9 +80,7 @@ function LoginForm({setLoginStatus}){
     return(
       <Dialog open={formOpen} onClose={()=>setFormOpen(false)} fullWidth maxWidth='sm'>
         {/*header of the dialog */}
-        <DialogTitle 
-          sx=
-          {{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
+        <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
             <b>Login form</b>
               {/* closeIcon */}
           <CancelIcon

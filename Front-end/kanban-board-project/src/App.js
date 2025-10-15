@@ -14,11 +14,12 @@ import {useState} from 'react';
 function App() 
 {
   const[loginStatus, setLoginStatus] = useState(false);
+  const[userData, setUserData] = useState(null);
 
    return(
          <>
          
-           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} />  
+           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} userData={userData} />  
             
             {/* Main content area between header & footer */} 
            <Box component="main" sx={{ minHeight: "40vh", 
@@ -30,7 +31,7 @@ function App()
 
              <Routes>
                <Route path = "/" element = {<HomePage/>} />
-               <Route path = "/login" element = {<LoginForm setLoginStatus={setLoginStatus}/>} />
+               <Route path = "/login" element = {<LoginForm setLoginStatus={setLoginStatus} setUserData={setUserData}/>} />
                <Route path = "/register" element = {<RegisterForm/>} />
                <Route path = "/infopage" element = {<InfoPage/>} />
              </Routes>
