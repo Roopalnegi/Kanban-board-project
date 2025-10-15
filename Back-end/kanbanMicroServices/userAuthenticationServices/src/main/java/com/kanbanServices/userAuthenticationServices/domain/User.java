@@ -22,7 +22,7 @@ public class User
     {}
 
     // parameterized constructor
-    public User(Long userId, String username,String email, String password, String role)
+    public User(Long userId, String username,String email,String password, String role)
     {
         this.userId = userId;
         this.username = username;

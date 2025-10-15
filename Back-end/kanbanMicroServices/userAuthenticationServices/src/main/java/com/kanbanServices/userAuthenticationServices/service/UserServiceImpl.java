@@ -8,6 +8,8 @@ import com.kanbanServices.userAuthenticationServices.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class UserServiceImpl implements IUserService
@@ -49,6 +51,13 @@ public class UserServiceImpl implements IUserService
             throw new UserAlreadyExistsException("User Already Exists");
         }
         return userRepository.save(newUser);
+    }
+
+
+    @Override
+    public Optional<User> findByEmail(String email)
+    {
+        return userRepository.findByEmail(email);
     }
 
 

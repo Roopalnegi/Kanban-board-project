@@ -5,6 +5,8 @@ import com.kanbanServices.userAuthenticationServices.exception.InvalidPasswordEx
 import com.kanbanServices.userAuthenticationServices.exception.UserAlreadyExistsException;
 import com.kanbanServices.userAuthenticationServices.exception.UserNotFoundException;
 
+import java.util.Optional;
+
 
 public interface IUserService
 {
@@ -16,5 +18,7 @@ public interface IUserService
    // register method
    User registerUser(User newUser) throws UserAlreadyExistsException;
 
+   // find user by email
+   Optional<User> findByEmail(String email);
 
 }
