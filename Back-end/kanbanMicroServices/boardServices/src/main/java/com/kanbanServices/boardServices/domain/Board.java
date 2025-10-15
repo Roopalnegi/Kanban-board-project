@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Document(collection = "Board")
 @EnableMongoAuditing
 public class Board {
@@ -16,27 +17,23 @@ public class Board {
     @Id
     private int boardId; //MongoDb document id
     private String boardName; //name of the bo
-    private String assignedTo; //admin
-    private List<String>taskId;//list of the task under board
-    private String status;// "toDolist",inProgress","complete","archive"
-    private String priority; // low,medium,high
+    private String createdBy;//admin
+    private List<Column>columns; //list type of column object embedding in board
     private String remarks; //admin can remark or comment about task
     @CreatedDate
     private LocalDate createdAt; //when board is created
     @LastModifiedDate
     private LocalDate updatedAt; //when the board is updated
 
-    // empty constructors
+    // empty constructor
     public Board(){}
 
-    //parameterized constructors
-    public Board(int boardId, String boardName, String assignedTo, List<String> taskId, String status, String priority, String remarks, LocalDate createdAt, LocalDate updatedAt) {
+    //parameterized constructor
+    public Board(int boardId, String boardName, String createdBy, List<Column> columns, String remarks, LocalDate createdAt, LocalDate updatedAt) {
         this.boardId = boardId;
         this.boardName = boardName;
-        this.assignedTo = assignedTo;
-        this.taskId = taskId;
-        this.status = status;
-        this.priority = priority;
+        this.createdBy = createdBy;
+        this.columns = columns;
         this.remarks = remarks;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -44,7 +41,6 @@ public class Board {
 
 
     //setters and getters
-
     public int getBoardId() {
         return boardId;
     }
@@ -61,36 +57,20 @@ public class Board {
         this.boardName = boardName;
     }
 
-    public String getAssignedTo() {
-        return assignedTo;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public List<String> getTaskId() {
-        return taskId;
+    public List<Column> getColumns() {
+        return columns;
     }
 
-    public void setTaskId(List<String> taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 
     public String getRemarks() {
@@ -124,10 +104,7 @@ public class Board {
         return "Board{" +
                 "boardId=" + boardId +
                 ", boardName='" + boardName + '\'' +
-                ", assignedTo='" + assignedTo + '\'' +
-                ", taskId=" + taskId +
-                ", status='" + status + '\'' +
-                ", priority='" + priority + '\'' +
+                ", createdBy='" + createdBy + '\'' +
                 ", remarks='" + remarks + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

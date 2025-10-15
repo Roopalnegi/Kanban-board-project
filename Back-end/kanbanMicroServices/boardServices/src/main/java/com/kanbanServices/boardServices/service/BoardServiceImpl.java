@@ -1,14 +1,20 @@
 package com.kanbanServices.boardServices.service;
 
 import com.kanbanServices.boardServices.domain.Board;
+import com.kanbanServices.boardServices.domain.Column;
 import com.kanbanServices.boardServices.execption.BoardAlredyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
+import com.kanbanServices.boardServices.execption.ColumnAlreadyExistsException;
+import com.kanbanServices.boardServices.execption.ColumnNotFoundException;
 import com.kanbanServices.boardServices.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.ast.OpAnd;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BoardServiceImpl implements BoardService{
@@ -29,7 +35,6 @@ public class BoardServiceImpl implements BoardService{
             throw new BoardAlredyExistsException("Board already exists with id : " + board.getBoardId());
         }
         board.setCreatedAt(LocalDate.now());
-        board.setStatus("toDoList"); // default starting status
 
         return boardRepository.save(board);
     }
@@ -48,34 +53,8 @@ public class BoardServiceImpl implements BoardService{
         return boardRepository.findAll();
     }
 
-    //update
-
-
-    @Override
-    public Board updateBoard(int boardId, Board updateData) throws BoardNotFoundExecption {
-        Board existingBoard=getBoardById(boardId);
-
-        if (updateData.getBoardName()!=null){
-            existingBoard.setBoardName(updateData.getBoardName());
-        }
-        if(updateData.getAssignedTo()!=null){
-            existingBoard.setAssignedTo(updateData.getAssignedTo());
-        }
-        if (updateData.getStatus()!=null){
-            existingBoard.setStatus(updateData.getStatus());
-        }
-        if(updateData.getPriority()!=null){
-            existingBoard.setPriority(updateData.getPriority());
-        }
-        if (updateData.getTaskId()!=null){
-            existingBoard.setTaskId(updateData.getTaskId());
-        }
-        existingBoard.setUpdatedAt(LocalDate.now());
-        return boardRepository.save(existingBoard);
-    }
 
     //delete
-
     @Override
     public boolean deleteBoard(int boardId) throws BoardNotFoundExecption {
         if (!boardRepository.existsById(boardId)){
@@ -85,34 +64,73 @@ public class BoardServiceImpl implements BoardService{
         return true;
     }
 
+    //checking board exists
+
     @Override
-    public List<Board> getBoardByStatus(String status) {
-        return boardRepository.findByStatus(status);
+    public boolean checkBoarExist(int boardId) {
+        return boardRepository.findByBoardId(boardId).isPresent();
     }
 
     @Override
-    public List<Board> getBoardAssignedTo(String assignedTo) {
-        return boardRepository.findByAssignedTo(assignedTo);
+    public boolean checkColumnExists(int columnId) {
+        return boardRepository.findByColumnId(columnId).isPresent();
     }
 
-    @Override
-    public Board moveToArchive(int boardId) throws BoardNotFoundExecption {
-        Board board=getBoardById(boardId);
-        board.setStatus("archive");
-        board.setUpdatedAt(LocalDate.now());
+    public Board createBoardColumn(int boardId, Column column)throws ColumnAlreadyExistsException,BoardNotFoundExecption{
+        Board board=getBoardById(boardId);//validate board exists
+        if(board.getColumns()==null){
+            board.setColumns(new ArrayList<>());
+        }
+        //check if column already exists
+        boolean columnExist=board.getColumns().stream().anyMatch(c->c.getColumnId()==column.getColumnId()||
+                c.getColumnName().equalsIgnoreCase(column.getColumnName()));
+        if(columnExist){
+            throw new ColumnAlreadyExistsException("column already exixts");
+        }
+        board.getColumns().add(column);
         return boardRepository.save(board);
+
+    }
+
+//get column by id (searching through board)
+    public Column getColumnById(int columnId)throws ColumnNotFoundException{
+        Board board=boardRepository.findByColumnId(columnId).orElseThrow(()->
+                new ColumnNotFoundException("column not found by this id"));
+        return board.getColumns().stream().filter(c->c.getColumnId()==columnId)
+                .findFirst()
+                .orElseThrow(()->new ColumnNotFoundException("column not found"));
     }
 
     @Override
-    public Board restoreFromArchive(int boardId) throws BoardNotFoundExecption {
-        Board board=getBoardById(boardId);
-        board.setStatus("toDoList");
-        board.setUpdatedAt(LocalDate.now());
-        return boardRepository.save(board);
+    public Column getColumnByName(String columnName) throws ColumnNotFoundException {
+        List<Board>boards=boardRepository.findByColumnName(columnName);
+        if (boards.isEmpty()){
+            throw new ColumnNotFoundException(("no column found by id"));
+        }
+
+        for (Board board:boards){
+            for (Column column:board.getColumns()){
+                if (column.getColumnName().equalsIgnoreCase(columnName)){
+                    return column;
+                }
+            }
+        }
+        throw new ColumnNotFoundException("column with name"+columnName);
     }
 
     @Override
-    public Board getByTaskId(String taskId) {
-        return boardRepository.findByTaskIdContaining(taskId);
+    public List<Column> getColumnsByPosition(int boardId, int position) {
+        Optional<Board>board=boardRepository.findByBoardId(boardId);
+        if (board.isEmpty()||board.get().getColumns()==null){
+            return new ArrayList<>();
+        }
+        Board boards=board.get();
+        List<Column>match=new ArrayList<>();
+        for (Column c:boards.getColumns()){
+            if (c.getColumnOrder()==position){
+                match.add(c);
+            }
+        }
+        return match;
     }
 }

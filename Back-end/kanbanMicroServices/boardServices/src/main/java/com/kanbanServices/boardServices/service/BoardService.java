@@ -1,33 +1,61 @@
 package com.kanbanServices.boardServices.service;
 
 import com.kanbanServices.boardServices.domain.Board;
+import com.kanbanServices.boardServices.domain.Column;
 import com.kanbanServices.boardServices.execption.BoardAlredyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
+import com.kanbanServices.boardServices.execption.ColumnAlreadyExistsException;
+import com.kanbanServices.boardServices.execption.ColumnNotFoundException;
 
 import java.util.List;
 
 public interface BoardService {
 
-    //view task in board
-    public Board getByTaskId(String taskId);
-    // create new board
+    /**checking board exists or not*/
+    boolean checkBoarExist(int boardId);
+
+    /** create new board*/
     public Board createBoard(Board board) throws BoardAlredyExistsException;
-//view single board details
+
+    /**view single board details*/
     public Board getBoardById(int boardId)throws BoardNotFoundExecption;
-//view all board details
+
+    //view all board details
     public List<Board>getAllBoard();
-//update board by id and update board like status,priority
-    public Board updateBoard(int boardId,Board updateData)throws BoardNotFoundExecption;
-//deleting board
+
+    /**deleting board*/
     public boolean deleteBoard(int boardId)throws BoardNotFoundExecption;
-//view board by its status
-    public List<Board>getBoardByStatus(String status);
-    //view to see assigned task under board
-    public List<Board>getBoardAssignedTo(String assignedTo);
-    //archive board
-    public Board moveToArchive(int boardId)throws BoardNotFoundExecption;
-    //restore board task from archive
-    public Board restoreFromArchive(int boardId) throws BoardNotFoundExecption;
+    /**
+     * create column
+     */
+    public Board createBoardColumn(int boardId, Column column) throws ColumnAlreadyExistsException, BoardNotFoundExecption;
+
+    /**
+     * Retrieves a column by its ID.
+     */
+    public Column getColumnById(int columnId) throws ColumnNotFoundException;
+
+    /**
+     * Retrieves a column by its name.
+     */
+   public Column getColumnByName(String columnName) throws ColumnNotFoundException;
+
+    /**
+     * Retrieves columns by their position in a board.
+     */
+   public List<Column> getColumnsByPosition(int boardId, int position);
+    /*
+    * check if column exists*/
+    public boolean checkColumnExists(int columnId);
+
+//    /**
+//     * Updates a specific column within a board.
+//     */
+//    Column updateBoardColumn(int boardId, int columnId, Column updatedColumn)
+//            throws BoardNotFoundExecption, ColumnNotFoundException;
+
+
+
     }
 
 
