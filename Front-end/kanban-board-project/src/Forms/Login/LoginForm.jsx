@@ -58,9 +58,17 @@ function LoginForm({setLoginStatus,setUserData})
                                                  horizontal:"right"
                                                },
                                             });
-      //close login form and redirect to dashboard
+      //close login form and redirect to dashboard based on role
       setFormOpen(false);
-      navigate('/');
+      
+      if( user.role === "admin") 
+         navigate("/admin-dashboard");
+      else if( user.role === "employee")
+          navigate("/employee-dashboard");
+      else
+          navigate("/");      // fallback     
+
+
     }
     catch(error)
     {
