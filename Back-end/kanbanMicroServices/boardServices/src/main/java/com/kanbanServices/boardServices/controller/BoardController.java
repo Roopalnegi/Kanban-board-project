@@ -32,8 +32,10 @@ public class BoardController {
     }
 
     /*
-    *board endpoints
-    */
+     * Create a new board
+     * POST http://localhost:8080/api/v1/board
+     */
+
     @PostMapping
     public ResponseEntity<?>createBoard(@RequestBody Board board, HttpServletRequest request){
         try {
@@ -47,7 +49,11 @@ public class BoardController {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.CONFLICT);
         }
     }
-    @GetMapping("/{boardId}")
+    /*
+     * Get a board by ID
+     * GET http://localhost:8080/api/v1/board/getboard/{boardId}
+     */
+    @GetMapping("/getboard/{boardId}")
     public ResponseEntity<?>getBoardById(@PathVariable int boardId){
         try {
             Board board=boardService.getBoardById(boardId);
@@ -57,8 +63,21 @@ public class BoardController {
             return new ResponseEntity<>(execption.getMessage(),HttpStatus.NOT_FOUND);
         }
     }
+    /*
+     * Get all boards
+     * GET http://localhost:8080/api/v1/board/getallboards
+     */
+    @GetMapping("/getallboards")
+    public ResponseEntity<List<Board>> getAllBoards() {
+        List<Board> boards = boardService.getAllBoard();
+        return new ResponseEntity<>(boards, HttpStatus.OK);
+    }
 
-    @DeleteMapping("/{boardId}")
+    /*
+     * Delete a board by ID
+     * DELETE http://localhost:8080/api/v1/board/deleteboard/{boardId}
+     */
+    @DeleteMapping("/deleteboard/{boardId}")
     public ResponseEntity<?> deleteBoard(@PathVariable int boardId) {
         try {
             boolean deleted = boardService.deleteBoard(boardId);
@@ -67,10 +86,11 @@ public class BoardController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
-    /*
-    * columns end points
-    */
-    @PostMapping("/{boardId}columns")
+        /*
+        * Create a column inside a board
+         * POST http://localhost:8080/api/v1/board/{boardId}/createcolumn
+         * */
+    @PostMapping("/{boardId}/createcolumn")
     public ResponseEntity<Board>createColumn(@PathVariable int boardId, @RequestBody Column column){
         try {
             Board uppdatedBoard=boardService.createBoardColumn(boardId,column);
@@ -81,7 +101,11 @@ public class BoardController {
             return new ResponseEntity<>(null,HttpStatus.CONFLICT);
         }
     }
-    @GetMapping("/columns/{columnId}")
+    /*
+     * Get a column by ID
+     * GET http://localhost:8080/api/v1/board/getcolumn/{columnId}
+     */
+    @GetMapping("/getcolumn/{columnId}")
     public ResponseEntity<Column> getColumnById(@PathVariable int columnId) {
         try {
             Column column = boardService.getColumnById(columnId);
@@ -90,8 +114,11 @@ public class BoardController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
-
-    @GetMapping("/columns/name/{columnName}")
+    /*
+     * Get a column by name
+     * GET http://localhost:8080/api/v1/board/getcolumnbyname/{columnName}
+     */
+    @GetMapping("/getcolumnbyname/{columnName}")
     public ResponseEntity<Column> getColumnByName(@PathVariable String columnName) {
         try {
             Column column = boardService.getColumnByName(columnName);
@@ -101,7 +128,11 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/{boardId}/columns/position/{position}")
+    /*
+     * Get all columns by position/order in a board
+     * GET http://localhost:8080/api/v1/board/{boardId}/getcolumnsbyposition/{position}
+     */
+    @GetMapping("/{boardId}/getcolumnsbyposition/{position}")
     public ResponseEntity<List<Column>> getColumnsByPosition(
             @PathVariable int boardId,
             @PathVariable int position
@@ -112,12 +143,19 @@ public class BoardController {
 
     // ===== Optional Checks ===== //
 
-    @GetMapping("/check/{boardId}")
+    /*
+     * Check if a board exists
+     * GET http://localhost:8080/api/v1/board/checkboard/{boardId}
+     */
+    @GetMapping("/checkboard/{boardId}")
     public ResponseEntity<Boolean> checkBoardExists(@PathVariable int boardId) {
-        return new ResponseEntity<>(boardService.checkBoarExist(boardId), HttpStatus.OK);
+        return new ResponseEntity<>(boardService.checkBoardExist(boardId), HttpStatus.OK);
     }
-
-    @GetMapping("/columns/check/{columnId}")
+    /*
+     * Check if a column exists (in any board)
+     * GET http://localhost:8080/api/v1/board/checkcolumn/{columnId}
+     */
+    @GetMapping("/checkcolumn/{columnId}")
     public ResponseEntity<Boolean> checkColumnExists(@PathVariable int columnId) {
         return new ResponseEntity<>(boardService.checkColumnExists(columnId), HttpStatus.OK);
     }

@@ -66,14 +66,18 @@ public class BoardServiceImpl implements BoardService{
 
     //checking board exists
 
+
     @Override
-    public boolean checkBoarExist(int boardId) {
-        return boardRepository.findByBoardId(boardId).isPresent();
+    public boolean checkBoardExist(int boardId) {
+        return boardRepository.existsByBoardId(boardId);
     }
 
     @Override
     public boolean checkColumnExists(int columnId) {
-        return boardRepository.findByColumnId(columnId).isPresent();
+        if(!boardRepository.existsByColumnId(columnId)){
+            throw new ColumnAlreadyExistsException("column already exists");
+        }
+        return true;
     }
 
     public Board createBoardColumn(int boardId, Column column)throws ColumnAlreadyExistsException,BoardNotFoundExecption{
@@ -133,4 +137,10 @@ public class BoardServiceImpl implements BoardService{
         }
         return match;
     }
+
+    // Checks if a column with given ID exists within a specific board
+    public boolean columnExistsInBoard(int boardId, int columnId) {
+        return boardRepository.findByBoardIdAndColumnId(boardId, columnId).isPresent();
+    }
+
 }

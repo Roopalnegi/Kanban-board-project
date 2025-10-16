@@ -19,7 +19,7 @@ public class Board {
     private String boardName; //name of the bo
     private String createdBy;//admin
     private List<Column>columns; //list type of column object embedding in board
-    private String remarks; //admin can remark or comment about task
+    private String description; //admin can remark or comment about task
     @CreatedDate
     private LocalDate createdAt; //when board is created
     @LastModifiedDate
@@ -29,12 +29,12 @@ public class Board {
     public Board(){}
 
     //parameterized constructor
-    public Board(int boardId, String boardName, String createdBy, List<Column> columns, String remarks, LocalDate createdAt, LocalDate updatedAt) {
+    public Board(int boardId, String boardName, String createdBy, List<Column> columns, String description, LocalDate createdAt, LocalDate updatedAt) {
         this.boardId = boardId;
         this.boardName = boardName;
         this.createdBy = createdBy;
         this.columns = columns;
-        this.remarks = remarks;
+        this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -73,12 +73,12 @@ public class Board {
         this.columns = columns;
     }
 
-    public String getRemarks() {
-        return remarks;
+    public String getDescription() {
+        return description;
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDate getCreatedAt() {
@@ -105,7 +105,7 @@ public class Board {
                 "boardId=" + boardId +
                 ", boardName='" + boardName + '\'' +
                 ", createdBy='" + createdBy + '\'' +
-                ", remarks='" + remarks + '\'' +
+                ", description='" + description + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

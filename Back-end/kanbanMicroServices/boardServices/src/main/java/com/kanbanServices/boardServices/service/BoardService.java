@@ -12,7 +12,7 @@ import java.util.List;
 public interface BoardService {
 
     /**checking board exists or not*/
-    boolean checkBoarExist(int boardId);
+    boolean checkBoardExist(int boardId);
 
     /** create new board*/
     public Board createBoard(Board board) throws BoardAlredyExistsException;
@@ -48,11 +48,8 @@ public interface BoardService {
     * check if column exists*/
     public boolean checkColumnExists(int columnId);
 
-//    /**
-//     * Updates a specific column within a board.
-//     */
-//    Column updateBoardColumn(int boardId, int columnId, Column updatedColumn)
-//            throws BoardNotFoundExecption, ColumnNotFoundException;
+    public boolean columnExistsInBoard(int boardId, int columnId);
+
 
 
 

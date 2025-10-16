@@ -13,7 +13,8 @@ public interface BoardRepository extends MongoRepository<Board,Integer> {
     @Override
     //fetching all the details
     List<Board> findAll();
-    //to avoid duplicate finding Board with id and name
+    // Find a specific board by both boardId and boardName
+    // (used to prevent duplicate boards)
     Optional<Board> findByBoardIdAndBoardName( int boardId, String boardName);
 
     // find by id
@@ -30,10 +31,15 @@ public interface BoardRepository extends MongoRepository<Board,Integer> {
     @Query("{'columns.columnName':?0}")
     List<Board>findByColumnName(String columnName);
 
-    //finding board by boardID and columnID
+    //Find a specific board that contains a specific column (boardId + columnId)
+    // Useful for verifying a column belongs to a given board
     @Query("{'boardId':?0,'columns.columnId':?1}")
     Optional<Board>findByBoardIdAndColumnId(int boardId,int columnId);
 
+    //existById for board and column
+    boolean existsByBoardId(int boardId);
+
+    boolean existsByColumnId(int columnId);
 
     /*
     @Query:---
