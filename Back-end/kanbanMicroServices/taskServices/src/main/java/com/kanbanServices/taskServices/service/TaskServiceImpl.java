@@ -3,6 +3,7 @@ package com.kanbanServices.taskServices.service;
 import com.kanbanServices.taskServices.domain.Task;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
+import com.kanbanServices.taskServices.proxy.BoardServiceClient;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,23 @@ public class TaskServiceImpl implements TaskService
 {
 
     private final TaskRepository taskRepository;
+    private final BoardValidationService boardValidationService;
 
     @Autowired
-    public TaskServiceImpl (TaskRepository taskRepository)
+    public TaskServiceImpl (TaskRepository taskRepository, BoardValidationService boardValidationService)
     {
         this.taskRepository = taskRepository;
+        this.boardValidationService = boardValidationService;
     }
 
 
     @Override
     public Task createTask(Task task) throws TaskAlreadyExistsException
     {
+        // validate board and column first
+        boardValidationService.validateBoardId(task.getBoardId());
+        boardValidationService.validateColumnId(task.getBoardId(), task.getColumnId());
+
         // check if task already exists by its title and boardId as two tasks can have same title but live in different boards
        if(taskRepository.findByTitleAndBoardId(task.getTitle(), task.getBoardId()).isPresent())
        {
@@ -47,20 +54,6 @@ public class TaskServiceImpl implements TaskService
 
 
     @Override
-    public List<Task> getTaskByBoardId(Long boardId)
-    {
-        return taskRepository.findByBoardId(boardId);  // may return empty list - appropriate response will be in frontend
-    }
-
-
-    @Override
-    public List<Task> getTaskByColumnId(Long columnId)
-    {
-        return taskRepository.findByColumnId(columnId);   // may return empty list
-    }
-
-
-    @Override
     public List<Task> getTaskByPriority(String priority)
     {
         return taskRepository.findByPriority(priority);  // may return empty list
@@ -70,6 +63,10 @@ public class TaskServiceImpl implements TaskService
     @Override
     public Task updatedTask(String taskId, Task updatedTaskData) throws TaskNotFoundException
     {
+        // validate board and column first
+        boardValidationService.validateBoardId(updatedTaskData.getBoardId());
+        boardValidationService.validateColumnId(updatedTaskData.getBoardId(), updatedTaskData.getColumnId());
+
         return taskRepository.findById(taskId)
                 .map(t -> {
                                  t.setTitle(updatedTaskData.getTitle());
@@ -90,6 +87,10 @@ public class TaskServiceImpl implements TaskService
         Task archiveTask = taskRepository.findByTaskId(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
 
+        // validate board and column first
+        boardValidationService.validateBoardId(archiveTask.getBoardId());
+        boardValidationService.validateColumnId(archiveTask.getBoardId(), archiveTask.getColumnId());
+
         // if exist , then store current column id into previous column id variable
         archiveTask.setPreviousColumnId(archiveTask.getColumnId());
 
@@ -106,6 +107,10 @@ public class TaskServiceImpl implements TaskService
         // check if task exist or not
         Task restoreTask = taskRepository.findByTaskId(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
+
+        // validate board and column first
+        boardValidationService.validateBoardId(restoreTask.getBoardId());
+        boardValidationService.validateColumnId(restoreTask.getBoardId(), restoreTask.getColumnId());
 
         restoreTask.setColumnId(restoreTask.getPreviousColumnId());
         restoreTask.setPreviousColumnId(null);      // after restore, clean the previous column id
@@ -138,12 +143,6 @@ public class TaskServiceImpl implements TaskService
     }
 
 
-//    @Override
-//   // public boolean writeComment(String comment,String taskid,  )
-//    {
-//
-//    }
-
     @Override
     public Long countDaysBeforeDue(LocalDate dueDate)
     {
@@ -154,6 +153,7 @@ public class TaskServiceImpl implements TaskService
         long days = ChronoUnit.DAYS.between(todayDate,dueDate);
         return days < 0 ? -1 : days;
     }
+
 
 }
 

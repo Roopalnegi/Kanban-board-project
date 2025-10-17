@@ -16,12 +16,6 @@ public interface TaskService
     // view single task details
     Task getTaskById(String taskId) throws TaskNotFoundException;
 
-    // view all tasks in a board
-    List<Task> getTaskByBoardId(Long boardId);
-
-    // view tasks by column
-    List<Task> getTaskByColumnId(Long columnId);
-
     // view tasks by priority
     List<Task> getTaskByPriority(String priority);
 
