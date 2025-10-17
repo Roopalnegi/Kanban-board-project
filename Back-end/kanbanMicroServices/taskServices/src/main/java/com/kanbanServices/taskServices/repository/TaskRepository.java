@@ -12,16 +12,16 @@ import java.util.Optional;
 public interface TaskRepository extends MongoRepository<Task,String>
 {
     // find task by title by board id to avoid duplication
-    Optional<Task> findByTitleAndBoardId(String title, Long BoardId);
+    Optional<Task> findByTitleAndBoardId(String title, String BoardId);
 
     // find task by id
     Optional<Task> findByTaskId(String taskId);
 
     // find task by column id
-    List<Task> findByColumnId(Long columnId);
+    List<Task> findByColumnId(int columnId);
 
     // find task by board id
-    List<Task> findByBoardId(Long boardId);
+    List<Task> findByBoardId(String boardId);
 
     // find task by priority
     List<Task> findByPriority(String priority);

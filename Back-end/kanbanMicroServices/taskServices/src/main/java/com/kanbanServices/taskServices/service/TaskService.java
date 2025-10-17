@@ -32,7 +32,7 @@ public interface TaskService
     Boolean deleteTask(String taskId) throws TaskNotFoundException;
 
     // move task b/w columns -- to do, in-progress, done, archive
-    Task moveTaskByColumn(String taskId, Long newColumnId) throws TaskNotFoundException;
+    Task moveTaskByColumn(String taskId, int newColumnId) throws TaskNotFoundException;
 
     // count days before due date
     Long countDaysBeforeDue(LocalDate updatedAt);

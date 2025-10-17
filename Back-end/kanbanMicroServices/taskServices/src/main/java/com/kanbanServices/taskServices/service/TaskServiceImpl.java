@@ -27,6 +27,7 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // create a new task
     @Override
     public Task createTask(Task task) throws TaskAlreadyExistsException
     {
@@ -44,6 +45,8 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+
+    // view single task details
     @Override
     public Task getTaskById(String taskId) throws TaskNotFoundException
     {
@@ -53,6 +56,7 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // view tasks by priority
     @Override
     public List<Task> getTaskByPriority(String priority)
     {
@@ -60,6 +64,8 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+
+    // update task info - title, description, priority, assigned To, due Date
     @Override
     public Task updatedTask(String taskId, Task updatedTaskData) throws TaskNotFoundException
     {
@@ -80,6 +86,8 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+
+    // archive task
     @Override
     public Task archiveTask(String taskId) throws TaskNotFoundException
     {
@@ -95,12 +103,14 @@ public class TaskServiceImpl implements TaskService
         archiveTask.setPreviousColumnId(archiveTask.getColumnId());
 
         // updated now column id to archive column i.e. 4
-        archiveTask.setColumnId(4L);       // assuming archive column id is 4
+        archiveTask.setColumnId(4);       // assuming archive column id is 4
 
         return taskRepository.save(archiveTask);
     }
 
 
+
+    // restore task from archive
     @Override
     public Task restoreTaskFromArchive(String taskId) throws TaskNotFoundException
     {
@@ -113,12 +123,14 @@ public class TaskServiceImpl implements TaskService
         boardValidationService.validateColumnId(restoreTask.getBoardId(), restoreTask.getColumnId());
 
         restoreTask.setColumnId(restoreTask.getPreviousColumnId());
-        restoreTask.setPreviousColumnId(null);      // after restore, clean the previous column id
+        restoreTask.setPreviousColumnId(-1);      // after restore, clean the previous column id
 
         return taskRepository.save(restoreTask);
     }
 
 
+
+    // delete task
     @Override
     public Boolean deleteTask(String taskId) throws TaskNotFoundException
     {
@@ -132,8 +144,9 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // move task b/w columns -- to do, in-progress, done, archive
     @Override
-    public Task moveTaskByColumn(String taskId, Long newColumnId) throws TaskNotFoundException
+    public Task moveTaskByColumn(String taskId, int newColumnId) throws TaskNotFoundException
     {
         return taskRepository.findById(taskId)
                 .map(t ->{ t.setColumnId(newColumnId);
@@ -143,6 +156,7 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // count days before due date
     @Override
     public Long countDaysBeforeDue(LocalDate dueDate)
     {

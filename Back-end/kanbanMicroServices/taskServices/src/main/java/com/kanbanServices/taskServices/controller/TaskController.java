@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/task")
+@CrossOrigin(origins = "http://localhost:3001")//allow ui(react) to call api
 public class TaskController
 {
     private final TaskService taskService;
@@ -29,9 +30,10 @@ public class TaskController
         this.requestHelper = requestHelper;
     }
 
-    // method to create a new task - admin secured
+
+    // method to handle creating a new task
     @PostMapping("/createTask")
-    public ResponseEntity<?> handleCreateTask(@RequestBody Task newTask, HttpServletRequest request) throws TaskAlreadyExistsException
+    public ResponseEntity<?> handleCreateTask(@RequestBody Task newTask, HttpServletRequest request)
     {
         try
         {
@@ -56,9 +58,10 @@ public class TaskController
     }
 
 
-    // method to view single task details
+
+    // method to handle getting single task details by id
     @GetMapping("/getTaskById/{taskId}")
-    public ResponseEntity<?> handleGetTaskById(@PathVariable String taskId) throws TaskNotFoundException
+    public ResponseEntity<?> handleGetTaskById(@PathVariable String taskId)
     {
        try
        {
@@ -77,46 +80,12 @@ public class TaskController
 
 
 
-    // method to view all tasks in a board
-    @GetMapping("/getTaskByBoardId/{boardId}")
-    public ResponseEntity<?> handleGetTaskByBoardId(@PathVariable Long boardId)
-    {
-        try
-        {
-            List<Task> foundTaskList = taskService.getTaskByBoardId(boardId);
-            return new ResponseEntity<>(foundTaskList,HttpStatus.OK);
-        }
-        catch (Exception e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    // method to view tasks by column
-    @GetMapping("/getTaskByColumnId/{columnId}")
-    public ResponseEntity<?> handleGetTaskByColumnId(@PathVariable Long columnId)
-    {
-        try
-        {
-            List<Task> foundTaskList = taskService.getTaskByColumnId(columnId);
-            return new ResponseEntity<>(foundTaskList,HttpStatus.OK);
-        }
-        catch (Exception e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-
-    // method to view tasks by priority
+    // method to handle getting tasks by priority
     @GetMapping("/getTaskByPriority/{priority}")
     public ResponseEntity<?> handleGetTaskByPriority(@PathVariable String priority)
     {
         try
         {
-
             List<Task> foundTaskList = taskService.getTaskByPriority(priority);
             return new ResponseEntity<>(foundTaskList,HttpStatus.OK);
         }
@@ -127,9 +96,10 @@ public class TaskController
     }
 
 
-    // method to update task info (title,description,priority,assigned to, due date) - admin secured
+
+    // method to handle updating task info (title,description,priority,assigned to, due date) - admin secured
     @PutMapping("/updateTask/{taskId}")
-    public ResponseEntity<?> handleUpdateTask(@PathVariable String taskId, @RequestBody Task updatedTaskData, HttpServletRequest request) throws TaskNotFoundException
+    public ResponseEntity<?> handleUpdateTask(@PathVariable String taskId, @RequestBody Task updatedTaskData, HttpServletRequest request)
     {
         try
         {
@@ -154,9 +124,9 @@ public class TaskController
     }
 
 
-    // method to archive task
+    // method to handle archive task
     @PutMapping("/archiveTask/{taskId}")
-    public ResponseEntity<?> handleArchiveTask(@PathVariable String taskId) throws TaskNotFoundException
+    public ResponseEntity<?> handleArchiveTask(@PathVariable String taskId)
     {
         try
         {
@@ -175,9 +145,9 @@ public class TaskController
 
 
 
-    // method to restore task
+    // method to handle restoring task from archive
     @PutMapping("/restoreTask/{taskId}")
-    public ResponseEntity<?> handleRestoreTask(@PathVariable String taskId) throws TaskNotFoundException
+    public ResponseEntity<?> handleRestoreTask(@PathVariable String taskId)
     {
         try
         {
@@ -196,9 +166,9 @@ public class TaskController
 
 
 
-    // method to delete task - admin secured
+    // method to handle deleting task
     @DeleteMapping("/deleteTask/{taskId}")
-    public ResponseEntity<?> handleDeleteTask(@PathVariable String taskId, HttpServletRequest request) throws TaskNotFoundException
+    public ResponseEntity<?> handleDeleteTask(@PathVariable String taskId, HttpServletRequest request)
     {
         try
         {
@@ -223,9 +193,10 @@ public class TaskController
     }
 
 
-    // method to move task b/w columns - employee secured
+
+    // method to handle moving task b/w columns - employee secured
     @PutMapping("/moveTaskByColumn/{taskId}/{columnId}")
-    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable Long columnId, HttpServletRequest request) throws TaskNotFoundException
+    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable int columnId, HttpServletRequest request)
     {
         try
         {
@@ -250,7 +221,8 @@ public class TaskController
     }
 
 
-    // method to count days before due date
+
+    // method to handle counting days before due date
     @GetMapping("/noOfDaysBeforeDue/{dueDate}")
     public ResponseEntity<?> handleCountNoOfDaysBeforeDue(@PathVariable LocalDate dueDate)
     {

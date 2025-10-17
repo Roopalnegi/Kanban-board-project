@@ -16,8 +16,8 @@ public class BoardValidationService
     }
 
 
-    // check if board id exist
-    public void validateBoardId (Long boardId)
+    // check board exist before assigning task
+    public void validateBoardId (String boardId)
     {
         Boolean exists = boardServiceClient.checkBoardExists(boardId);
 
@@ -28,12 +28,12 @@ public class BoardValidationService
     }
 
 
-    // check if column exists inside the board
-    public void validateColumnId(Long boardId, Long columnId)
+    // check if column with a given ID belongs to that specific board
+    public void validateColumnId(String boardId, int columnId)
     {
         try
         {
-            boardServiceClient.
+            boardServiceClient.checkColumnExists(boardId,columnId);
         }
         catch (Exception e)
         {

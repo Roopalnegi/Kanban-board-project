@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "BoardServices", url = "http://localhost:8082/api/v1/boards")
 public interface BoardServiceClient
 {
-    // check if board exist or not in board service
-    @GetMapping("/check/{boardId}")
-    Boolean checkBoardExists(@PathVariable Long boardId);
 
-    // check if column exist or not inside a board in board service
-    @GetMapping("/columns/check/{columnId}")
-    Boolean checkColumnExists(@PathVariable Long columnId);
+    // check board exist before assigning task
+    @GetMapping("/checkBoard/{boardId}")
+    Boolean checkBoardExists(@PathVariable String boardId);
+
+
+    // check if column with a given ID belongs to that specific board
+    @GetMapping("{boardId}/checkColumn/{columnId}")
+    Boolean checkColumnExists(@PathVariable String boardId, int columnId);
 }
