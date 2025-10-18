@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "BoardServices", url = "http://localhost:8082/api/v1/boards")
+@FeignClient(name = "BoardServices", url = "http://localhost:8082/api/v1/board")
 public interface BoardServiceClient
 {
 
@@ -15,5 +15,15 @@ public interface BoardServiceClient
 
     // check if column with a given ID belongs to that specific board
     @GetMapping("{boardId}/checkColumn/{columnId}")
-    Boolean checkColumnExists(@PathVariable String boardId, int columnId);
+    Boolean checkColumnExists(@PathVariable String boardId, @PathVariable int columnId);
 }
+
+
+/*
+when task service call board service method via feign client, it didn't send token itself
+
+so, we have to two options to do that -- (i) manually pass the token -- easy to implement for a few calls but have to change both service and controller layer
+                                         (ii) feign interceptor -- automatic send the token but needs more setup / code -- so using this one
+
+
+ */
