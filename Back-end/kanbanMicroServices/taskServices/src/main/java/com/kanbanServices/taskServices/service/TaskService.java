@@ -6,6 +6,7 @@ import com.kanbanServices.taskServices.exception.TaskNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 
 public interface TaskService
@@ -19,20 +20,23 @@ public interface TaskService
     // view tasks by priority
     List<Task> getTaskByPriority(String priority);
 
+    // fetch get all tasks grouped by column in a specific board i.e. Map <columnName, tasks>
+    List<Task> getTasksOfBoardId(String boardId) throws TaskNotFoundException;
+
     // update task info - title, description, priority, assigned To, due Date
     Task updatedTask(String taskId, Task updatedDate) throws TaskNotFoundException;
 
     // archive task
-    public Task archiveTask(String taskId) throws TaskNotFoundException;
+    Task archiveTask(String taskId) throws TaskNotFoundException;
 
     // restore task from archive
-    public Task restoreTaskFromArchive(String taskId) throws TaskNotFoundException;
+    Task restoreTaskFromArchive(String taskId) throws TaskNotFoundException;
 
     // delete task
     Boolean deleteTask(String taskId) throws TaskNotFoundException;
 
     // move task b/w columns -- to do, in-progress, done, archive
-    Task moveTaskByColumn(String taskId, int newColumnId) throws TaskNotFoundException;
+    Task moveTaskByColumn(String taskId, String newColumnId) throws TaskNotFoundException;
 
     // count days before due date
     Long countDaysBeforeDue(LocalDate updatedAt);

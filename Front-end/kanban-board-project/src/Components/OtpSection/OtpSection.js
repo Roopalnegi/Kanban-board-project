@@ -1,5 +1,5 @@
 import { TextField, Button, Box, useTheme } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import { useState } from 'react';
 import axios from 'axios';
 import { useSnackbar } from 'notistack';
@@ -98,7 +98,7 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
                 )
        ):
        (
-          <CheckCircleIcon sx = {{color: 'green', fontSize: 30}} />
+          <VerifiedIcon sx = {{color: 'green', fontSize: 30}} />
        )      
     }
     </Box>

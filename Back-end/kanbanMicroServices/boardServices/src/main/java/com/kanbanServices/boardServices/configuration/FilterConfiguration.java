@@ -1,25 +1,22 @@
 package com.kanbanServices.boardServices.configuration;
 
 import com.kanbanServices.boardServices.filter.JwtFilter;
-import jakarta.servlet.DispatcherType;
-import jakarta.servlet.FilterRegistration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import java.util.*;
 
-@Configuration
-public class FilterConfiguration {
+
+public class FilterConfiguration
+{
+    // since JwtFilter with FeignClient autowired, so register it as
     @Bean
-    public FilterRegistrationBean jwtFilter(){
-        FilterRegistrationBean filterRegistrationBean=new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new JwtFilter());
+    public FilterRegistrationBean<JwtFilter> jwtFilter(JwtFilter filter)
+    {
+        FilterRegistrationBean<JwtFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(filter);
         filterRegistrationBean.addUrlPatterns("/api/v1/board/*");
         return filterRegistrationBean;
-
     }
-
 
 
 }

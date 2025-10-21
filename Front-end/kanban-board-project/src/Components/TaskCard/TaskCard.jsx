@@ -1,14 +1,44 @@
-import { Card, CardHeader, CardContent, CardActions, 
-         Box, Typography, IconButton, 
+import { Card, CardContent,
+         Box, Typography, 
          Tooltip, Avatar, AvatarGroup } from '@mui/material';
+import {useEffect, useState} from 'react';
+import { calculateNoOfDays } from '../../Services/TaskServices';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import DeleteIcon from '@mui/icons-material/Delete';
+import LeftSideSpeedDial from '../LeftSideSpeedDial/LeftSideSpeedDial';
 
-function TaskCard({ task }) 
+function TaskCard({task}) 
 {
+
+   const [daysLeft, setDaysLeft] = useState(null);
+
+   
+   // function to calculate days left to complete task
+   useEffect(() => {
+    
+    const fetchDaysLeft = async () => {
+
+      try
+      {
+        const days = await calculateNoOfDays(task.dueDate);
+        setDaysLeft(days);
+      }
+      catch(error)
+      {
+        console.log("Error in calculating no. of days to complete the task :", error);
+        setDaysLeft("N/A");
+      }
+    };
+
+    fetchDaysLeft();
+
+   },[task.dueDate]);
+
+
+
 
     // function to get badge color based on priority
     const getPriorityColor = (priority) => {
+            if (!priority) return "#75757554"; // fallback color for undefined/null
             switch ((priority).toLowerCase()) 
             {
               case "high": return "#f5584dff"; // orange
@@ -19,6 +49,7 @@ function TaskCard({ task })
     };
 
     
+
     // function to get random rgb code 
     const getRandomRGB = () => {
          const r = Math.floor(Math.random() * 256); // Red: 0-255
@@ -28,17 +59,20 @@ function TaskCard({ task })
     };
 
 
+
   return (
          <Card sx={{ width: 250, borderRadius: 2, boxShadow: 3,      
-                     display: 'flex', flexDirection: 'column',
+                     display: 'flex', flexDirection: 'column',p :2, mb:2
                   }} raised
          >
       
          {/* Card Header */}
-         <CardHeader title={task.title} sx={{ fontWeight: 'bold', fontSize: 18 }} />
-
+         <Typography sx={{ fontWeight: 'bolder', fontSize: 18}} > 
+          {task.title} 
+         </Typography>
+         
          {/* Card Content */}
-         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
 
 
             {/* Task description */}
@@ -58,7 +92,7 @@ function TaskCard({ task })
               {/* Assigned To avatars with AvatarGroup */}
               <AvatarGroup spacing="large">
                 {
-                 task.assignedTo.map(email => (
+                 task.assignedTo?.map(email => (
                                                  <Tooltip key={email} title={email} arrow>
                                                    <Avatar sx={{ bgcolor: getRandomRGB(), width: 28, height: 28, fontSize: 14 }}>
                                                      {email.charAt(0).toUpperCase()}
@@ -92,19 +126,19 @@ function TaskCard({ task })
               
             {/* Days Left */}
               <Typography variant="body2" color="black">
-                {task.daysLeft} days left
+                {daysLeft} days left
               </Typography>
             </Box>
 
 
         </CardContent>
 
-        {/* Card Actions: Delete icon */}
-        <CardActions sx={{ justifyContent: 'flex-end', paddingRight: 1 }}>
-          <IconButton size="small" color="error">
-            <DeleteIcon />
-          </IconButton>
-        </CardActions>
+        {/* Helper Tools */}
+        <Box sx = {{textAlign: "right", m:1}}>
+            <LeftSideSpeedDial />
+        </Box>
+                  
+             
     
         </Card>
         );

@@ -32,6 +32,14 @@ public class JwtFilter extends GenericFilterBean
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        // Allow preflight requests to pass through
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()))
+        {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
+
         // Step 1: Get Authorization header
         String authHeader = request.getHeader("Authorization");
 

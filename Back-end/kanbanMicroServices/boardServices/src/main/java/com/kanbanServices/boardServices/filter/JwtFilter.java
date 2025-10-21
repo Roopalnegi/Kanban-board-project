@@ -1,75 +1,100 @@
 package com.kanbanServices.boardServices.filter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.kanbanServices.boardServices.proxy.UserAuthClient;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
+@Component
+public class JwtFilter extends GenericFilterBean
+{
+    private final UserAuthClient userAuthClient;
 
-public class JwtFilter extends GenericFilterBean {
+    @Autowired
+    public JwtFilter(UserAuthClient userAuthClient)
+    {
+        this.userAuthClient = userAuthClient;
+    }
 
-    private static final String SECRET_KEY = "kabanprojectsecretkey@123";
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
+    {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        response.setContentType("application/json");
+
+
+        // Allow preflight requests to pass through
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()))
+        {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
 
         // Step 1: Get Authorization header
         String authHeader = request.getHeader("Authorization");
 
         // Step 2: Check for Bearer token
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Missing Token\"}");
             return;
         }
 
-        // Step 3: Extract JWT token
-        String token = authHeader.substring(7);
 
-        try {
-            // Step 4: Validate token
-
-            Claims claims = Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            // Step 5: Extract user info from claims
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
-
-            // Step 6: Pass data to request
-            request.setAttribute("username", username);
-            request.setAttribute("role", role);
-
-            // Step 7: Continue with filter chain
+        try
+        {
+            //validate token by calling userAuthenticationService by using feign client
+            Map<String,String>userData=userAuthClient.validateToken(authHeader);
+            //attach user info in the request
+            request.setAttribute("email",userData.get("email"));
+            request.setAttribute("role",userData.get("role"));
+            // continue with filter chain
             filterChain.doFilter(servletRequest, servletResponse);
 
-        } catch (ExpiredJwtException e) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
-        } catch (JwtException e) {
+        }
+        catch (JwtException e)
+        {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " + e.getMessage());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing JWT: " + e.getMessage());
         }
     }
 
-    private void sendError(HttpServletResponse response, int status, String message) throws IOException {
+    // helper method to send message whenever there is error like missing token, feign failure etc.
+    private void sendError(HttpServletResponse response, int status, String message) throws IOException
+    {
         response.setStatus(status);
-        try (PrintWriter writer = response.getWriter()) {
-            writer.write("{\"error\": \"" + message + "\"}");
-            writer.flush();
-        }
+        response.setContentType("application/json");                // help client to interpret the response correctly as json
+
+        PrintWriter writer = response.getWriter();
+        writer.write("{\"error\": \"" + message + "\"}");
+        writer.flush();           // force response to be sent immediately to the client
     }
 }
+
+
+/*
+getWriter() -- a method httpServletResponse class
+            -- give "PrintWriter" object that send plain text (JSON) directly into http response body (to the client)
+
+response.getWriter().write("{  \"error\" : \"Invalid token\"  }");    ----> in frontend it will be ----> {"error" : "Invalid token"}
+     |-------- instead of blank paper or generic 500 error
+
+
+
+
+
+ */

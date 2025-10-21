@@ -1,6 +1,7 @@
 package com.kanbanServices.taskServices.proxy;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -14,8 +15,14 @@ public interface BoardServiceClient
 
 
     // check if column with a given ID belongs to that specific board
-    @GetMapping("{boardId}/checkColumn/{columnId}")
-    Boolean checkColumnExists(@PathVariable String boardId, @PathVariable int columnId);
+    @GetMapping("/{boardId}/checkColumn/{columnId}")
+    Boolean checkColumnExists(@PathVariable String boardId, @PathVariable String columnId);
+
+    // fetch archive column fetch
+    @GetMapping("/calculateArchiveColumnId/{boardId}")
+    String calculateArchiveColumnId(@PathVariable String boardId);
+
+
 }
 
 

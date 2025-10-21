@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService
@@ -64,6 +67,18 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // fetch get all tasks grouped by column in a specific board i.e. Map <columnName, tasks>
+    @Override
+    public List<Task> getTasksOfBoardId(String boardId) throws TaskNotFoundException
+    {
+        // validate board first
+        boardValidationService.validateBoardId(boardId);
+
+        // if found. get all matching tasks
+        return taskRepository.findByBoardId(boardId);
+
+    }
+
 
     // update task info - title, description, priority, assigned To, due Date
     @Override
@@ -92,20 +107,25 @@ public class TaskServiceImpl implements TaskService
     public Task archiveTask(String taskId) throws TaskNotFoundException
     {
         // check if task exist or not
-        Task archiveTask = taskRepository.findByTaskId(taskId)
+        Task task = taskRepository.findByTaskId(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
 
         // validate board and column first
-        boardValidationService.validateBoardId(archiveTask.getBoardId());
-        boardValidationService.validateColumnId(archiveTask.getBoardId(), archiveTask.getColumnId());
+        boardValidationService.validateBoardId(task.getBoardId());
+        boardValidationService.validateColumnId(task.getBoardId(), task.getColumnId());
 
         // if exist , then store current column id into previous column id variable
-        archiveTask.setPreviousColumnId(archiveTask.getColumnId());
+        task.setPreviousColumnId(task.getColumnId());
 
-        // updated now column id to archive column i.e. 4
-        archiveTask.setColumnId(4);       // assuming archive column id is 4
+        // fetch archive column id -- always at last
+        String archiveColumnId = boardValidationService.calculateArchiveColumnId(task.getBoardId());
 
-        return taskRepository.save(archiveTask);
+        // update task to move into the archive column
+        task.setPreviousColumnId(task.getColumnId());
+        task.setColumnId(archiveColumnId);
+
+        return taskRepository.save(task);
+
     }
 
 
@@ -123,7 +143,7 @@ public class TaskServiceImpl implements TaskService
         boardValidationService.validateColumnId(restoreTask.getBoardId(), restoreTask.getColumnId());
 
         restoreTask.setColumnId(restoreTask.getPreviousColumnId());
-        restoreTask.setPreviousColumnId(-1);      // after restore, clean the previous column id
+        restoreTask.setPreviousColumnId("null");      // after restore, clean the previous column id
 
         return taskRepository.save(restoreTask);
     }
@@ -146,7 +166,7 @@ public class TaskServiceImpl implements TaskService
 
     // move task b/w columns -- to do, in-progress, done, archive
     @Override
-    public Task moveTaskByColumn(String taskId, int newColumnId) throws TaskNotFoundException
+    public Task moveTaskByColumn(String taskId, String newColumnId) throws TaskNotFoundException
     {
         return taskRepository.findById(taskId)
                 .map(t ->{ t.setColumnId(newColumnId);

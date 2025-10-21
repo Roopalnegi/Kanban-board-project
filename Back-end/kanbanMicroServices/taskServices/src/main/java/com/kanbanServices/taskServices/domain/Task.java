@@ -17,8 +17,8 @@ public class Task
     private String taskId;                     // MongoDB document ID
     private String title;                  // name of the task
     private String task_description;       // detailed info about task
-    private int columnId;                 // reference to which Kanban column
-    private int previousColumnId;         // reference to which restore task from archive column
+    private String columnId;                 // reference to which Kanban column
+    private String previousColumnId;         // reference to which restore task from archive column
     private String boardId;                  // reference to which board (project / team)
     private String priority;               // low, high, medium
     private List<String> assignedTo;             // employee name     // change to list
@@ -37,7 +37,7 @@ public class Task
 
 
     // parameterized constructor
-    public Task(String taskId, String title, String task_description, int columnId, int previousColumnId, String boardId, String priority, List<String> assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
+    public Task(String taskId, String title, String task_description, String columnId, String previousColumnId, String boardId, String priority, List<String> assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
     {
         this.taskId = taskId;
         this.title = title;
@@ -61,10 +61,10 @@ public class Task
     public void setTitle(String title) {this.title = title;}
     public String getTask_description() {return task_description;}
     public void setTask_description(String task_description) {this.task_description = task_description;}
-    public int getColumnId() {return columnId;}
-    public void setColumnId(int columnId) {this.columnId = columnId;}
-    public int getPreviousColumnId() {return previousColumnId;}
-    public void setPreviousColumnId(int previousColumnId) {this.previousColumnId = previousColumnId;}
+    public String getColumnId() {return columnId;}
+    public void setColumnId(String columnId) {this.columnId = columnId;}
+    public String getPreviousColumnId() {return previousColumnId;}
+    public void setPreviousColumnId(String previousColumnId) {this.previousColumnId = previousColumnId;}
     public String getBoardId() {return boardId;}
     public void setBoardId(String boardId) {this.boardId = boardId;}
     public String getPriority() {return priority;}

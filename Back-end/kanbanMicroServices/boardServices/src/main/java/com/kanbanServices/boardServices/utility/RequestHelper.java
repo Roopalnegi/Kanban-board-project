@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.AccessDeniedException;
 @Component
-public class RequestHelper {
+public class RequestHelper
+{
     public String getRole(HttpServletRequest request)
     {
-        String role = (String) request.getAttribute("role");
-        return role;
+        return (String) request.getAttribute("role");
     }
 
     // check if user is admin

@@ -2,7 +2,7 @@ package com.kanbanServices.boardServices.controller;
 
 import com.kanbanServices.boardServices.domain.Board;
 import com.kanbanServices.boardServices.domain.Column;
-import com.kanbanServices.boardServices.execption.BoardAlredyExistsException;
+import com.kanbanServices.boardServices.execption.BoardAlreadyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
 import com.kanbanServices.boardServices.execption.ColumnAlreadyExistsException;
 import com.kanbanServices.boardServices.execption.ColumnNotFoundException;
@@ -19,146 +19,320 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/board")
-@CrossOrigin(origins = "http://localhost:3001")//allow ui(react) to call api
-public class BoardController {
+public class BoardController
+{
 
     private final BoardService boardService;
     private final RequestHelper requestHelper;
 
     @Autowired
-    public BoardController(BoardService boardService, RequestHelper requestHelper) {
+    public BoardController(BoardService boardService, RequestHelper requestHelper)
+    {
         this.boardService = boardService;
         this.requestHelper=requestHelper;
     }
 
-    /*
-     * Create a new board
-     * POST http://localhost:8080/api/v1/board
-     */
 
+    // ---------------- board related --------------------
+
+    // method handle creating new board
+    // will have same post url - http://localhost:8082/api/v1/board
     @PostMapping
-    public ResponseEntity<?>createBoard(@RequestBody Board board, HttpServletRequest request){
-        try {
+    public ResponseEntity<?> createBoard (@RequestBody Board board, HttpServletRequest request)
+    {
+        try
+        {
+            // check if user is admin
             requestHelper.checkAdminRole(request);
-            Board created=boardService.createBoard(board);
+            Board created = boardService.createBoard(board);
+            System.out.println("Check create board :" + created);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
-        }catch (AccessDeniedException e){
+        }
+        catch (AccessDeniedException e)
+        {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.FORBIDDEN);
         }
-        catch (BoardAlredyExistsException e) {
+        catch (BoardAlreadyExistsException e)
+        {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.CONFLICT);
         }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    /*
-     * Get a board by ID
-     * GET http://localhost:8080/api/v1/board/getboard/{boardId}
-     */
-    @GetMapping("/getboard/{boardId}")
-    public ResponseEntity<?>getBoardById(@PathVariable int boardId){
-        try {
+
+
+
+    // method to handle getting specific board by id
+    @GetMapping("/getBoard/{boardId}")
+    public ResponseEntity<?>getBoardById(@PathVariable String boardId)
+    {
+        try
+        {
             Board board=boardService.getBoardById(boardId);
             return new ResponseEntity<>(board,HttpStatus.OK);
-
-        }catch (BoardNotFoundExecption execption){
-            return new ResponseEntity<>(execption.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    /*
-     * Get all boards
-     * GET http://localhost:8080/api/v1/board/getallboards
-     */
-    @GetMapping("/getallboards")
-    public ResponseEntity<List<Board>> getAllBoards() {
-        List<Board> boards = boardService.getAllBoard();
-        return new ResponseEntity<>(boards, HttpStatus.OK);
+
+
+    // method to handle getting all boards info
+    @GetMapping("/getAllBoards")
+    public ResponseEntity<?> getAllBoards()
+    {
+        try
+        {
+            List<Board> boards = boardService.getAllBoard();
+            return new ResponseEntity<>(boards, HttpStatus.OK);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /*
-     * Delete a board by ID
-     * DELETE http://localhost:8080/api/v1/board/deleteboard/{boardId}
-     */
-    @DeleteMapping("/deleteboard/{boardId}")
-    public ResponseEntity<?> deleteBoard(@PathVariable int boardId) {
-        try {
+
+    // method to handle deleting board by id
+    @DeleteMapping("/deleteBoard/{boardId}")
+    public ResponseEntity<?> deleteBoard(@PathVariable String  boardId,HttpServletRequest request)
+    {
+        try
+        {
+            // check if user is admin
+            requestHelper.checkAdminRole(request);
             boolean deleted = boardService.deleteBoard(boardId);
             return new ResponseEntity<>("Board deleted successfully", HttpStatus.OK);
-        } catch (BoardNotFoundExecption e) {
+        }
+        catch (AccessDeniedException e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.FORBIDDEN);
+        }
+        catch (BoardNotFoundExecption e)
+        {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-    }
-        /*
-        * Create a column inside a board
-         * POST http://localhost:8080/api/v1/board/{boardId}/createcolumn
-         * */
-    @PostMapping("/{boardId}/createcolumn")
-    public ResponseEntity<Board>createColumn(@PathVariable int boardId, @RequestBody Column column){
-        try {
-            Board uppdatedBoard=boardService.createBoardColumn(boardId,column);
-            return new ResponseEntity<>(uppdatedBoard,HttpStatus.CREATED);
-        }catch (BoardNotFoundExecption e){
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-        }catch (ColumnAlreadyExistsException e){
-            return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    /*
-     * Get a column by ID
-     * GET http://localhost:8080/api/v1/board/getcolumn/{columnId}
-     */
-    @GetMapping("/getcolumn/{columnId}")
-    public ResponseEntity<Column> getColumnById(@PathVariable int columnId) {
-        try {
+
+
+    // method to handle updating board details
+    @PutMapping("/updateBoard/{boardId}")
+    public ResponseEntity<?>updateBoard(@PathVariable String boardId,@RequestBody Board updateBoardData)
+    {
+        try
+        {
+            Board updatedBoard=boardService.updateBoard(boardId,updateBoardData);
+            return new ResponseEntity<>(updatedBoard,HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+    // ----------- column related ------------------
+
+
+
+    // method to handle creating a board inside the column
+    @PostMapping("/{boardId}/createColumn")
+    public ResponseEntity<?> createColumn (@PathVariable String  boardId, @RequestBody Column column)
+    {
+        try
+        {
+            Column addedColumn = boardService.createBoardColumn(boardId,column);
+            return new ResponseEntity<>(addedColumn,HttpStatus.CREATED);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch (ColumnAlreadyExistsException e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.CONFLICT);
+        } catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle getting specific column by id
+    @GetMapping("/getColumn/{columnId}")
+    public ResponseEntity<?> getColumnById(@PathVariable String columnId)
+    {
+        try
+        {
             Column column = boardService.getColumnById(columnId);
             return new ResponseEntity<>(column, HttpStatus.OK);
-        } catch (ColumnNotFoundException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    /*
-     * Get a column by name
-     * GET http://localhost:8080/api/v1/board/getcolumnbyname/{columnName}
-     */
-    @GetMapping("/getcolumnbyname/{columnName}")
-    public ResponseEntity<Column> getColumnByName(@PathVariable String columnName) {
-        try {
+
+
+    // method to handle updating only column name
+    @PutMapping("/{boardId}/updateColumnName/{columnId}")
+    public ResponseEntity<?> updateColumnName(@PathVariable String boardId, @PathVariable String columnId, @RequestBody String columnNewName)
+    {
+        try
+        {
+            Column updatedColumn = boardService.updateBoardColumnName(boardId,columnId,columnNewName);
+            return new ResponseEntity<>(updatedColumn, HttpStatus.OK);
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle getting column by name
+    @GetMapping("/getColumnByName/{columnName}")
+    public ResponseEntity<?> getColumnByName(@PathVariable String columnName)
+    {
+        try
+        {
             Column column = boardService.getColumnByName(columnName);
             return new ResponseEntity<>(column, HttpStatus.OK);
-        } catch (ColumnNotFoundException e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    /*
-     * Get all columns by position/order in a board
-     * GET http://localhost:8080/api/v1/board/{boardId}/getcolumnsbyposition/{position}
-     */
-    @GetMapping("/{boardId}/getcolumnsbyposition/{position}")
-    public ResponseEntity<List<Column>> getColumnsByPosition(
-            @PathVariable int boardId,
-            @PathVariable int position
-    ) {
-        List<Column> columns = boardService.getColumnsByPosition(boardId, position);
-        return new ResponseEntity<>(columns, HttpStatus.OK);
+
+
+    //method to handle deleting column from a board
+    @DeleteMapping("/{boardId}/deleteColumn/{columnId}")
+    public ResponseEntity<?> deleteBoardColumn(@PathVariable String boardId, @PathVariable String columnId)
+    {
+        try
+        {
+            boolean isDeleted = boardService.deleteBoardColumn(boardId, columnId);
+            if (isDeleted)
+            {
+                return new ResponseEntity<>("Column deleted successfully.", HttpStatus.OK);
+            }
+            else
+            {
+                return new ResponseEntity<>("Column could not be deleted.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage() + columnId, HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    // ===== Optional Checks ===== //
 
-    /*
-     * Check if a board exists
-     * GET http://localhost:8080/api/v1/board/checkboard/{boardId}
-     */
-    @GetMapping("/checkboard/{boardId}")
-    public ResponseEntity<Boolean> checkBoardExists(@PathVariable int boardId) {
-        return new ResponseEntity<>(boardService.checkBoardExist(boardId), HttpStatus.OK);
+
+
+    // ----------- task service helpers ------------
+
+    // method to handle checking board exist before assigning a task
+    @GetMapping("/checkBoard/{boardId}")
+    public ResponseEntity<?> checkBoardExists(@PathVariable String  boardId)
+    {
+        try
+        {
+            return new ResponseEntity<>(boardService.checkBoardExistForTask(boardId), HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    /*
-     * Check if a column exists (in any board)
-     * GET http://localhost:8080/api/v1/board/checkcolumn/{columnId}
-     */
-    @GetMapping("/checkcolumn/{columnId}")
-    public ResponseEntity<Boolean> checkColumnExists(@PathVariable int columnId) {
-        return new ResponseEntity<>(boardService.checkColumnExists(columnId), HttpStatus.OK);
+
+
+    // method to handle checking if column with a given ID belongs to that specific board
+    @GetMapping("{boardId}/checkColumn/{columnId}")
+    public ResponseEntity<?> checkColumnExists(@PathVariable String boardId, @PathVariable String columnId)
+    {
+        try
+        {
+            return new ResponseEntity<>(boardService.columnExistsInBoardForTask(boardId,columnId), HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+
+    // method to handle fetch archive column id
+    @GetMapping("/calculateArchiveColumnId/{boardId}")
+    public ResponseEntity<?> calculateArchiveColumnId(@PathVariable String boardId)
+    {
+        try
+        {
+            String archivePosition = boardService.calculateArchiveColumnId(boardId);
+            return new ResponseEntity<>(archivePosition, HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 

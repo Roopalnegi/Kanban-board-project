@@ -7,6 +7,7 @@
   position: fixed;          /* to fixed position of header*/
   top: 0;                 /* keep header at the top */
   width: 100%;
+  z-index: 1200;        /* ensure header sits above all cards */
 }
 
 

@@ -14,14 +14,14 @@ function HomePage()
             {/* Left side */}
             <Box component = "img"
                  src = "./landing-page-image.png" alt = "home-page" 
-                 sx={{width: { xs: "100%", sm: "400px", md: "700px" },
+                 sx={{width: { xs: "100%", sm: "300px", md: "500px" },
                       height: "auto"}}
             />
 
             {/*Right side */}
             <Box className = {styles.boxContainer}>
 
-              <Typography variant="h3" sx = {{fontWeight: 900, mb: 2,textAlign: {sm:"center",md: "right"} }}>
+              <Typography variant="h3" sx = {{fontWeight: 800, mb: 2,textAlign: {sm:"center",md: "right"} }}>
                  Organize Chaos, Visualize Progress
               </Typography>
 

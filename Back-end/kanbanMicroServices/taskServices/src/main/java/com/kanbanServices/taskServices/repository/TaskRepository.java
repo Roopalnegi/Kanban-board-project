@@ -17,9 +17,6 @@ public interface TaskRepository extends MongoRepository<Task,String>
     // find task by id
     Optional<Task> findByTaskId(String taskId);
 
-    // find task by column id
-    List<Task> findByColumnId(int columnId);
-
     // find task by board id
     List<Task> findByBoardId(String boardId);
 

@@ -1,0 +1,20 @@
+html, body, #root
+{
+    height: 100%;
+    margin: 0;
+}
+
+.AppLayout
+{
+    display: flex;           /* stack header, main, footer vertically */
+    flex-direction: column;
+    min-height: 100vh;         /* ensure footer remain at bottom even if content i short*/
+}
+
+.AppMain
+{
+    flex-grow: 1;         /* fill available space b/w header and footer*/
+    background-color: #FFFFFF;
+    padding: 100px 80px 40px;    /* add top padding to compensate for fixed header */
+    overflow: visible;         /* allow whole page (not just main) to scroll*/
+}

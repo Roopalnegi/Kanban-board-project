@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/task")
-@CrossOrigin(origins = "http://localhost:3001")//allow ui(react) to call api
 public class TaskController
 {
     private final TaskService taskService;
@@ -73,6 +72,7 @@ public class TaskController
            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
        }
        catch (Exception e)
+
        {
            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
        }
@@ -92,6 +92,27 @@ public class TaskController
         catch (Exception e)
         {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    // method to handle fetching all tasks for a particular board
+    @GetMapping("/getAllTasksOfBoardId/{boardId}")
+    public ResponseEntity<?> handleGetAllTasksOfBoardId(@PathVariable String boardId)
+    {
+        try
+        {
+            List<Task> matchTaskList = taskService.getTasksOfBoardId(boardId);
+            return new ResponseEntity<>(matchTaskList, HttpStatus.OK);
+        }
+        catch (TaskNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -196,7 +217,7 @@ public class TaskController
 
     // method to handle moving task b/w columns - employee secured
     @PutMapping("/moveTaskByColumn/{taskId}/{columnId}")
-    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable int columnId, HttpServletRequest request)
+    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable String columnId, HttpServletRequest request)
     {
         try
         {

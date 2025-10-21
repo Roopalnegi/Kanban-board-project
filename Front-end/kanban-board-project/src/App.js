@@ -7,13 +7,12 @@ import HomePage from "./Pages/HomePage/HomePage.jsx";
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard.jsx";
 import EmployeeDashboard from "./Pages/EmployeeDashboard/EmployeeDashboard.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
+import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
 
-import TaskCard from "./Components/TaskCard/TaskCard.jsx";
-
-import {Box} from '@mui/material';
 
 import {Routes, Route} from 'react-router-dom';
 import {useState} from 'react';
+import "./App.css";
 
 
 function App() 
@@ -21,31 +20,15 @@ function App()
   const[loginStatus, setLoginStatus] = useState(false);
   const[userData, setUserData] = useState(null);
 
-  // temperoray task object
-  const task = {
-  taskId: "45E3",
-  title: "Sample Task Card",
-  task_description: "This is a sample task card description just for demonstration purposes",
-  priority: "high",
-  assignedTo: ["sam@gmail.com", "alice@gmail.com", 'roopalnegi147@gmail.com', 'palim@gmailcom'],
-  dueDate: "2025-10-10",
-  daysLeft: 5
-};
-
 
    return(
-         <>
+         <div className = "AppLayout">
          
            <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} userData={userData} />  
             
             {/* Main content area between header & footer */} 
-           <Box component="main" sx={{ minHeight: "40vh", 
-                                       pt: "70px", // padding top = header height
-                                       pb: "70px", // padding bottom = footer height
-                                       backgroundColor: "#FFFFFF",
-                                    }}
-           >
-
+           
+            <main className = "AppMain">
              <Routes>
                <Route path = "/" element = {<HomePage/>} />
                <Route path = "/login" element = {<LoginForm setLoginStatus={setLoginStatus} setUserData={setUserData}/>} />
@@ -66,15 +49,13 @@ function App()
                                  </ProtectedRoute> }
                 />
 
-               
+                <Route path = "/board/:boardId" element = {<BoardDashboard/>} />
 
-               <Route path = "/taskcard" element= {<TaskCard task = {task} />} />
              </Routes>
-
-          </Box>
-
+            </main>
+          
         <Footer/> 
-         </>
+         </div>
          );
   
 }

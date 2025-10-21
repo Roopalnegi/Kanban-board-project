@@ -1,8 +1,11 @@
 package com.kanbanServices.taskServices.service;
 
+import com.kanbanServices.taskServices.exception.TaskNotFoundException;
 import com.kanbanServices.taskServices.proxy.BoardServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class BoardValidationService
@@ -29,7 +32,7 @@ public class BoardValidationService
 
 
     // check if column with a given ID belongs to that specific board
-    public void validateColumnId(String boardId, int columnId)
+    public void validateColumnId(String boardId, String columnId)
     {
         try
         {
@@ -41,5 +44,18 @@ public class BoardValidationService
         }
     }
 
+
+    // fetch archive column id
+    public String calculateArchiveColumnId(@PathVariable String boardId)
+    {
+        try
+        {
+            return boardServiceClient.calculateArchiveColumnId(boardId);
+        }
+        catch(Exception e)
+        {
+            throw new IllegalArgumentException("Failed to fetch archive column position for board ID: " + boardId + ". " + e.getMessage());
+        }
+    }
 
 }
