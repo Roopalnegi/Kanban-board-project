@@ -18,9 +18,16 @@ public interface BoardServiceClient
     @GetMapping("/{boardId}/checkColumn/{columnId}")
     Boolean checkColumnExists(@PathVariable String boardId, @PathVariable String columnId);
 
-    // fetch archive column fetch
+
+
+    // fetch archive column id
     @GetMapping("/calculateArchiveColumnId/{boardId}")
     String calculateArchiveColumnId(@PathVariable String boardId);
+
+
+    // fetch done column id
+    @GetMapping("/calculateDoneColumnId/{boardId}")
+    String calculateDoneColumnId(@PathVariable String boardId);
 
 
 }

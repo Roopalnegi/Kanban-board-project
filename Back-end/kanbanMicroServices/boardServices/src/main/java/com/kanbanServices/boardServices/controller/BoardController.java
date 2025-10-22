@@ -335,6 +335,26 @@ public class BoardController
 
 
 
+    // method to handle fetch done column id
+    @GetMapping("/calculateDoneColumnId/{boardId}")
+    public ResponseEntity<?> calculateDoneColumnId(@PathVariable String boardId)
+    {
+        try
+        {
+            String donePosition = boardService.calculateDoneColumnId(boardId);
+            return new ResponseEntity<>(donePosition, HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
 

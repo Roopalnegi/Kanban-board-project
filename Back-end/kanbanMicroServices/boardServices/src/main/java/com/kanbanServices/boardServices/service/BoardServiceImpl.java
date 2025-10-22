@@ -342,6 +342,28 @@ public class BoardServiceImpl implements BoardService
                                  .orElseThrow(() -> new ColumnNotFoundException("Archive column missing"));
     }
 
+
+    // get column id of column that is counted as "Done"
+    // but the problem is user can rename the columns, so not sure which column represent done or other words which represent done like finished, close etc.
+    // so go for middle solution -- whichever column name is either done, completed, finish, close those column can be count as done part hence fetch column id
+    @Override
+    public String calculateDoneColumnId(String boardId) throws BoardNotFoundExecption,ColumnNotFoundException
+    {
+        // check if board exist
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundExecption("Board not found with ID: " + boardId));
+
+        // possible names representing "done" word in kanban board
+        List<String> possibleWords = List.of("done", "completed", "finished", "closed");
+
+        return board.getColumns().stream()
+                                 .filter(c -> possibleWords.contains(c.getColumnName().toLowerCase()))
+                .map(Column::getColumnId)
+                .findFirst()
+                .orElseThrow(() -> new ColumnNotFoundException("Cannot Pin Point Any Column with following words - done, completed, finished, closed."));
+    }
+
+
 }
 
 

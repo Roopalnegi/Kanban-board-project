@@ -13,7 +13,6 @@ const getBoardDetails = async (boardId) => {
 // fetching all baords 
 const getAllBoards = async () => {
     const response = await axiosInstance.get(`${baseURL}/getAllBoards`);
-    console.log("all boards : ", response.data);
     return response.data;
 };
 

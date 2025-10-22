@@ -65,6 +65,10 @@ public interface BoardService
 
     // archive column would always be permanent and at last
     String calculateArchiveColumnId(String boardId) throws BoardNotFoundExecption;
+
+    // get column id of column that is counted as "Done"
+    String calculateDoneColumnId(String boardId) throws BoardNotFoundExecption;
+
 }
 
 

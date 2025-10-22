@@ -8,7 +8,10 @@ import com.kanbanServices.userAuthenticationServices.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -58,6 +61,21 @@ public class UserServiceImpl implements IUserService
     public Optional<User> findByEmail(String email)
     {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Map<Long, String> fetchAllEmployees()
+    {
+        List<User> users = userRepository.findAll();
+
+        // map will look like this { 101=John Doe - john@example.com}
+        Map<Long, String> employeeDetails = users.stream()
+                .filter(u -> "employee".equalsIgnoreCase(u.getRole()))
+                .collect(Collectors.toMap(User::getUserId,                        // key -- userID
+                         u -> u.getUsername() + "-" + u.getEmail()));       // value -- username - email
+
+
+        return employeeDetails;
     }
 
 

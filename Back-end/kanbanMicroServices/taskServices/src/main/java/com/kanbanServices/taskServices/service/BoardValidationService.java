@@ -58,4 +58,20 @@ public class BoardValidationService
         }
     }
 
+
+    // fetch done column id
+    public String calculateDoneColumnId(@PathVariable String boardId)
+    {
+        try
+        {
+            return boardServiceClient.calculateDoneColumnId(boardId);
+        }
+        catch(Exception e)
+        {
+            throw new IllegalArgumentException("Failed to fetch done column position for board ID: " + boardId + ". " + e.getMessage());
+        }
+    }
+
+
+
 }

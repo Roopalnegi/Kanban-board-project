@@ -211,6 +211,22 @@ public class UserController
         }
     }
 
+
+    // method to fetch all employee based user for assigned To property of task
+    @GetMapping("/fetchAllEmployeeDetails")
+    public ResponseEntity<?> fetchAllEmployeeDetails()
+    {
+        try
+        {
+           Map<Long,String> employeeDetails = userService.fetchAllEmployees();
+           return new ResponseEntity<>(employeeDetails, HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
 
 

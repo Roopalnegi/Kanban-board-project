@@ -21,7 +21,7 @@ public class Task
     private String previousColumnId;         // reference to which restore task from archive column
     private String boardId;                  // reference to which board (project / team)
     private String priority;               // low, high, medium
-    private List<String> assignedTo;             // employee name     // change to list
+    private List<String> assignedTo;             // employee email id
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;         // deadline for the task
     @CreatedDate

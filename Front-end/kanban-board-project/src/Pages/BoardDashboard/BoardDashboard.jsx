@@ -1,17 +1,19 @@
 import {useState, useEffect} from 'react';
-import {Grid,Typography,Stack, CircularProgress} from '@mui/material';
-import InlineEditableBoardInfo from '../../Components/Board2/EditBoardInfo';
+import {Typography,Stack, CircularProgress} from '@mui/material';
+import InlineEditableBoardInfo from '../../Components/Board/InlineEditBoardInfo';
 import ColumnCard from '../../Components/ColumnCard/ColumnCard';
-import { getBoardDetails } from '../../Services/BoardServices';
+import { getBoardDetails, deleteBoard } from '../../Services/BoardServices';
 import { getAllTasksOfBoardId } from '../../Services/TaskServices';
 import { addColumnToBoard } from '../../Services/ColumnServices';
 import { enqueueSnackbar } from 'notistack';
-import { useParams } from 'react-router-dom';
-import { addColumnImg, deleteImg, helpImg } from '../../Components/IconComponent/Icon';
-import LeftSideSpeedDial from '../../Components/LeftSideSpeedDial/LeftSideSpeedDial';
+import { useParams, useNavigate } from 'react-router-dom';
+import { addColumnImg,helpImg,deleteBoardImg  } from '../../Components/IconComponent/Icon';
+import SpeedDialLayout from '../../Components/SpeedDialLayout/SpeedDialLayout';
 
 function BoardDashboard()
 {
+
+   const navigate = useNavigate();
 
    const {boardId} = useParams();
 
@@ -21,6 +23,7 @@ function BoardDashboard()
 
    const [loading, setLoading] = useState(true);       // track data loading status 
    
+
    // fetch board and its tasks
    useEffect(() => {
      
@@ -42,10 +45,7 @@ function BoardDashboard()
         }
         catch (error) 
         {
-            enqueueSnackbar(error?.message || "Failed to fetch board or tasks", { variant: "error",
-                                                                         autoHideDuration: 2000,
-                                                                         anchorOrigin: { vertical: "top", horizontal: "right" },
-                                                                       });
+            enqueueSnackbar(error?.message || "Failed to fetch board or tasks", { variant: "error"});
         }
         
     };    
@@ -53,6 +53,7 @@ function BoardDashboard()
      fetchBoard();
 
    },[boardId]);
+
 
 
    // function to add column to a board
@@ -75,16 +76,39 @@ function BoardDashboard()
    };
 
 
-    // update column name in board state
+     const handleDeleteBoard = async (boardId) => {
+     try
+     {
+       const response = await deleteBoard(boardId);
+       enqueueSnackbar(response || "Board Deleted Successfully !", {variant: "success"});    
+       
+       navigate("/admin-dashboard");                                                                                                          
+     }
+     catch(error)
+     {
+      enqueueSnackbar(error?.message, {variant: "error"});
+     }
+   };
+
+
+
+    // update column name in board state (app lift state)
     const handleColumnNameChange = (columnId, newName) => {
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col =>
-        col.columnId === columnId ? { ...col, columnName: newName } : col
-      ),
-    }));
+    setBoard(prev => ({ ...prev,
+                        columns: prev.columns.map(col => col.columnId === columnId ? { ...col, columnName: newName } : col),
+                     }));
+    };
+
+    
+     // update column name in board state (app lift state)
+    const handleColumnDelete = (columnId) => {
+    setBoard(prev => ({ ...prev,
+                        columns: prev.columns.filter(col => col.columnId !== columnId)
+                     }));
   };
 
+
+   
 
    // opeartions / actions perform on board
    const actions = [
@@ -93,19 +117,20 @@ function BoardDashboard()
        name: 'Add Column',
        onClick : handleAddColumn, 
      },
-     { 
-       src : deleteImg, 
-       name: 'Delete Column',
-       onClick : () => alert("delete column clicked"),
+    { 
+       src : deleteBoardImg, 
+       name: 'Delete Board',
+       onClick : () => handleDeleteBoard(boardId),
     },
     { 
      src : helpImg, 
      name: 'Help',
-     onClick : () => alert("help clicked"),
+     onClick : () => alert("Help Clicked !"),
     },
    ];
 
   
+
    // custom message if baord data or task data is failed to fetch
    if(!board || loading)
    {
@@ -122,25 +147,27 @@ function BoardDashboard()
               <InlineEditableBoardInfo board = {board} />
     
               {/* Helper Tools */}
-              <LeftSideSpeedDial actions={actions}/>
+              <SpeedDialLayout actions = {actions} direction = "left"/>
           </Stack>
           
           
-     
-          <Grid container spacing = {7} sx={{ my: 2, alignItems: 'flex-start' }}>
+          {/* overflowX -- allow horizontally acrolling if column overflow */}
+          <div style={{ display: "flex", gap: "40px", overflowX: "auto", padding: "16px 0"}}>
               
              {/* filter tasks by columnid for each column card */}
              {
-                board.columns?.map( col => (<Grid item key = {col.columnId} xs = {12} md = {4}>
-                                                <ColumnCard boardId = {boardId}
+                board.columns?.map( col => (
+                                                <ColumnCard key = {col.columnId}
+                                                            boardId = {boardId}
                                                             column = {col} 
                                                             tasks = {taskList.filter(t => t.columnId === col.columnId)}
-                                                            onColumnNameChange = {handleColumnNameChange}/>
-                                            </Grid>
+                                                            onColumnNameChange = {handleColumnNameChange}
+                                                            onColumnDelete = {handleColumnDelete}/>
+                                            
                                            ))
              }
      
-           </Grid>
+           </div>
   
       </div>
    );

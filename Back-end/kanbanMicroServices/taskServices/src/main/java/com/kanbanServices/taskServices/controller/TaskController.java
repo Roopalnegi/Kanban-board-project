@@ -1,6 +1,7 @@
 package com.kanbanServices.taskServices.controller;
 
 import com.kanbanServices.taskServices.domain.Task;
+import com.kanbanServices.taskServices.exception.MaxTaskLimitReachedException;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
 import com.kanbanServices.taskServices.service.TaskService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/task")
@@ -45,6 +47,10 @@ public class TaskController
         catch (TaskAlreadyExistsException e)
         {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.CONFLICT);
+        }
+        catch (MaxTaskLimitReachedException e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
         catch(AccessDeniedException e)
         {
@@ -96,7 +102,6 @@ public class TaskController
     }
 
 
-
     // method to handle fetching all tasks for a particular board
     @GetMapping("/getAllTasksOfBoardId/{boardId}")
     public ResponseEntity<?> handleGetAllTasksOfBoardId(@PathVariable String boardId)
@@ -118,6 +123,7 @@ public class TaskController
 
 
 
+
     // method to handle updating task info (title,description,priority,assigned to, due date) - admin secured
     @PutMapping("/updateTask/{taskId}")
     public ResponseEntity<?> handleUpdateTask(@PathVariable String taskId, @RequestBody Task updatedTaskData, HttpServletRequest request)
@@ -133,6 +139,10 @@ public class TaskController
         catch (TaskNotFoundException e)
         {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (MaxTaskLimitReachedException e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
         catch (AccessDeniedException e)
         {
@@ -242,6 +252,7 @@ public class TaskController
     }
 
 
+    // ----------- helper methods -----------
 
     // method to handle counting days before due date
     @GetMapping("/noOfDaysBeforeDue/{dueDate}")
@@ -251,6 +262,25 @@ public class TaskController
         {
             Long days = taskService.countDaysBeforeDue(dueDate);
             return new ResponseEntity<>(days,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle fetching all employee details for assigned To property of task
+    @GetMapping("/fetchAllEmployeeDetails")
+    public ResponseEntity<?> handleFetchAllEmployeeDetails(HttpServletRequest request)
+    {
+        try
+        {
+            // check if user is admin
+            requestHelper.checkAdminRole(request);
+
+            Map<Long, String> employees = taskService.getAllEmployeeDetails();
+            return new ResponseEntity<>(employees,HttpStatus.OK);
         }
         catch (Exception e)
         {

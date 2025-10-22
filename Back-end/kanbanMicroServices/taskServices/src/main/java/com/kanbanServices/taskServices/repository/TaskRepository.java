@@ -23,12 +23,12 @@ public interface TaskRepository extends MongoRepository<Task,String>
     // find task by priority
     List<Task> findByPriority(String priority);
 
-    // count active (non-archive) task assigned to a user
-    // assume done - 3 id and archive - 4
+    // active task -- who are not in archive column or done column
+    // count active task assigned to a user i.e. count task whose columnId is not equal to active column id & done column id
     // db.task.countDocuments({ assignedTo: userEmail,
-    //                          columnId: {$nin :[3,4]} });
-    @Query(value = "{'assignedTo': ?0, 'columnId' : { $nin: [3,4]} }", count = true)
-    long countActiveTaskByAssignedTo(String userEmail);
+    //                          columnId: {$nin :"archiveColumnId", "doneColumnId"} });
+    @Query(value = "{'assignedTo': ?0, 'columnId' : {$nin: [?1, ?2]} }", count = true)
+    long countActiveTaskByAssignedTo(String assignedTo, String archiveColumnId, String doneColumnId);
 
 }
 
@@ -37,4 +37,6 @@ public interface TaskRepository extends MongoRepository<Task,String>
 value - actual mongo db query
 count - tell spring to count query not fetch data
 ?0 - first method parameter
+?1 - second method parameter
+?2 -third method parameter
  */

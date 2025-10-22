@@ -1,4 +1,4 @@
-import {Box, Typography, TextField} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import {useState} from 'react';
 import { handleUpdatingBoardInfo } from '../../Services/BoardServices';
 import { enqueueSnackbar } from 'notistack';
@@ -23,21 +23,16 @@ function InlineEditableBoardInfo({board})
             else
                 setDescription(newValue);
 
-            enqueueSnackbar("Board updated successfully !", {variant: "success",
-                                                             autoHideDuration: 2000,
-                                                             anchorOrigin: {vertical: "top", horizontal: "right"},
-                                                            });
+            enqueueSnackbar("Board updated successfully !", {variant: "success"});
         }
         catch(error)
         {
-            enqueueSnackbar(error?.message || "Failed to update board", {variant: "error",
-                                                                         autoHideDuration: 2000,
-                                                                         anchorOrigin: {vertical: "top", horizontal: "right"},
-                                                                         }); 
+            enqueueSnackbar(error?.message || "Failed to update board !", {variant: "error"}); 
         }
        
     };
 
+    
     return (
     <Box sx={{ boxShadow: 3, p: 2, mb: 3, position: "relative" }}>
 

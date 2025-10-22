@@ -13,7 +13,11 @@ export const addColumnImg = process.env.PUBLIC_URL + "/Icons/add-column-icon.png
 
 export const addTaskImg = process.env.PUBLIC_URL + "/Icons/add-task-icon.png";
 
+export const deleteBoardImg = process.env.PUBLIC_URL + "/Icons/delete-board-icon.png";
+
 export const deleteImg = process.env.PUBLIC_URL + "/Icons/delete-icon.png";
+
+export const restoreImg = process.env.PUBLIC_URL + "/Icons/restore-icon.png";
 
 export const helpImg = process.env.PUBLIC_URL + "/Icons/help-icon.png";
 

@@ -1,8 +1,7 @@
-import { Grid, Card, CardContent, Typography, IconButton, Box } from "@mui/material";
+import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-// import DeleteIcon from "@mui/icons-material/Delete";
 import {Icon} from '../IconComponent/Icon';
-import { deleteImg } from '../IconComponent/Icon';
+import { deleteBoardImg } from '../IconComponent/Icon';
 import {useNavigate} from 'react-router-dom';
 import { useSnackbar } from "notistack";
 import { deleteBoard } from "../../Services/BoardServices";
@@ -23,20 +22,14 @@ export default function BoardList({boards, onBoardDeleted})
      try
      {
        const response = await deleteBoard(boardId);
-       enqueueSnackbar(response || "Board Deleted Successfully !", {variant: "success",
-                                                                    autoHideDuration: 2000,
-                                                                    anchorOrigin: { vertical: "top", horizontal: "right" },
-                                                                   });    
+       enqueueSnackbar(response || "Board Deleted Successfully !", {variant: "success"});    
        
       // tell parent to remove board from state (app lift state)
       onBoardDeleted(boardId);                                                                                                                  
      }
      catch(error)
      {
-      enqueueSnackbar(error?.message, {variant: "error",
-                                        autoHideDuration: 2000,
-                                        anchorOrigin: { vertical: "top", horizontal: "right" },
-                                       });
+      enqueueSnackbar(error?.message, {variant: "error"});
      }
   };
 
@@ -66,11 +59,7 @@ export default function BoardList({boards, onBoardDeleted})
                       {board.boardName}
                     </Typography>
                   </Box>
-                  {/* <IconButton color="error"size="small"onClick={(e)=> { e.stopPropagation();
-                                                                        handleDeleteBoard(board.boardId);}}>
-                    <DeleteIcon/>
-                  </IconButton> */}
-                  <Icon src = {deleteImg} alt = "DeleteIcon" onClick = {(e) => {e.stopPropagation();
+                  <Icon src = {deleteBoardImg} alt = "DeleteBoardIcon" onClick = {(e) => {e.stopPropagation();
                                                                                 handleDeleteBoard(board.boardId);}}
                         sx = {{cursor: "pointer"}} />                                                        
 

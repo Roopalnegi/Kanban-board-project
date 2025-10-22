@@ -1,19 +1,19 @@
 package com.kanbanServices.taskServices.service;
 
 import com.kanbanServices.taskServices.domain.Task;
+import com.kanbanServices.taskServices.exception.MaxTaskLimitReachedException;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
-import com.kanbanServices.taskServices.proxy.BoardServiceClient;
+import com.kanbanServices.taskServices.proxy.UserAuthClient;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Service
 public class TaskServiceImpl implements TaskService
@@ -21,18 +21,20 @@ public class TaskServiceImpl implements TaskService
 
     private final TaskRepository taskRepository;
     private final BoardValidationService boardValidationService;
+    private final UserAuthClient userAuthClient;
 
     @Autowired
-    public TaskServiceImpl (TaskRepository taskRepository, BoardValidationService boardValidationService)
+    public TaskServiceImpl (TaskRepository taskRepository, BoardValidationService boardValidationService, UserAuthClient userAuthClient)
     {
         this.taskRepository = taskRepository;
         this.boardValidationService = boardValidationService;
+        this.userAuthClient = userAuthClient;
     }
 
 
     // create a new task
     @Override
-    public Task createTask(Task task) throws TaskAlreadyExistsException
+    public Task createTask(Task task) throws TaskAlreadyExistsException, MaxTaskLimitReachedException
     {
         // validate board and column first
         boardValidationService.validateBoardId(task.getBoardId());
@@ -42,6 +44,23 @@ public class TaskServiceImpl implements TaskService
        if(taskRepository.findByTitleAndBoardId(task.getTitle(), task.getBoardId()).isPresent())
        {
            throw new TaskAlreadyExistsException("Tasks already exists with id : " + task.getTaskId());
+       }
+
+       // get archive and done column id from board service
+       String archiveColumnId = boardValidationService.calculateArchiveColumnId(task.getBoardId());
+       String doneColumnId = boardValidationService.calculateDoneColumnId(task.getBoardId());
+
+       // check task limit for each employee
+       if(task.getAssignedTo() != null)
+       {
+           for (String employee : task.getAssignedTo())
+           {
+               long activeTask = taskRepository.countActiveTaskByAssignedTo(employee,archiveColumnId,doneColumnId);
+               if(activeTask >= 5)
+               {
+                   throw new MaxTaskLimitReachedException();
+               }
+           }
        }
 
        return taskRepository.save(task);
@@ -82,11 +101,39 @@ public class TaskServiceImpl implements TaskService
 
     // update task info - title, description, priority, assigned To, due Date
     @Override
-    public Task updatedTask(String taskId, Task updatedTaskData) throws TaskNotFoundException
+    public Task updatedTask(String taskId, Task updatedTaskData) throws TaskNotFoundException, MaxTaskLimitReachedException
     {
         // validate board and column first
         boardValidationService.validateBoardId(updatedTaskData.getBoardId());
         boardValidationService.validateColumnId(updatedTaskData.getBoardId(), updatedTaskData.getColumnId());
+
+        // get archive and done column id from board service
+        String archiveColumnId = boardValidationService.calculateArchiveColumnId(updatedTaskData.getBoardId());
+        String doneColumnId = boardValidationService.calculateDoneColumnId(updatedTaskData.getBoardId());
+
+
+        // check task limit for each assigned employee
+        if(updatedTaskData.getAssignedTo() != null)
+        {
+            for (String employee : updatedTaskData.getAssignedTo())
+            {
+                long activeTask = taskRepository.countActiveTaskByAssignedTo(employee,archiveColumnId,doneColumnId);
+
+                // subtract 1 if the same task is already assigned to this employee
+                Task currentTask = taskRepository.findById(taskId).orElse(null);
+                if (currentTask != null && currentTask.getAssignedTo().contains(employee))
+                {
+                    activeTask--;
+                }
+
+                if(activeTask >= 5)
+                {
+                    throw new MaxTaskLimitReachedException();
+                }
+            }
+        }
+
+
 
         return taskRepository.findById(taskId)
                 .map(t -> {
@@ -176,6 +223,8 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // -------------- helper methods ----------------
+
     // count days before due date
     @Override
     public Long countDaysBeforeDue(LocalDate dueDate)
@@ -186,6 +235,14 @@ public class TaskServiceImpl implements TaskService
         // for handling the situation here due date crossed current date -- return -1
         long days = ChronoUnit.DAYS.between(todayDate,dueDate);
         return days < 0 ? -1 : days;
+    }
+
+
+    //  get all employee data for assignedTo property of task
+    @Override
+    public Map<Long,String> getAllEmployeeDetails()
+    {
+        return userAuthClient.fetchAllEmployeeDetails();
     }
 
 

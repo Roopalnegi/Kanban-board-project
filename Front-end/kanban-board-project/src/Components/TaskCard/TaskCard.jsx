@@ -4,7 +4,6 @@ import { Card, CardContent,
 import {useEffect, useState} from 'react';
 import { calculateNoOfDays } from '../../Services/TaskServices';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import LeftSideSpeedDial from '../LeftSideSpeedDial/LeftSideSpeedDial';
 
 function TaskCard({task}) 
 {
@@ -131,14 +130,7 @@ function TaskCard({task})
             </Box>
 
 
-        </CardContent>
-
-        {/* Helper Tools */}
-        <Box sx = {{textAlign: "right", m:1}}>
-            <LeftSideSpeedDial />
-        </Box>
-                  
-             
+        </CardContent>     
     
         </Card>
         );

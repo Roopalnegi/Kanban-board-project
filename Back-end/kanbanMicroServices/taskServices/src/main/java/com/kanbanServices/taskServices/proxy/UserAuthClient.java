@@ -12,4 +12,10 @@ public interface UserAuthClient
     // call a validation endpoint in UserAuthentication Service
     @GetMapping("/validateToken")
     Map<String,String> validateToken(@RequestHeader("Authorization") String token);
+
+
+    // call user authentication service to get all employee details
+    @GetMapping("/fetchAllEmployeeDetails")
+    Map<Long,String> fetchAllEmployeeDetails();
+
 }

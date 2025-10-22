@@ -6,16 +6,17 @@ import { Icon } from '../IconComponent/Icon';
 
 
 
-function LeftSideSpeedDial({actions = []}) 
+function SpeedDialLayout({actions = [], direction, className = ""}) 
 {
   return (
     <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}>
       
       <SpeedDial
-        ariaLabel="Left Side speed dial"
+        ariaLabel="Side speed dial"
+        className= {className}
         sx={{zIndex: 1100, '& .MuiFab-primary': {width: 40, height: 40}, }}  // smaller size 
-        icon={<SpeedDialIcon sx = {{fontSize: 20}}/>}
-        direction= "left"                 // open toward left side
+        icon={<SpeedDialIcon sx = {{fontSize: 10}}/>}
+        direction= {direction}                 // open toward which side
       >
         
         {
@@ -33,4 +34,4 @@ function LeftSideSpeedDial({actions = []})
 
 }
 
-export default LeftSideSpeedDial;
+export default SpeedDialLayout;
