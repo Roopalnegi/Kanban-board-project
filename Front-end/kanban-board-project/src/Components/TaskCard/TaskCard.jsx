@@ -3,7 +3,7 @@ import { Card, CardContent, CardActions,
          Tooltip, Avatar, AvatarGroup } from '@mui/material';
 import {useEffect, useState} from 'react';
 import { useSnackbar } from 'notistack';
-import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask, notify} from '../../Services/TaskServices';
+import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask} from '../../Services/TaskServices';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { Icon, pencilImg, deleteImg, restoreImg } from "../../Components/IconComponent/Icon";
 
@@ -17,32 +17,6 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
    // track if task in column archive
    const isArchived = task.columnId ===  archiveColumnId ;
    
-   // ---------- ntification
-   const [showDropdown, setShowDropdown] = useState(false);
-   const [comment, setComment] = useState("");
-   const [reply, setReply] = useState("");
-
-   const handleNotify = async () => {
-      try
-      {
-        const data = {taskId: task.taskId,
-        message: userRole === "Employee" ? comment : reply,
-        sentBy: userRole, // "Employee" or "Admin"
-        employeeComment: userRole === "Employee" ? comment : null,
-        adminReply: userRole === "Admin" ? reply : null
-                      };
-        const response = await notify(data);
-        alert("Notification sent!");
-      setComment("");
-      setReply("");
-      }
-      catch(error)
-      {
-        console.error(error);
-      alert("Error sending notification");
-      }
-   };
-
 
 
    // function to calculate days left to complete task
@@ -230,31 +204,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
               </Typography>
             </Box>
 
-        {showDropdown && (
-        <div className="comment-section">
-          {userRole === "Employee" && (
-            <textarea
-              placeholder="Write comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          )}
-          {userRole === "Admin" && (
-            <textarea
-              placeholder="Write reply"
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-            />
-          )}
-          <button onClick={handleNotify}>Notify</button>
-        </div>
-      )}
-
-
-
-
-
-
+        
 
         </CardContent>     
 

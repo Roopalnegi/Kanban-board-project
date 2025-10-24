@@ -8,24 +8,48 @@ import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard.jsx";
 import EmployeeDashboard from "./Pages/EmployeeDashboard/EmployeeDashboard.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
 import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
-import NotificationPanel from "./Components/NotificationPanel/NotificationPanel.jsx";
+import NotificationPanel from "./Components/Notification/NotificationPanel.jsx";
 
+import { getAllNotifications } from "./Services/NotificationService.js";
 
 import {Routes, Route} from 'react-router-dom';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import "./App.css";
 
 
 function App() 
 {
-  const[loginStatus, setLoginStatus] = useState(false);
-  const[userData, setUserData] = useState(null);
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
+
+   // fetch all notifications whenever userData changes
+  useEffect(() => {
+    
+    const fetchNotifications = async () => {
+      if (!userData?.email) return;
+      try 
+      {
+        const list = await getAllNotifications(userData.email);
+        setNotifications(list);
+        setUnreadNotificationCount(list.filter(n => !n.isRead).length);
+      } 
+      catch (error) 
+      {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [userData]);
 
 
    return(
          <div className = "AppLayout">
          
-           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} userData={userData} />  
+           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} userData={userData} unreadNotificationCount = {unreadNotificationCount}/>  
             
             {/* Main content area between header & footer */} 
            
@@ -51,7 +75,9 @@ function App()
                 />
 
                 <Route path = "/board/:boardId" element = {<BoardDashboard/>} />
-                <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} />} />
+                <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} notifications = {notifications}
+                                                                                 setNotifications = {setNotifications}
+                                                                                 setUnreadNotificationCount = {setUnreadNotificationCount} />} />
 
              </Routes>
             </main>

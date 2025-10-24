@@ -6,6 +6,7 @@ import com.kanbanServices.boardServices.execption.BoardAlreadyExistsException;
 import com.kanbanServices.boardServices.execption.BoardNotFoundExecption;
 import com.kanbanServices.boardServices.execption.ColumnAlreadyExistsException;
 import com.kanbanServices.boardServices.execption.ColumnNotFoundException;
+import com.kanbanServices.boardServices.proxy.TaskClient;
 import com.kanbanServices.boardServices.repository.BoardRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,19 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BoardServiceImpl implements BoardService
 {
 
     private final BoardRepository boardRepository;
+    private final TaskClient taskClient;
 
     @Autowired
-    public BoardServiceImpl(BoardRepository boardRepository)
+    public BoardServiceImpl(BoardRepository boardRepository, TaskClient taskClient)
     {
         this.boardRepository = boardRepository;
+        this.taskClient = taskClient;
     }
 
 
@@ -100,6 +102,7 @@ public class BoardServiceImpl implements BoardService
         }
 
         boardRepository.deleteById(boardId);
+        taskClient.handleDeleteAllTasksOfBoard(boardId);
         return true;
     }
 

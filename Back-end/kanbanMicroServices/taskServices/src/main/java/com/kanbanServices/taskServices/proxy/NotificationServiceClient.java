@@ -11,6 +11,6 @@ public interface NotificationServiceClient
 {
    // call notification service to save notification
    @PostMapping("/saveNotification")
-   Boolean sendNotificationData(@RequestBody Map<String, String> notificationData);
+   Boolean sendNotificationData(@RequestBody Map<String, Object> notificationData);
 
 }

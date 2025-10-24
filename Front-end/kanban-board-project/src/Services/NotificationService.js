@@ -2,12 +2,11 @@ import axiosInstance from "./axiosConfig";
 
 const baseURL = "http://localhost:8084/api/v1/notification";
 
-// get user notifications
-const getAllNotifications = async (username) => {
-   const response = await axiosInstance.get(`${baseURL}/allNotifications?recipient=${username}`);
-   return response.data;
+// get all user notifications (no pagination)
+const getAllNotifications = async (email) => {
+   const response = await axiosInstance.get(`${baseURL}/allNotifications?recipient=${email}`);
+   return response.data;   // returns List<Notification>
 };
-
 
 // mark notification as read
 const markNotificationAsRead = async (notificationId) => {
@@ -15,36 +14,28 @@ const markNotificationAsRead = async (notificationId) => {
    return response.data;
 };
 
-
-// filter notification by date
-const filterNotificationByDate = async (username, date) => {
-   const response = await axiosInstance.get(`${baseURL}/getNotificationByDate?recipient=${username}&date=${date}`);
+// filter notification by date (no pagination)
+const filterNotificationByDate = async (email, date) => {
+   const response = await axiosInstance.get(`${baseURL}/getNotificationByDate?recipient=${email}&date=${date}`);
    return response.data;
 };
 
-
-// filter notification by month and year
-const filterNotificationByMonthAndYear = async (username,month,year) => {
-     const response = await axiosInstance.get(`${baseURL}/getNotificationByMonthAndYear?recipient=${username}&month=${month}&year=${year}`);
-     return response.data;
+// filter notification by month and year (no pagination)
+const filterNotificationByMonthAndYear = async (email, month, year) => {
+   const response = await axiosInstance.get(`${baseURL}/getNotificationByMonthAndYear?recipient=${email}&month=${month}&year=${year}`);
+   return response.data;
 };
 
-
-// get unread notification
-const unreadNotification = async (username) => {
-    const response = await axiosInstance.get(`${baseURL}/getUnreadNotification?recipient=${username}`);
-    return response.data;
+// get unread notifications (no pagination)
+const unreadNotification = async (email) => {
+   const response = await axiosInstance.get(`${baseURL}/getUnreadNotification?recipient=${email}`);
+   return response.data;  // returns list of unread notifications
 };
 
-
-// count unread notification
-const countUnreadNotification = async (username) => {
-    const response = await axiosInstance.get(`${baseURL}/countUnreadNotification?recipient=${username}`);
-    return response.data; 
+// count unread notifications
+const countUnreadNotification = async (email) => {
+   const response = await axiosInstance.get(`${baseURL}/countUnreadNotification?recipient=${email}`);
+   return response.data;  // returns number
 };
 
-
-export {getAllNotifications, markNotificationAsRead, filterNotificationByDate, filterNotificationByMonthAndYear, unreadNotification, countUnreadNotification};
-
-
-
+export {  getAllNotifications,  markNotificationAsRead,  filterNotificationByDate,  filterNotificationByMonthAndYear,  unreadNotification,  countUnreadNotification };

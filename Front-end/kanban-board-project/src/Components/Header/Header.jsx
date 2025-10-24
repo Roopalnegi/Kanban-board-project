@@ -1,20 +1,16 @@
-import {useState, useEffect} from 'react';
 import {Box,useTheme, Badge} from '@mui/material';
 import {useNavigate,Link} from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import styles from './Header.module.css';
-import { countUnreadNotification } from '../../Services/NotificationService';
 
 
-function Header({loginStatus, setLoginStatus, userData})
+function Header({loginStatus, setLoginStatus, userData, unreadNotificationCount})
 {
    
   const theme = useTheme();
-
   const navigate = useNavigate();
 
-  const[countNotification, setCountNotification] = useState(0);
 
   const logout = () => {
     setLoginStatus(false);
@@ -24,31 +20,6 @@ function Header({loginStatus, setLoginStatus, userData})
    };
   
    
-  // getting unread notifications count
-  useEffect(() => {
-  
-     const countUnreadNotify = async () => {
-       try
-       {
-         const count = await countUnreadNotification(userData.username);
-         setCountNotification(count);
-       }
-       catch(error)
-       {
-        console.error("Error in counting unread notification : ", error);
-       }
-    };
-
-    if(userData?.username)
-    {
-      countUnreadNotify();
-    }
-
-
-  },[userData]);
-  
-
-
 
    return(
            <Box component="header" 
@@ -73,7 +44,7 @@ function Header({loginStatus, setLoginStatus, userData})
                                          <span> Hi {userData?.username} </span>
                                        </li>
                                        <li>
-                                        <Badge color = "inherit" badgeContent = {countNotification || 0}>
+                                        <Badge color = "white" badgeContent = {unreadNotificationCount || 0}>
                                            <NotificationsIcon onClick = {() => navigate("/notificationpanel")}/>
                                         </Badge>
                                        </li>

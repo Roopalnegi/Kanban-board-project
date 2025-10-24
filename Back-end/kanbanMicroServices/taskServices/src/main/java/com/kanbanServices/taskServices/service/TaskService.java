@@ -36,6 +36,9 @@ public interface TaskService
     // delete task
     Boolean deleteTask(String taskId) throws TaskNotFoundException;
 
+    // delete all tasks of a board
+    Boolean deleteAllTasksOfBoard(String boardId) throws TaskNotFoundException;
+
     // move task b/w columns -- to do, in-progress, done, archive
     Task moveTaskByColumn(String taskId, String newColumnId, String doneBy) throws TaskNotFoundException;
 

@@ -62,6 +62,6 @@ const updateTask = async (taskId, updatedData) => {
 
 
 
-export {getAllTasksOfBoardId, addTask, getEmployeeDetails, calculateNoOfDays, deletePermanent, archiveTask, restoreTask, updateTask, notify};
+export {getAllTasksOfBoardId, addTask, getEmployeeDetails, calculateNoOfDays, deletePermanent, archiveTask, restoreTask, updateTask};
 
 

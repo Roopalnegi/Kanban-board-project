@@ -19,7 +19,7 @@ public class Notification
    @ElementCollection
    @CollectionTable(name = "notification_recipients",
                     joinColumns = @JoinColumn(name = "notification_id"))
-   private List<String> recipients;          // to whom it is given
+   private List<String> recipients; // to whom it is given
    @CreationTimestamp
    private LocalDateTime createdOn;
    private boolean isRead;           // track if notification read or not

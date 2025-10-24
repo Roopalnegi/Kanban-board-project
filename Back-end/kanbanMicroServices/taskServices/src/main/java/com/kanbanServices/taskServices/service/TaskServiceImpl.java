@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -265,6 +266,26 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // delete all tasks of a board
+    @Override
+    public Boolean deleteAllTasksOfBoard(String boardId) throws TaskNotFoundException
+    {
+        List<Task> tasks = getTasksOfBoardId(boardId);
+
+        if(tasks.isEmpty())
+            return true;
+
+        // extract id's because deleteAllById accept List of id's
+        List<String> taskIds = tasks.stream()
+                                    .map(Task::getTaskId)
+                                    .collect(Collectors.toList());
+
+        taskRepository.deleteAllById(taskIds);
+
+        return true;
+    }
+
+
     // move task b/w columns -- to do, in-progress, done, archive
     @Override
     public Task moveTaskByColumn(String taskId, String newColumnId, String doneBy) throws TaskNotFoundException
@@ -316,11 +337,28 @@ public class TaskServiceImpl implements TaskService
             return;
       try
       {
-        Map<String, String> notificationMap = new HashMap<>();
+          // If "All" is passed, replace it with all employee emails
+          if (recipients.contains("All"))
+          {
+              recipients = userAuthClient.fetchAllEmployeeDetails() // Map<Long, String> with "Name - email"
+                      .values()
+                      .stream()
+                      .map(val -> {
+                          // since value format: "Name - email"
+                          if (val.contains("-")) {
+                              return val.split("-")[1].trim(); // extract email
+                          }
+                          return val.trim();
+                      })
+                      .collect(Collectors.toList());
+          }
+
+        Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("taskName", task.getTitle());
         notificationMap.put("message", message);
         notificationMap.put("sentBy", sentBy);
-        notificationMap.put("sentTo", String.join(",", recipients));
+        notificationMap.put("recipients", recipients);
+
         notificationClient.sendNotificationData(notificationMap);
         // debugging
         System.out.println("Sending notification to: " + recipients);

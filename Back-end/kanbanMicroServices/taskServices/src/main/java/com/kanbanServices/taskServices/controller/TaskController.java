@@ -224,6 +224,26 @@ public class TaskController
     }
 
 
+    // method to handle deleting all task of a board
+    @DeleteMapping("/deleteAllTasksByBoard/{BoardId}")
+    public ResponseEntity<?> handleDeleteAllTasksOfBoard(@PathVariable String boardId)
+    {
+        try
+        {
+            boolean flag = taskService.deleteAllTasksOfBoard(boardId);
+            return new ResponseEntity<>(flag,HttpStatus.OK);
+        }
+        catch (TaskNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     // method to handle moving task b/w columns - employee secured
     @PutMapping("/moveTaskByColumn/{taskId}/{columnId}")

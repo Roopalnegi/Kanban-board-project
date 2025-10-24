@@ -3,7 +3,6 @@ package com.example.NotificationService.controller;
 import com.example.NotificationService.domain.Notification;
 import com.example.NotificationService.exception.NotificationNotFoundException;
 import com.example.NotificationService.service.NotificationService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +14,7 @@ import java.util.List;
 @RequestMapping("/api/v1/notification")
 public class NotificationController
 {
+
     private final NotificationService notificationService;
 
     public NotificationController(NotificationService notificationService)
@@ -22,21 +22,22 @@ public class NotificationController
         this.notificationService = notificationService;
     }
 
-    // method to handle saving  notification
+
+    // method to handle saving notification
     @PostMapping("/saveNotification")
-    public ResponseEntity<?> handleSaveNotification(@RequestBody Notification notification)
+    public ResponseEntity<Boolean> handleSaveNotification(@RequestBody Notification notification)
     {
         try
         {
-            Notification savedNotification = notificationService.saveNotification(notification);
-            return new ResponseEntity<>(savedNotification, HttpStatus.OK);
+            notificationService.saveNotification(notification);
+            return new ResponseEntity<>(true, HttpStatus.OK);
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();       // debugging
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
     // method to handle mark notification as read
@@ -48,7 +49,7 @@ public class NotificationController
             Notification markedNotification = notificationService.markNotificationAsRead(notificationId);
             return new ResponseEntity<>(markedNotification, HttpStatus.OK);
         }
-        catch(NotificationNotFoundException e)
+        catch (NotificationNotFoundException e)
         {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -59,14 +60,13 @@ public class NotificationController
     }
 
 
-
-    // method to handle getting user notification with sorting and pagging
-    @GetMapping("/getNotification")
+    // method to handle getting all user notifications (no pagination)
+    @GetMapping("/allNotifications")
     public ResponseEntity<?> handleFetchRecipientNotification(@RequestParam("recipient") String recipient)
     {
         try
         {
-            Page<Notification> notifications = notificationService.fetchRecipientNotification(recipient);
+            List<Notification> notifications = notificationService.fetchRecipientNotification(recipient);
             return new ResponseEntity<>(notifications, HttpStatus.OK);
         }
         catch (Exception e)
@@ -76,13 +76,14 @@ public class NotificationController
     }
 
 
-    // method to handle getting user notification based on date with pagging and sorting
+    // method to handle getting user notifications by date (no pagination)
     @GetMapping("/getNotificationByDate")
-    public ResponseEntity<?> handleFindNotificationByDate(@RequestParam("recipient") String recipient, @RequestParam("date") LocalDate date)
+    public ResponseEntity<?> handleFindNotificationByDate(@RequestParam("recipient") String recipient,
+                                                          @RequestParam("date") LocalDate date)
     {
         try
         {
-            Page<Notification> notifications = notificationService.findNotificationByDate(recipient,date);
+            List<Notification> notifications = notificationService.findNotificationByDate(recipient, date);
             return new ResponseEntity<>(notifications, HttpStatus.OK);
         }
         catch (Exception e)
@@ -92,18 +93,16 @@ public class NotificationController
     }
 
 
-    // method to handle getting user notification based on month and year with pagging and sorting
+    // method to handle getting user notifications by month and year (no pagination)
     @GetMapping("/getNotificationByMonthAndYear")
-    public ResponseEntity<?> handleGetUnreadNotificationsOfUser(@RequestParam("recipient") String recipient, @RequestParam("month") int month, @RequestParam("year") int year)
+    public ResponseEntity<?> handleGetNotificationByMonthAndYear(@RequestParam("recipient") String recipient,
+                                                                 @RequestParam("month") int month,
+                                                                 @RequestParam("year") int year)
     {
         try
         {
-            Page<Notification> notifications = notificationService.findNotificationByMonthAndYear(recipient, month, year);
+            List<Notification> notifications = notificationService.findNotificationByMonthAndYear(recipient, month, year);
             return new ResponseEntity<>(notifications, HttpStatus.OK);
-        }
-        catch (NotificationNotFoundException e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         catch (Exception e)
         {
@@ -112,18 +111,14 @@ public class NotificationController
     }
 
 
-    // method to handle getting unread notification with sorting and pagging
+    // method to handle getting unread notifications (no pagination)
     @GetMapping("/getUnreadNotification")
-    public ResponseEntity<?> handleGetNotificationsByMonthAndYear(@RequestParam("recipient") String recipient)
+    public ResponseEntity<?> handleGetUnreadNotification(@RequestParam("recipient") String recipient)
     {
         try
         {
-            Page<Notification> notifications = notificationService.findUserUnreadNotification(recipient);
+            List<Notification> notifications = notificationService.findUserUnreadNotification(recipient);
             return new ResponseEntity<>(notifications, HttpStatus.OK);
-        }
-        catch (NotificationNotFoundException e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         catch (Exception e)
         {
@@ -132,7 +127,7 @@ public class NotificationController
     }
 
 
-    // method to handle counting unread notification of a user
+    // method to handle counting unread notifications
     @GetMapping("/countUnreadNotification")
     public ResponseEntity<?> handleCountUnreadNotifications(@RequestParam("recipient") String recipient)
     {
@@ -142,12 +137,11 @@ public class NotificationController
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
 
 /*
-@RequestParam -- bind method argument to url query string
- */
+@RequestParam -- binds method argument to URL query string
+*/

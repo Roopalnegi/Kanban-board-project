@@ -16,6 +16,7 @@
 		<module>userAuthenticationServices</module>
 		<module>boardServices</module>
 		<module>taskServices</module>
+		<module>NotificationService</module>
 	</modules>
 	<name>kanbanMicroServices</name>
 	<description>Demo project for Spring Boot</description>
