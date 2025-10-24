@@ -4,6 +4,7 @@ import com.kanbanServices.taskServices.domain.Task;
 import com.kanbanServices.taskServices.exception.MaxTaskLimitReachedException;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
+import com.kanbanServices.taskServices.proxy.NotificationServiceClient;
 import com.kanbanServices.taskServices.proxy.UserAuthClient;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +24,15 @@ public class TaskServiceImpl implements TaskService
     private final TaskRepository taskRepository;
     private final BoardValidationService boardValidationService;
     private final UserAuthClient userAuthClient;
+    private final NotificationServiceClient notificationClient;
 
     @Autowired
-    public TaskServiceImpl (TaskRepository taskRepository, BoardValidationService boardValidationService, UserAuthClient userAuthClient)
+    public TaskServiceImpl (TaskRepository taskRepository, BoardValidationService boardValidationService, UserAuthClient userAuthClient, NotificationServiceClient notificationClient)
     {
         this.taskRepository = taskRepository;
         this.boardValidationService = boardValidationService;
         this.userAuthClient = userAuthClient;
+        this.notificationClient = notificationClient;
     }
 
 
@@ -50,20 +54,38 @@ public class TaskServiceImpl implements TaskService
        String archiveColumnId = boardValidationService.calculateArchiveColumnId(task.getBoardId());
        String doneColumnId = boardValidationService.calculateDoneColumnId(task.getBoardId());
 
+        // fetch employee details map: email -> name
+        Map<Long, String> employeeMap = userAuthClient.fetchAllEmployeeDetails();
+
        // check task limit for each employee
        if(task.getAssignedTo() != null)
        {
-           for (String employee : task.getAssignedTo())
+           for (String employeeEmail : task.getAssignedTo())
            {
-               long activeTask = taskRepository.countActiveTaskByAssignedTo(employee,archiveColumnId,doneColumnId);
-               if(activeTask >= 5)
+               long activeTask = taskRepository.countActiveTaskByAssignedTo(employeeEmail,archiveColumnId,doneColumnId);
+               if(activeTask > 5)
                {
-                   throw new MaxTaskLimitReachedException();
+                   // find employee name by matching email in the map values
+                   String empName = employeeMap.values()      // gives all "name - email" strings.
+                                              .stream()
+                                              .filter(val -> val.contains(employeeEmail))   //  find the value containing email
+                                              .findFirst()                         // find the first match
+                                              .orElse(employeeEmail); // fallback to email if not found any name
+                   throw new MaxTaskLimitReachedException( empName + " exceeds task limit : cannot assign more than 5 task !");
+
                }
            }
        }
 
-       return taskRepository.save(task);
+       Task savedTask =  taskRepository.save(task);
+
+       // send notification per assigned employee
+       if(savedTask.getAssignedTo() != null)
+        {
+            sendNotification(savedTask, "You have been assigned a new task: " + savedTask.getTitle(), "Admin", savedTask.getAssignedTo());
+        }
+
+       return savedTask;
     }
 
 
@@ -111,31 +133,40 @@ public class TaskServiceImpl implements TaskService
         String archiveColumnId = boardValidationService.calculateArchiveColumnId(updatedTaskData.getBoardId());
         String doneColumnId = boardValidationService.calculateDoneColumnId(updatedTaskData.getBoardId());
 
+        // fetch employee details map: email -> name
+        Map<Long, String> employeeMap = userAuthClient.fetchAllEmployeeDetails();
 
         // check task limit for each assigned employee
         if(updatedTaskData.getAssignedTo() != null)
         {
-            for (String employee : updatedTaskData.getAssignedTo())
+            for (String employeeEmail : updatedTaskData.getAssignedTo())
             {
-                long activeTask = taskRepository.countActiveTaskByAssignedTo(employee,archiveColumnId,doneColumnId);
+                long activeTask = taskRepository.countActiveTaskByAssignedTo(employeeEmail,archiveColumnId,doneColumnId);
 
                 // subtract 1 if the same task is already assigned to this employee
                 Task currentTask = taskRepository.findById(taskId).orElse(null);
-                if (currentTask != null && currentTask.getAssignedTo().contains(employee))
+                if (currentTask != null && currentTask.getAssignedTo().contains(employeeEmail))
                 {
                     activeTask--;
                 }
 
-                if(activeTask >= 5)
+                if(activeTask > 5)
                 {
-                    throw new MaxTaskLimitReachedException();
+                    // find employee name by matching email in the map values
+                    String empName = employeeMap.values()      // gives all "name - email" strings.
+                                                .stream()
+                                                .filter(val -> val.contains(employeeEmail))   //  find the value containing email
+                                                .findFirst()                         // find the first match
+                                                .orElse(employeeEmail); // fallback to email if not found any name
+
+                    throw new MaxTaskLimitReachedException( empName + " exceeds task limit : cannot assign more than 5 task !");
                 }
             }
         }
 
 
 
-        return taskRepository.findById(taskId)
+        Task savedUpdatedTask =  taskRepository.findById(taskId)
                 .map(t -> {
                                  t.setTitle(updatedTaskData.getTitle());
                                  t.setTask_description(updatedTaskData.getTask_description());
@@ -145,6 +176,13 @@ public class TaskServiceImpl implements TaskService
                                  return taskRepository.save(t);
                                 })
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
+
+        // send notification per assigned employee
+        if(savedUpdatedTask.getAssignedTo() != null)
+        {
+            sendNotification(savedUpdatedTask, "You have been assigned a new task: " + savedUpdatedTask.getTitle(), "Admin", savedUpdatedTask.getAssignedTo());
+        }
+        return savedUpdatedTask;
     }
 
 
@@ -171,8 +209,14 @@ public class TaskServiceImpl implements TaskService
         task.setPreviousColumnId(task.getColumnId());
         task.setColumnId(archiveColumnId);
 
-        return taskRepository.save(task);
+        // save task
+        Task savedTask = taskRepository.save(task);
 
+        // send notification
+        sendNotification(savedTask, "Task moved to Archive", "Admin", List.of("All"));
+
+        // return updated task
+        return savedTask;
     }
 
 
@@ -192,7 +236,15 @@ public class TaskServiceImpl implements TaskService
         restoreTask.setColumnId(restoreTask.getPreviousColumnId());
         restoreTask.setPreviousColumnId("null");      // after restore, clean the previous column id
 
-        return taskRepository.save(restoreTask);
+        // save task
+        Task savedTask = taskRepository.save(restoreTask);
+
+        // send notification
+        sendNotification(savedTask, "Task moved to " + savedTask.getColumnId(), "Admin", List.of("All"));
+
+
+        // return updated task
+        return savedTask;
     }
 
 
@@ -201,25 +253,36 @@ public class TaskServiceImpl implements TaskService
     @Override
     public Boolean deleteTask(String taskId) throws TaskNotFoundException
     {
-        if(taskRepository.findById(taskId).isEmpty())
-        {
-            throw new TaskNotFoundException("Task not found with task id : " + taskId);
-        }
+        Task foundTask = taskRepository.findById(taskId)
+                             .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
 
         taskRepository.deleteById(taskId);
+
+        // send notification by using map
+        sendNotification(foundTask, "Task deleted by Admin", "Admin", List.of("All"));
+
         return true;
     }
 
 
     // move task b/w columns -- to do, in-progress, done, archive
     @Override
-    public Task moveTaskByColumn(String taskId, String newColumnId) throws TaskNotFoundException
+    public Task moveTaskByColumn(String taskId, String newColumnId, String doneBy) throws TaskNotFoundException
     {
-        return taskRepository.findById(taskId)
-                .map(t ->{ t.setColumnId(newColumnId);
-                                return taskRepository.save(t);
-                               })
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
+
+        // store previous column for notification
+        task.setPreviousColumnId(task.getColumnId());
+        task.setColumnId(newColumnId);
+
+
+        // send notification
+        String newColumnName = boardValidationService.getColumnNameBy(task.getBoardId(), task.getColumnId());
+        sendNotification(task, "Task moved to " + newColumnName, doneBy, List.of("All"));
+
+
+        return task;
     }
 
 
@@ -234,6 +297,7 @@ public class TaskServiceImpl implements TaskService
 
         // for handling the situation here due date crossed current date -- return -1
         long days = ChronoUnit.DAYS.between(todayDate,dueDate);
+
         return days < 0 ? -1 : days;
     }
 
@@ -244,6 +308,30 @@ public class TaskServiceImpl implements TaskService
     {
         return userAuthClient.fetchAllEmployeeDetails();
     }
+
+    // method to send notification to notification service
+    private void sendNotification(Task task, String message, String sentBy, List<String> recipients)
+    {
+        if (recipients == null || recipients.isEmpty())
+            return;
+      try
+      {
+        Map<String, String> notificationMap = new HashMap<>();
+        notificationMap.put("taskName", task.getTitle());
+        notificationMap.put("message", message);
+        notificationMap.put("sentBy", sentBy);
+        notificationMap.put("sentTo", String.join(",", recipients));
+        notificationClient.sendNotificationData(notificationMap);
+        // debugging
+        System.out.println("Sending notification to: " + recipients);
+      }
+      catch (Exception e)
+      {
+          System.out.println("Failed to send notification !!!!");
+          e.printStackTrace();
+      }
+    }
+
 
 
 }

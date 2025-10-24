@@ -37,7 +37,7 @@ public interface TaskService
     Boolean deleteTask(String taskId) throws TaskNotFoundException;
 
     // move task b/w columns -- to do, in-progress, done, archive
-    Task moveTaskByColumn(String taskId, String newColumnId) throws TaskNotFoundException;
+    Task moveTaskByColumn(String taskId, String newColumnId, String doneBy) throws TaskNotFoundException;
 
     // ----------- helper method -----------
 

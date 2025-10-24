@@ -12,11 +12,11 @@ const addColumnToBoard = async (boardId, newColumn) => {
 
 
 // update column name in a board
-const updateColumnName = async (boardId, columnId, columnNewName) => {
-   // {columnNewName} -- send as JSON Object since request accept json type and columnNewName is string  
-   const response = await axiosInstance.put(`${baseURL}/${boardId}/updateColumnName/${columnId}`, {columnNewName});
+const updateColumnName = async (boardId, columnId, updatedColumn) => {  
+   const response = await axiosInstance.put(`${baseURL}/${boardId}/updateColumnName/${columnId}`, updatedColumn);
    return response.data;
 };
+
 
 
 // delete a column from a board
@@ -26,5 +26,11 @@ const deleteColumn = async (boardId, columnId) => {
 };
 
 
+// fetch archive column id
+const getArchiveColumnId = async (boardId) => {
+   const response = await axiosInstance.get(`${baseURL}/calculateArchiveColumnId/${boardId}`);
+   return response.data;
+};
 
-export {addColumnToBoard, updateColumnName, deleteColumn};
+
+export {addColumnToBoard, updateColumnName, deleteColumn, getArchiveColumnId};

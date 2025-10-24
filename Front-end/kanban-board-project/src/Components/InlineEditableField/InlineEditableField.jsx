@@ -65,7 +65,7 @@ function InlineEditableField( {label, value, onSave, multiline = false, forceEdi
                            />         
                        )
                        :(
-                            <Typography variant = "subtitle1"
+                            <Typography variant = "subtitle1" component="span"
                                         sx = {{cursor: "pointer", mt: 1, display: "flex", alignItems: "center", justifyContent: "space-between"}}
                             >
 

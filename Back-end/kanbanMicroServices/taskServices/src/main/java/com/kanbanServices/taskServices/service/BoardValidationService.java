@@ -46,7 +46,7 @@ public class BoardValidationService
 
 
     // fetch archive column id
-    public String calculateArchiveColumnId(@PathVariable String boardId)
+    public String calculateArchiveColumnId(String boardId)
     {
         try
         {
@@ -60,7 +60,7 @@ public class BoardValidationService
 
 
     // fetch done column id
-    public String calculateDoneColumnId(@PathVariable String boardId)
+    public String calculateDoneColumnId(String boardId)
     {
         try
         {
@@ -69,6 +69,20 @@ public class BoardValidationService
         catch(Exception e)
         {
             throw new IllegalArgumentException("Failed to fetch done column position for board ID: " + boardId + ". " + e.getMessage());
+        }
+    }
+
+
+    // get column name by its id
+    public String getColumnNameBy(String boardId,String columnId)
+    {
+        try
+        {
+            return boardServiceClient.getColumnNameBy(boardId, columnId);
+        }
+        catch(Exception e)
+        {
+            throw new IllegalArgumentException("Failed to fetch column name :" + e.getMessage());
         }
     }
 

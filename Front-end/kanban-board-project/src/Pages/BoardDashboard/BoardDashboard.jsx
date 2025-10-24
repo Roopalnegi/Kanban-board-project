@@ -1,26 +1,25 @@
 import {useState, useEffect} from 'react';
 import {Typography,Stack, CircularProgress} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import { useParams, useNavigate } from 'react-router-dom';
 import InlineEditableBoardInfo from '../../Components/Board/InlineEditBoardInfo';
 import ColumnCard from '../../Components/ColumnCard/ColumnCard';
+import SpeedDialLayout from '../../Components/SpeedDialLayout/SpeedDialLayout';
 import { getBoardDetails, deleteBoard } from '../../Services/BoardServices';
 import { getAllTasksOfBoardId } from '../../Services/TaskServices';
-import { addColumnToBoard } from '../../Services/ColumnServices';
-import { enqueueSnackbar } from 'notistack';
-import { useParams, useNavigate } from 'react-router-dom';
+import { addColumnToBoard, updateColumnName } from '../../Services/ColumnServices';
 import { addColumnImg,helpImg,deleteBoardImg  } from '../../Components/IconComponent/Icon';
-import SpeedDialLayout from '../../Components/SpeedDialLayout/SpeedDialLayout';
+
 
 function BoardDashboard()
 {
 
+   const {enqueueSnackbar} = useSnackbar();
    const navigate = useNavigate();
-
    const {boardId} = useParams();
 
    const [board, setBoard] = useState({columns: []});            // store baord data
-
-   const [taskList, setTaskList] = useState([]);        // store all task belongs to board
-
+   const [tasks, setTasks] = useState([]);        // store all task belongs to board
    const [loading, setLoading] = useState(true);       // track data loading status 
    
 
@@ -36,108 +35,147 @@ function BoardDashboard()
 
             // fetch all tasks data belong to baord
             const taskData = await getAllTasksOfBoardId(boardId); 
-            
-
+          
             setBoard(boardData);
-            setTaskList(taskData);
+            setTasks(taskData);
             setLoading(false);
-
         }
         catch (error) 
         {
-            enqueueSnackbar(error?.message || "Failed to fetch board or tasks", { variant: "error"});
+            enqueueSnackbar(error.response?.data|| "Failed to fetch board or tasks !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
         }
         
     };    
 
      fetchBoard();
 
-   },[boardId]);
+   },[boardId, enqueueSnackbar]);
 
 
 
-   // function to add column to a board
+   // add new column
    const handleAddColumn = async () => {
      try
      {
         const newColumn = {columnName : "Untitled"};   // create a deafult column name
         await addColumnToBoard(boardId, newColumn);
-      
-        enqueueSnackbar("New column created!", { variant: "success" });
-
-        // re-fetch baord after adding column
         const updatedBoard = await getBoardDetails(boardId);
         setBoard(updatedBoard);
+        enqueueSnackbar("New column added !", { variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
      }
      catch(error)
      {
-       enqueueSnackbar(error?.message || "Failed to create column", { variant: "error" });
+        enqueueSnackbar(error.response?.data || "Failed to fetch create column !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
      }
    };
 
 
-     const handleDeleteBoard = async (boardId) => {
-     try
-     {
-       const response = await deleteBoard(boardId);
-       enqueueSnackbar(response || "Board Deleted Successfully !", {variant: "success"});    
-       
-       navigate("/admin-dashboard");                                                                                                          
-     }
-     catch(error)
-     {
-      enqueueSnackbar(error?.message, {variant: "error"});
-     }
+    // delete board 
+    const handleDeleteBoard = async (boardId) => {
+      try
+      {
+        await deleteBoard(boardId);
+        enqueueSnackbar("Board deleted successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});    
+        navigate("/admin-dashboard");                                                                                                          
+      }
+      catch(error)
+      {
+        enqueueSnackbar(error.response?.data || "Failed to delete board !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+      }
    };
 
 
 
-    // update column name in board state (app lift state)
-    const handleColumnNameChange = (columnId, newName) => {
-    setBoard(prev => ({ ...prev,
-                        columns: prev.columns.map(col => col.columnId === columnId ? { ...col, columnName: newName } : col),
-                     }));
+    // --------- Column handlers lifted up -------------
+
+    // update column name  (app lift up state)
+    const handleColumnNameChange = async (columnId, updatedColumn) => {
+      try
+      {
+        await updateColumnName(boardId, columnId, updatedColumn);
+        const updatedBoard = await getBoardDetails(boardId);
+        setBoard(updatedBoard);
+      }
+      catch(error)
+      {
+        enqueueSnackbar(error.response?.data || "Failed to sync updated column name !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+      }
     };
 
-    
-     // update column name in board state (app lift state)
+
+    // delete column (app lift up state)
     const handleColumnDelete = (columnId) => {
-    setBoard(prev => ({ ...prev,
+      setBoard(prev => ({ ...prev,
                         columns: prev.columns.filter(col => col.columnId !== columnId)
                      }));
-  };
+
+      // also remove tasks of that column  
+      setTasks(prev => prev.filter(t => t.columnId !== columnId));              
+    };
 
 
-   
+
+    // --------- Task handlers lifted up -----------
+
+    // added new task (app lift up state)
+    const handleTaskAdded = (newTask) => {
+        setTasks(prev => [...prev, newTask]);
+    };
+
+
+    // update task (app lift up state)
+    const handleTaskUpdated = (updatedTask) => {
+      setTasks(prev => prev.map(t => t.taskId === updatedTask.taskId ? updatedTask : t));  
+    };
+
+
+    // remove task permanently (app lift up state)
+    const handleTaskDeleted = (taskId) => {
+       setTasks(prev => prev.filter(t => t.taskId !== taskId));
+    };
+
+
+    // archive task
+    const handleTaskArchive = (updatedTask) => {
+      setTasks(prev => prev.map(t => t.taskId === updatedTask.taskId ? updatedTask : t));
+    };
+
+
+    // restore task
+    const handleTaskRestore = (updatedTask) => {
+        setTasks(prev => prev.map(t => t.taskId === updatedTask.taskId ? updatedTask : t));
+    };
+
+
 
    // opeartions / actions perform on board
    const actions = [
-     { 
-       src : addColumnImg, 
+     { src : addColumnImg, 
        name: 'Add Column',
        onClick : handleAddColumn, 
      },
     { 
        src : deleteBoardImg, 
        name: 'Delete Board',
-       onClick : () => handleDeleteBoard(boardId),
+       onClick : handleDeleteBoard,
     },
     { 
      src : helpImg, 
      name: 'Help',
-     onClick : () => alert("Help Clicked !"),
+     onClick : () => enqueueSnackbar("Contact ✉️ roopalnegi147@gmail.com for further query.", {variant: "info", anchorOrigin: {horizontal: "top", vertical: "right"}}),
     },
    ];
 
   
 
    // custom message if baord data or task data is failed to fetch
-   if(!board || loading)
+   if(loading)
    {
-    return <Typography variant = "h4" sx = {{m:3, textAlign: "center"}}> 
-     <CircularProgress size = "30px" color = "inherit" /> Loading ....</Typography>
+      return ( <Typography variant = "h4" sx = {{m:3, textAlign: "center"}}> 
+                     <CircularProgress size = "30px" color = "inherit" /> Loading ....
+               </Typography>
+             );  
    }
-
 
 
    return (<div>
@@ -160,9 +198,15 @@ function BoardDashboard()
                                                 <ColumnCard key = {col.columnId}
                                                             boardId = {boardId}
                                                             column = {col} 
-                                                            tasks = {taskList.filter(t => t.columnId === col.columnId)}
+                                                            tasks = {tasks.filter(t => t.columnId === col.columnId)}
                                                             onColumnNameChange = {handleColumnNameChange}
-                                                            onColumnDelete = {handleColumnDelete}/>
+                                                            onColumnDelete = {handleColumnDelete}
+                                                            onTaskAdded = {handleTaskAdded}
+                                                            onTaskUpdate = {handleTaskUpdated}
+                                                            onTaskArchive = {handleTaskArchive}
+                                                            onTaskRestore = {handleTaskRestore}
+                                                            onTaskDelete = {handleTaskDeleted}
+                                                />
                                             
                                            ))
              }

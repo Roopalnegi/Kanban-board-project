@@ -236,7 +236,7 @@ public class BoardServiceImpl implements BoardService
 
     // update column name
     @Override
-    public Column updateBoardColumnName (String boardId, String columnId, String columnNewName) throws BoardNotFoundExecption, ColumnNotFoundException
+    public Column updateBoardColumnName (String boardId, String columnId, Column updateColumnData) throws BoardNotFoundExecption, ColumnNotFoundException
     {
         // check if board exist
         Board board = boardRepository.findById(boardId)
@@ -249,7 +249,11 @@ public class BoardServiceImpl implements BoardService
                 .orElseThrow(() -> new ColumnNotFoundException("Column not found with ID: " + columnId));
 
         // update column name
-        columnExists.setColumnName(columnNewName);
+        if(updateColumnData != null)
+        columnExists.setColumnName(updateColumnData.getColumnName());
+
+        // save the changes in db
+        boardRepository.save(board);
 
         return columnExists;
     }
@@ -271,27 +275,6 @@ public class BoardServiceImpl implements BoardService
                 .orElseThrow(() -> new ColumnNotFoundException("Column not found with Id: " + columnId));
     }
 
-
-
-    // retrieve column by name to validate column existence by name instead of id
-    @Override
-    public Column getColumnByName(String columnName) throws ColumnNotFoundException
-    {
-        // fetch all boards that contain specific column name
-        List<Board> boards = boardRepository.findByColumnName(columnName);
-
-        // if empty
-        if (boards.isEmpty())
-        {
-            throw new ColumnNotFoundException("No column found with name: " + columnName);
-        }
-
-        // if not --> Assuming each board can have only one column with that name
-        return boards.get(0).getColumns().stream()
-                .filter(col -> col.getColumnName().equalsIgnoreCase(columnName))
-                .findFirst()
-                .orElseThrow(() -> new ColumnNotFoundException("No column found with name: " + columnName));
-    }
 
 
     // helper method - sort columns in a board by its order / position
@@ -362,6 +345,24 @@ public class BoardServiceImpl implements BoardService
                 .findFirst()
                 .orElseThrow(() -> new ColumnNotFoundException("Cannot Pin Point Any Column with following words - done, completed, finished, closed."));
     }
+
+
+    // get column name by its id
+    @Override
+    public String getColumnNameById(String boardId, String columnId) throws BoardNotFoundExecption,ColumnNotFoundException
+    {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundExecption("Board not found"));
+
+
+        return board.getColumns().stream()
+                .filter(col -> col.getColumnId().equalsIgnoreCase(columnId))
+                .map(Column::getColumnName)
+                .findFirst()
+                .orElseThrow(() -> new ColumnNotFoundException("No column found "));
+    }
+
+
 
 
 }

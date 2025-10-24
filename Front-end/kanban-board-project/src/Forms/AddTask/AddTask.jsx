@@ -1,28 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {useForm}from 'react-hook-form';
-import{useNavigate}from 'react-router-dom';
 import { useSnackbar} from 'notistack';
-import axios from 'axios';
 import{Dialog, DialogContent, DialogTitle,DialogActions,
-       TextField,Button, MenuItem, Select, InputLabel, FormControl,
-       Tooltip,CircularProgress,useTheme,Button} from "@mui/material";
+       MenuItem, Select, InputLabel, FormControl,
+       RadioGroup, FormControlLabel, Radio, FormLabel,
+       ListItemText, Checkbox, useTheme,TextField,Button} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
+import { addTask, getEmployeeDetails, updateTask } from "../../Services/TaskServices";
+import formatEmployeeData from "../../Services/Utils/employeeUtil";
 
 
 
 
-function AddTaskForm()
+function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open, onClose})
 {
-  const theme=useTheme();
 
-  const navigate=useNavigate();
+  // the "task" prop created to handle both create task and edit task modes
+  const theme=useTheme();
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const[formOpen,setFormOpen]=useState(true);// controls visibility of login
-  const[loading, setLoading] = useState(false);
-  const[employees, setEmployees] = useState([]);
-  const[minDate, setMinDate] = useState('');
+  const [employees, setEmployees] = useState([]);  // store all employee user details
+  const [priority, setPriority] = useState("low"); 
+  const [minDate, setMinDate] = useState('');
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  
+  //intialize from handling
+  const{ register, handleSubmit, formState:{errors}, trigger,reset} = useForm();
 
 
   // function to disable previous date
@@ -32,80 +36,192 @@ function AddTaskForm()
   },[]);
 
 
-  //intialize from handling
-  const{ register, handleSubmit, formState:{errors}, trigger,reset} = useForm();
+  // fetch employee data
+  useEffect(() => {
+    const fetchEmployees = async () => {
+       try
+       {
+         const data = await getEmployeeDetails(); // return objects --- {101: "John Doe - john@example.com"}
+         const empArray = formatEmployeeData(data);     // convert object into array
+         setEmployees(empArray);
+       }
+       catch(error)
+       {
+         enqueueSnackbar("Failed to fetch employee data", {variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       }
+    }
+    fetchEmployees();   
+  },[enqueueSnackbar]);
+
+
+  
+  // ------- determining task mode -------------
+  // if task exist ---> edit mode on   ---------> else create mode on 
+  useEffect(() => {
+     
+      if(task)      // edit mode on as task already present, populate the form with existing task data (data prefilled when editing)
+      {
+          reset({
+                  title: task.title,
+                  task_description: task.task_description,
+                  dueDate: task.dueDate,
+                });
+          setPriority(task.priority || "low");
+          setSelectedEmployees(task.assignedTo || []);      
+      }
+      else       // create mode on as task does not exist at all -- set some default values
+      {
+          reset();
+          setPriority("low");
+          setSelectedEmployees([]);
+      }
+
+  },[task,reset]);
+
+
+
 
   //handle login from submission
-  const  loginSubmit=async(useData)=>{
+  const submit = async(formData)=>{
     try 
     {
-    
+        const taskData = {...formData, columnId, boardId, priority, assignedTo: selectedEmployees };
+        
+        if(task)      // edit mode
+        {
+           const updatedTask = await updateTask(task.taskId,taskData);
+           // notify parent board state to when task is updated (app lift up state)
+           if(onTaskUpdated) 
+              onTaskUpdated (updatedTask);
+           enqueueSnackbar("Task updated successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        }
+        else
+        {
+          const savedTask = await addTask(taskData);
+          // notify parent to update board (app lift up state)
+          if(onTaskAdded) 
+             onTaskAdded(savedTask);
+           enqueueSnackbar("Task created successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        }
+        handleClose();
     }
     catch(error)
     {
-      
+      enqueueSnackbar(error.response?.data || error.response?.data?.message || "Failed to create / update task !", {variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
     }
+  };
+
+
+  // handle proper closing of form
+  const handleClose = () => {
+    reset();
+    onClose && onClose();
   };
 
 
 
     return(
-      <Dialog open={formOpen} onClose={()=>setFormOpen(false)} fullWidth maxWidth='sm'>
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
 
         {/*header of the dialog */}
         
         <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
-            <b>Add Task Form</b>
+            <b> {task ? "Update Task Form" : "Create Task Form"}  </b>
             <CancelIcon
                 sx={{cursor:'pointer',color:theme.palette.error.main}}
-                onClick={() => {setFormOpen(false);}} 
+                onClick={() => handleClose()} 
             />
         </DialogTitle>
 
-          {/*add task form */}
-
-          <form onSubmit={handleSubmit( loginSubmit)}>
+        <form onSubmit={handleSubmit(submit)}>
 
             <DialogContent sx={{display:'flex',flexDirection:"column",gap:"20px"}}>
 
-              {/* Title Field */}
+               {/* Title */}
+               <TextField
+                 label="Task Title"
+                 variant="outlined"
+                 fullWidth
+                 {...register("title", { required: "Title is required" })}
+                 onBlur={() => trigger("title")}
+                 error={!!errors.title}
+                 helperText={errors.title?.message}
+               />
+         
+
+              {/* Description */}
               <TextField
-              label="Enter Title for task"
-              variant="outlined"
-              fullWidth
-              {...register("title",{ required: {value: true, message: "Title is required"},
-                                   })}
-              onBlur={()=>trigger('title')}
-              error={!!errors.title?.message}
-              helperText={errors.title?.message}
+                label="Task Description"
+                variant="outlined"
+                multiline
+                rows={3}
+                fullWidth
+                {...register("task_description", {
+                  required: "Task description is required",
+                })}
+                onBlur={() => trigger("task_description")}
+                error={!!errors.task_description}
+                helperText={errors.task_description?.message}
               />
 
-              {/* Task description */}
+
+              {/* Priority */}
+              <FormControl fullWidth>
+                <FormLabel>Priority</FormLabel>
+                   <RadioGroup row value={priority} onChange={(e) => setPriority(e.target.value)}>
+                        <FormControlLabel value="low" control={<Radio />} label="Low" />
+                        <FormControlLabel value="medium" control={<Radio />} label="Medium" />
+                        <FormControlLabel value="high" control={<Radio />} label="High" />
+                   </RadioGroup>
+              </FormControl>
+
+
+              <FormControl fullWidth>
+                <InputLabel>Assign To</InputLabel>
+                <Select multiple
+                        value={selectedEmployees}
+                        onChange={(e) => setSelectedEmployees(e.target.value)}
+                        renderValue={(selected) => selected.map(email => {
+                                                                          const emp = employees.find(emp => emp.email === email);
+                                                                          return emp ? emp.name : email;
+                                                                         }).join(", ")
+                                    }
+                >
+                {
+                  employees.map((emp) => (
+                                           <MenuItem key={emp.id} value={emp.email}>
+                                             <Checkbox checked={selectedEmployees.includes(emp.email)} />
+                                             <ListItemText primary={emp.name} secondary={emp.email} />
+                                           </MenuItem>
+                                          ))
+                }
+                </Select>
+              </FormControl>
+
+
+              {/* Due Date */}
               <TextField
-              label="Enter task description"
-              variant="outlined"
-              fullWidth
-              {...register('task description',{required:"Task descrpiton is required"})}
-              onBlur={()=>trigger('password')}
-              error={!!errors.password}
-              helperText={errors.password?.message}
+                type="date"
+                label="Due Date"
+                variant="outlined"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ min: minDate }}
+                {...register("dueDate", { required: "Due date is required" })}
+                onBlur={() => trigger("dueDate")}
+                error={!!errors.dueDate}
+                helperText={errors.dueDate?.message}
               />
-             
-             
-             {/* OTP section*/}
-             <OtpSection email = {watch("email")} context = "login"
-                         isOtpVerified = {isOtpVerified} setIsOtpVerified = {setIsOtpVerified} />
+    
 
-
-
-            </DialogContent>
+        </DialogContent>
 
  
-            {/*button-sumbit and reset */}
+        {/*button-sumbit and reset */}
 
-            <DialogActions sx={{ my: 2 }}>
-          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.colors.buttons }} disabled = {!isOtpVerified}>
-            Login
+        <DialogActions sx={{ my: 2 }}>
+          <Button type="submit" variant="contained" sx={{ backgroundColor: theme.colors.buttons }}>
+            { task ? "Update Task" : "Create Task" }
           </Button>
           <Button type="reset" variant="contained" onClick={() => reset()} sx={{ backgroundColor: theme.colors.buttons }}>
             Reset
@@ -113,5 +229,7 @@ function AddTaskForm()
         </DialogActions>
         </form>
       </Dialog>
-    )
+    );
   }
+
+  export default AddTaskForm;

@@ -1,21 +1,36 @@
 import { Card,CardContent,Box,Typography, Stack} from "@mui/material";
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import { useSnackbar } from "notistack";
 import TaskCard from "../TaskCard/TaskCard";
+import AddTaskForm from "../../Forms/AddTask/AddTask";
 import SpeedDialLayout from '../SpeedDialLayout/SpeedDialLayout';
-import styles from '../SpeedDialLayout/SpeedDialLayout.module.css';
 import InlineEditableField from "../InlineEditableField/InlineEditableField";
+import styles from '../SpeedDialLayout/SpeedDialLayout.module.css';
 import { addTaskImg, deleteImg, pencilImg } from "../IconComponent/Icon";
-import { updateColumnName, deleteColumn } from "../../Services/ColumnServices";
+import { updateColumnName, deleteColumn, getArchiveColumnId} from "../../Services/ColumnServices";
 
-function ColumnCard({boardId,column,tasks, onColumnNameChange, onColumnDelete})
+
+function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete})
 {
 
    const{enqueueSnackbar} = useSnackbar();
 
-   const [editing, setEditing] = useState(false);  // tarck column name edit mode
+   const [editing, setEditing] = useState(false);                  // track column name edit mode
+   const [editingTask, setEditingTask] = useState(null);           // store the task that needs to be edited
+   const [showTaskForm, setShowTaskForm] = useState(false);        // control addTaskForm dialog visibility
+   const [archiveId, setArchiveId] = useState(null);
 
-   
+
+   // function to get archive column id
+   useEffect(() => {
+       const archiveId = async () => {
+         const id = await getArchiveColumnId(boardId);
+         setArchiveId(id);
+       };
+       archiveId();
+   },[boardId]);
+
+
    // function to get column color based on priority
     const getColumnColor = (columnName) => {
             if (!columnName) return "#75757554"; // fallback color for undefined/null
@@ -25,65 +40,88 @@ function ColumnCard({boardId,column,tasks, onColumnNameChange, onColumnDelete})
               case "in progress": return "#FFD54F"; 
               case "done": return "#81C784"; 
               case "archive": return "#BDBDBD";
-              default: return getRandomRGB();
+              default: return getRandomRGBA();
             }
     };
 
     
 
-    // function to get random rgb code 
-    const getRandomRGB = () => {
+    // function to get random rgba code 
+    const getRandomRGBA = (alpha = 0.3 ) => {
          const r = Math.floor(Math.random() * 256); // Red: 0-255
          const g = Math.floor(Math.random() * 256); // Green: 0-255
          const b = Math.floor(Math.random() * 256); // Blue: 0-255
-         return `rgb(${r}, ${g}, ${b})`;
+         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }; 
 
 
 
+    // save column name
+    const handleSaveColumnName = async (newName) => {
+         try
+         {
+           const updatedColumn = { columnId: column.columnId, 
+                                   columnName: newName, 
+                                   columnOrder: column.columnOrder};
+
+           await updateColumnName(boardId, column.columnId, updatedColumn);
+           enqueueSnackbar("Column name updated !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           setEditing(false);
+    
+           // notify parent board state when column name change
+           if(onColumnNameChange) onColumnNameChange(column.columnId, updatedColumn);                                    
+         }
+         catch(error)
+         {
+            enqueueSnackbar(error.response?.data|| "Failed to update column name !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+         }
+    };
 
 
-
-
-
-
-
-
-   // function to save column name
-   const handleSaveColumnName = async (newName) => {
-     try
-     {
-       await updateColumnName(boardId, column.columnId, newName);
-       enqueueSnackbar("Column name updated !", {variant: "success"});
-       setEditing(false);
-
-       // notify parent update board state when column name change
-       if(onColumnNameChange) onColumnNameChange(column.columnId, newName);                                    
-     }
-     catch(error)
-     {
-         enqueueSnackbar(error?.message || "Failed to update column name !", {variant: "error"}); 
-     }
-            
-   };
-
-
-   // function to delete column from a board
-      const handleDeleteColumn = async (columnId) => {
+    // delete column
+    const handleDeleteColumn = async () => {
         try
         {
-           await deleteColumn (boardId, columnId);
-         
-           enqueueSnackbar("Column deleted successfully !", { variant: "success" });
-           
-           // notify parent update board state when column get deleted 
+           await deleteColumn (boardId, column.columnId);
+           enqueueSnackbar("Column deleted successfully !", { variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           // notify parent board state when column get deleted
            if(onColumnDelete) onColumnDelete(column.columnId);   
         }
         catch(error)
         {
-          enqueueSnackbar(error?.message || "Failed to create column !", { variant: "error" });
+          enqueueSnackbar(error.response?.data|| "Failed to delete column !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
         }
-      };
+    };
+
+
+
+    // --------- Task handlers lifted up -----------
+
+    // task added (lift up state)
+    const handleTaskAdded = (newTask) => {
+
+      // notify parent board state when task added
+      if(onTaskAdded) onTaskAdded(newTask);
+      setShowTaskForm(false);
+    }; 
+    
+
+    // function to edit task
+    const handleTaskUpdated = async (updatedTask) => {
+      
+      // notify parent board state when task is updated
+      if(onTaskUpdate) onTaskUpdate(updatedTask);
+      enqueueSnackbar("Task updated successfully !", {variant: "success"});
+      
+    };
+
+
+    // handler to open form for editing
+    const handleEditTask = (task) => {
+       setEditingTask(task);     // set task to edit
+       setShowTaskForm(true);    // open the add form dialog
+
+    };
 
 
     // opeartions / actions perform on card
@@ -96,12 +134,12 @@ function ColumnCard({boardId,column,tasks, onColumnNameChange, onColumnDelete})
          { 
            src : addTaskImg, 
            name: 'Add Task',
-           onClick : () => alert("Task form Clicked!"), 
+           onClick : () => setShowTaskForm(true), 
          },
         { 
            src : deleteImg, 
            name: 'Delete Column',
-           onClick : () => handleDeleteColumn (column.columnId),
+           onClick : handleDeleteColumn,
         }
        ];
       
@@ -132,12 +170,33 @@ function ColumnCard({boardId,column,tasks, onColumnNameChange, onColumnDelete})
              </Box>
         </Stack>
 
-          
+        
+        {/* Add Task Form */}
+
+         {
+           showTaskForm && (<AddTaskForm boardId = {boardId}
+                                         columnId = {column.columnId}
+                                         task = {editingTask}            // pass task for edit mode 
+                                         open = {showTaskForm}
+                                         onClose = {() => {setShowTaskForm(false); setEditingTask(null);}}                  // passing close function
+                                         onTaskAdded = {handleTaskAdded}     
+                                         onTaskUpdated = {handleTaskUpdated}  
+                            /> 
+                           )
+         }
+
+
         <CardContent style = {{flexGrow: 1}}>
         
          {
            tasks.length > 0 ? (
-                                 tasks.map(t => <TaskCard key = {t.taskId} task = {t} />)
+                                 tasks.map(t => <TaskCard key = {t.taskId} task = {t} 
+                                                          onTaskEdit = {handleEditTask}
+                                                          onTaskArchive = {onTaskArchive}
+                                                          onTaskRestore = {onTaskRestore}
+                                                          onTaskDelete = {onTaskDelete}
+                                                          archiveColumnId = {archiveId}
+                                                 />)
                                )
                             : (
                                <Typography variant = "body2" color = "gray" sx = {{textAlign: "center", marginTop: "16px"}}> No tasks yet </Typography>
@@ -152,4 +211,6 @@ function ColumnCard({boardId,column,tasks, onColumnNameChange, onColumnDelete})
 }
 
 export default ColumnCard;
+
+
                                              

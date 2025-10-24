@@ -20,7 +20,8 @@ const addTask = async (newTask) => {
 
 // fetch employee data for assigned To property of task
 const getEmployeeDetails = async () => {
-    const response = await axiosInstance.get
+    const response = await axiosInstance.get(`${baseURL}/fetchAllEmployeeDetails`);
+    return response.data;
 };
 
 
@@ -31,8 +32,36 @@ const calculateNoOfDays = async (dueDate) => {
 };
 
 
+// task delete forever
+const deletePermanent = async (taskId) => {
+   const response = await axiosInstance.delete(`${baseURL}/deleteTask/${taskId}`);
+   return response.data;
+};
 
 
-export {getAllTasksOfBoardId, addTask, calculateNoOfDays};
+// task delete temporarily / move to archive column
+const archiveTask = async (taskId) => {
+   const response = await axiosInstance.put(`${baseURL}/archiveTask/${taskId}`);
+   return response.data;
+};
+
+
+// restore task from archive 
+const restoreTask = async (taskId) => {
+   const response = await axiosInstance.put(`${baseURL}/restoreTask/${taskId}`);
+   return response.data;
+};
+
+
+// update task
+const updateTask = async (taskId, updatedData) => {
+   const response = await axiosInstance.put(`${baseURL}/updateTask/${taskId}`, updatedData);
+   return response.data;
+};
+
+
+
+
+export {getAllTasksOfBoardId, addTask, getEmployeeDetails, calculateNoOfDays, deletePermanent, archiveTask, restoreTask, updateTask, notify};
 
 

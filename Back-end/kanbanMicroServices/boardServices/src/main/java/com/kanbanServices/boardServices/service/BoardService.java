@@ -40,13 +40,11 @@ public interface BoardService
     Boolean deleteBoardColumn (String boardId,String columnId) throws BoardNotFoundExecption, ColumnNotFoundException;
 
     // update column name
-    Column updateBoardColumnName(String boardId, String columnId, String columnNewName) throws BoardNotFoundExecption, ColumnNotFoundException;
+    Column updateBoardColumnName(String boardId, String columnId, Column updateColumnData) throws BoardNotFoundExecption, ColumnNotFoundException;
 
     // retrieve column by id
     Column getColumnById (String columnId) throws ColumnNotFoundException;
 
-    // can help in validate column existence by name instead of id
-    Column getColumnByName (String columnName) throws ColumnNotFoundException;
 
     // helper method - sort columns in a board by its order / position
     List<Column> sortColumnsByOrder(List<Column> columns);
@@ -68,6 +66,9 @@ public interface BoardService
 
     // get column id of column that is counted as "Done"
     String calculateDoneColumnId(String boardId) throws BoardNotFoundExecption;
+
+    // get column name by its id
+    String getColumnNameById (String columnName,String columnId) throws BoardNotFoundExecption, ColumnNotFoundException;
 
 }
 

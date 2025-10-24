@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/board")
@@ -197,11 +198,11 @@ public class BoardController
 
     // method to handle updating only column name
     @PutMapping("/{boardId}/updateColumnName/{columnId}")
-    public ResponseEntity<?> updateColumnName(@PathVariable String boardId, @PathVariable String columnId, @RequestBody String columnNewName)
+    public ResponseEntity<?> updateColumnName(@PathVariable String boardId, @PathVariable String columnId, @RequestBody Column updateColumnData)
     {
         try
         {
-            Column updatedColumn = boardService.updateBoardColumnName(boardId,columnId,columnNewName);
+            Column updatedColumn = boardService.updateBoardColumnName(boardId,columnId,updateColumnData);
             return new ResponseEntity<>(updatedColumn, HttpStatus.OK);
         }
         catch (ColumnNotFoundException e)
@@ -217,27 +218,6 @@ public class BoardController
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-    // method to handle getting column by name
-    @GetMapping("/getColumnByName/{columnName}")
-    public ResponseEntity<?> getColumnByName(@PathVariable String columnName)
-    {
-        try
-        {
-            Column column = boardService.getColumnByName(columnName);
-            return new ResponseEntity<>(column, HttpStatus.OK);
-        }
-        catch (ColumnNotFoundException e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-        catch(Exception e)
-        {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
 
 
     //method to handle deleting column from a board
@@ -347,6 +327,30 @@ public class BoardController
         catch (BoardNotFoundExecption e)
         {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle getting column name by its id
+    @GetMapping("/getColumnNameBy/{boardId}/{columnId}")
+    public ResponseEntity<?> getColumnNameBy(@PathVariable String boardId,@PathVariable String columnId)
+    {
+        try
+        {
+            String columnName = boardService.getColumnNameById(boardId,columnId);
+            return new ResponseEntity<>(columnName, HttpStatus.OK);
+        }
+        catch (BoardNotFoundExecption e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (ColumnNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         catch(Exception e)
         {

@@ -28,7 +28,7 @@ public class Task
     private LocalDate createdAt;       // when the task was created
     @LastModifiedDate
     private LocalDate updatedAt;       // when it was last modified
-    private String comments;           // comments on tasks
+    private String comments;           // employee comments on tasks
 
 
     // empty constructor

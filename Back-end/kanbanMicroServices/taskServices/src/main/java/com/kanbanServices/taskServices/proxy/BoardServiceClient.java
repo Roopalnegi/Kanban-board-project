@@ -1,7 +1,6 @@
 package com.kanbanServices.taskServices.proxy;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -28,6 +27,11 @@ public interface BoardServiceClient
     // fetch done column id
     @GetMapping("/calculateDoneColumnId/{boardId}")
     String calculateDoneColumnId(@PathVariable String boardId);
+
+
+    // fetch column name by id
+    @GetMapping("/getColumnNameBy/{boardId}/{columnId}")
+    String getColumnNameBy(@PathVariable String boardId,@PathVariable String columnId);
 
 
 }

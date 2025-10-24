@@ -8,6 +8,7 @@ import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard.jsx";
 import EmployeeDashboard from "./Pages/EmployeeDashboard/EmployeeDashboard.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
 import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
+import NotificationPanel from "./Components/NotificationPanel/NotificationPanel.jsx";
 
 
 import {Routes, Route} from 'react-router-dom';
@@ -50,6 +51,7 @@ function App()
                 />
 
                 <Route path = "/board/:boardId" element = {<BoardDashboard/>} />
+                <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} />} />
 
              </Routes>
             </main>

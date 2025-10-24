@@ -227,14 +227,16 @@ public class TaskController
 
     // method to handle moving task b/w columns - employee secured
     @PutMapping("/moveTaskByColumn/{taskId}/{columnId}")
-    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable String columnId, HttpServletRequest request)
+    public ResponseEntity<?> handleMoveTaskByColumn(@PathVariable String taskId, @PathVariable String columnId, @RequestBody Map<String,String> sentBy, HttpServletRequest request)
     {
         try
         {
             // check if user is employee
             requestHelper.checkEmployeeRole(request);
 
-            Task task = taskService.moveTaskByColumn(taskId,columnId);
+            // extract employee name
+            String username = sentBy.get("username");
+            Task task = taskService.moveTaskByColumn(taskId,columnId,username);
             return new ResponseEntity<>(task,HttpStatus.OK);
         }
         catch (TaskNotFoundException e)

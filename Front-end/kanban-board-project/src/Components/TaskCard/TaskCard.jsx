@@ -1,16 +1,50 @@
-import { Card, CardContent,
-         Box, Typography, 
+import { Card, CardContent, CardActions,
+         Box, Typography, Alert, 
          Tooltip, Avatar, AvatarGroup } from '@mui/material';
 import {useEffect, useState} from 'react';
-import { calculateNoOfDays } from '../../Services/TaskServices';
+import { useSnackbar } from 'notistack';
+import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask, notify} from '../../Services/TaskServices';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { Icon, pencilImg, deleteImg, restoreImg } from "../../Components/IconComponent/Icon";
 
-function TaskCard({task}) 
+
+function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskDelete, archiveColumnId}) 
 {
 
-   const [daysLeft, setDaysLeft] = useState(null);
+   const {enqueueSnackbar} = useSnackbar();
 
+   const [daysLeft, setDaysLeft] = useState(null);
+   // track if task in column archive
+   const isArchived = task.columnId ===  archiveColumnId ;
    
+   // ---------- ntification
+   const [showDropdown, setShowDropdown] = useState(false);
+   const [comment, setComment] = useState("");
+   const [reply, setReply] = useState("");
+
+   const handleNotify = async () => {
+      try
+      {
+        const data = {taskId: task.taskId,
+        message: userRole === "Employee" ? comment : reply,
+        sentBy: userRole, // "Employee" or "Admin"
+        employeeComment: userRole === "Employee" ? comment : null,
+        adminReply: userRole === "Admin" ? reply : null
+                      };
+        const response = await notify(data);
+        alert("Notification sent!");
+      setComment("");
+      setReply("");
+      }
+      catch(error)
+      {
+        console.error(error);
+      alert("Error sending notification");
+      }
+   };
+
+
+
    // function to calculate days left to complete task
    useEffect(() => {
     
@@ -31,8 +65,6 @@ function TaskCard({task})
     fetchDaysLeft();
 
    },[task.dueDate]);
-
-
 
 
     // function to get badge color based on priority
@@ -59,12 +91,77 @@ function TaskCard({task})
 
 
 
+
+    // archive task
+    const handleArchiveTask = async () => {
+       try 
+       {
+          const updatedTask = await archiveTask(task.taskId);
+          // notify parent board state when task is archived
+           if(onTaskArchive) onTaskArchive(updatedTask);
+          enqueueSnackbar("Task archived !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       } 
+       catch (error) 
+       {
+         enqueueSnackbar(error.response?.data|| "Failed to archive task !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       }
+    };
+
+
+
+    // restore task
+    const handleRestoreTask = async () => {
+       try 
+       {
+          const updatedTask = await restoreTask(task.taskId);
+          // notify parent board state when task is restored 
+          if(onTaskRestore) onTaskRestore(updatedTask);
+          enqueueSnackbar("Task restored !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       } 
+       catch (error) 
+       {
+         enqueueSnackbar(error.response?.data|| "Failed to restore task !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       }
+    };
+
+
+
+    // delete task permanent
+    const handleDeleteTask = async () => {
+       try 
+       {
+          await deletePermanent(task.taskId);
+          // notify parent board state when task is deleted
+          if(onTaskDelete) onTaskDelete(task.taskId);
+          enqueueSnackbar("Task deleted permanently !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       } 
+       catch (error) 
+       {
+         enqueueSnackbar(error.response?.data|| "Failed to delete task permanently !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+       }
+    };
+
+
+    // edit task
+    const handleEditTask = () => {
+        if(onTaskEdit)
+           onTaskEdit(task);
+    };
+
+
+
+
   return (
          <Card sx={{ width: 250, borderRadius: 2, boxShadow: 3,      
-                     display: 'flex', flexDirection: 'column',p :2, mb:2
+                     display: 'flex', flexDirection: 'column',p :2, mb:2,
                   }} raised
          >
       
+         {/* Alert message if task due date passed */}
+         {
+           daysLeft <= 0 && <Alert severity = "warning" variant = "filled" sx = {{mb:2}}> <b>Due Date has already passed 😞! </b></Alert>
+         }
+
          {/* Card Header */}
          <Typography sx={{ fontWeight: 'bolder', fontSize: 18}} > 
           {task.title} 
@@ -91,13 +188,17 @@ function TaskCard({task})
               {/* Assigned To avatars with AvatarGroup */}
               <AvatarGroup spacing="large">
                 {
-                 task.assignedTo?.map(email => (
-                                                 <Tooltip key={email} title={email} arrow>
-                                                   <Avatar sx={{ bgcolor: getRandomRGB(), width: 28, height: 28, fontSize: 14 }}>
-                                                     {email.charAt(0).toUpperCase()}
-                                                   </Avatar>
-                                                 </Tooltip>
-                ))
+                 task.assignedTo?.map((email,index) => {
+                                                         const initial = email ? email.charAt(0).toUpperCase() : "?" ;        // ? is fallback in email does not exist
+                                                         return (<Tooltip key = {`${email}-${index}`} title = {email} arrow>
+                                                                    <Avatar sx={{ bgcolor: getRandomRGB(), width: 28, height: 28, fontSize: 14 }}>
+                                                                       {initial}
+                                                                    </Avatar>
+                                                                 </Tooltip>
+
+                                                                );
+                                                       })
+
                 }
               </AvatarGroup>
 
@@ -129,11 +230,81 @@ function TaskCard({task})
               </Typography>
             </Box>
 
+        {showDropdown && (
+        <div className="comment-section">
+          {userRole === "Employee" && (
+            <textarea
+              placeholder="Write comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          )}
+          {userRole === "Admin" && (
+            <textarea
+              placeholder="Write reply"
+              value={reply}
+              onChange={(e) => setReply(e.target.value)}
+            />
+          )}
+          <button onClick={handleNotify}>Notify</button>
+        </div>
+      )}
+
+
+
+
+
+
 
         </CardContent>     
+
+
+
+
+        {/* Edit Button and delete button */}
+        {/* if task in archive column -- show restore other wise edit & delete icon */}
+        <CardActions sx = {{justifyContent: "flex-end", gap: 2}}>
+            {
+               !isArchived ? (
+                                <>
+                                    <Tooltip title = "Edit" arrow>
+                                        <Icon src = {pencilImg} alt = "Edit Icon" onClick = {handleEditTask} sx = {{cursor: "pointer"}}/>
+                                    </Tooltip>
+                                    <Tooltip title = "Archive" arrow>
+                                        <Icon src = {deleteImg} alt = "Archive Icon" onClick = {handleArchiveTask} sx = {{cursor: "pointer"}}/>
+                                    </Tooltip>   
+                                </>
+                               )
+                               :(<>
+                                    <Tooltip title = "Restore" arrow>
+                                        <Icon src = {restoreImg} alt = "Restore Icon" onClick = {handleRestoreTask} sx = {{cursor: "pointer"}}/>
+                                    </Tooltip>
+                                    <Tooltip title = "Delete Permantently" arrow>
+                                        <Icon src = {deleteImg} alt = "Delete Permantently Icon" onClick = {handleDeleteTask} sx = {{cursor: "pointer"}}/>
+                                    </Tooltip>    
+                                </>   
+                               ) 
+            }            
+        </CardActions>
     
-        </Card>
+      </Card>
         );
 }
 
 export default TaskCard;
+
+/*
+
+Now the flow is:
+
+
+1. User clicks Edit icon on a TaskCard  ----> TaskCard calls onTaskEdit(task) [parent handler]
+
+2. ColumnCard recieves task ------> sets editingTask + open form
+
+3. AddTaskForm receives task prop -------------->  edit mode triggered
+
+4. on submit  ----------------> calls updateTask ----------> then onTaskUpdated(updatedTask) --------> Board updated instantly 
+
+i.e. TaskCard ---> ColumnCard ---> AddTaskForm ---> TaskServices
+*/
