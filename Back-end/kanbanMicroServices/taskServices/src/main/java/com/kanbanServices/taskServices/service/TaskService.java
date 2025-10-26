@@ -4,6 +4,7 @@ import com.kanbanServices.taskServices.domain.Task;
 import com.kanbanServices.taskServices.exception.MaxTaskLimitReachedException;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,9 +18,6 @@ public interface TaskService
 
     // view single task details
     Task getTaskById(String taskId) throws TaskNotFoundException;
-
-    // view tasks by priority
-    List<Task> getTaskByPriority(String priority);
 
     // fetch get all tasks grouped by column in a specific board
     List<Task> getTasksOfBoardId(String boardId) throws TaskNotFoundException;
@@ -49,4 +47,35 @@ public interface TaskService
 
     // get all employee data for assigned To property of task
     Map<Long,String> getAllEmployeeDetails();
+
+
+
+    // ----------- searching and filtering methods  acc.per board -----------------
+
+    // filter task by priority
+    List<Task> filterTaskByPriority(String boardId, String priority);
+
+
+    // filter task created on specific date -- user want to see how many task is created at particular date
+    List<Task> filterTaskByCreatedDate(String boardId, LocalDate date);
+
+
+    // filter task due on specific date  -- user want to see how many task have deadline today
+    List<Task> filterTaskByDueDate(String boardId, LocalDate date);
+
+
+    // filter tasks created on specific month and year
+    List<Task> filterTaskByCreatedMonth(String boardId,int month, int year);
+
+
+    // filter tasks due on specific month and year
+    List<Task> filterTaskByDueMonth(String boardId,int month, int year);
+
+
+    // search by any -- title / description / assigned to
+    List<Task> searchTasks(String boardId, String keyword);
+
+
+
 }
+

@@ -43,19 +43,19 @@ public class NotificationServiceImpl implements NotificationService
     @Override
     public List<Notification> fetchRecipientNotification(String recipient)
     {
-        return notificationRepository.findAllByRecipient(recipient);
+        return notificationRepository.findByRecipientsContainsOrderByCreatedOnDesc(recipient);
     }
 
     // filter user notifications by date
     @Override
-    public List<Notification> findNotificationByDate(String recipient, LocalDate date)
+    public List<Notification> findNotificationByDate(String recipient,LocalDate date)
     {
-        return notificationRepository.findByRecipientAndDate(recipient, date);
+        return notificationRepository.findByRecipientAndDate(recipient,date);
     }
 
     // filter user notifications by month and year
     @Override
-    public List<Notification> findNotificationByMonthAndYear(String recipient, int month, int year)
+    public List<Notification> findNotificationByMonthAndYear(String recipient,int month,int year)
     {
         return notificationRepository.findByRecipientAndMonthAndYear(recipient, month, year);
     }

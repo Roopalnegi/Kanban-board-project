@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,14 +99,6 @@ public class TaskServiceImpl implements TaskService
         // check if task is not find by id and then exception
         return taskRepository.findByTaskId(taskId).
                 orElseThrow(() -> new TaskNotFoundException("Task not found with task id : " + taskId));
-    }
-
-
-    // view tasks by priority
-    @Override
-    public List<Task> getTaskByPriority(String priority)
-    {
-        return taskRepository.findByPriority(priority);  // may return empty list
     }
 
 
@@ -330,6 +323,7 @@ public class TaskServiceImpl implements TaskService
         return userAuthClient.fetchAllEmployeeDetails();
     }
 
+
     // method to send notification to notification service
     private void sendNotification(Task task, String message, String sentBy, List<String> recipients)
     {
@@ -371,6 +365,84 @@ public class TaskServiceImpl implements TaskService
     }
 
 
+    // ----------- searching and filtering methods  acc.per board -----------------
+
+    // filter task by priority
+    @Override
+    public List<Task> filterTaskByPriority(String boardId, String priority)
+    {
+        List<Task> tasks = taskRepository.findByBoardIdAndPriority(boardId, priority);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+
+    // filter task created on specific date -- user want to see how many task is created at particular date
+    @Override
+    public List<Task> filterTaskByCreatedDate(String boardId, LocalDate date)
+    {
+        List<Task> tasks = taskRepository.findByBoardIdAndCreatedAt(boardId, date);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+
+    // filter task due on specific date  -- user want to see how many task have deadline today
+    @Override
+    public List<Task> filterTaskByDueDate(String boardId, LocalDate date)
+    {
+        List<Task> tasks = taskRepository.findByBoardIdAndDueDate(boardId, date);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+
+    // filter tasks created on specific month and year
+    @Override
+    public List<Task> filterTaskByCreatedMonth(String boardId,int month, int year)
+    {
+        List<Task> tasks = taskRepository.findByCreatedMonthAndYear(boardId, month, year);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+
+    // filter tasks due on specific month and year
+    @Override
+    public List<Task> filterTaskByDueMonth(String boardId,int month, int year)
+    {
+        List<Task> tasks = taskRepository.findByDueMonthAndYear(boardId,month, year);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
+
+
+    // search by any -- title / description / assigned to
+    @Override
+    public List<Task> searchTasks(String boardId, String keyword)
+    {
+        List<Task> tasks = taskRepository.searchTasksByKeyword(boardId,keyword);
+        if(tasks.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return tasks;
+    }
 
 }
 

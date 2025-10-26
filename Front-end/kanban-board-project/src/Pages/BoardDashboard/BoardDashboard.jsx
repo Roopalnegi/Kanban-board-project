@@ -1,14 +1,17 @@
 import {useState, useEffect} from 'react';
-import {Typography,Stack, CircularProgress} from '@mui/material';
+import {Typography,Stack, CircularProgress, Box } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useParams, useNavigate } from 'react-router-dom';
 import InlineEditableBoardInfo from '../../Components/Board/InlineEditBoardInfo';
 import ColumnCard from '../../Components/ColumnCard/ColumnCard';
 import SpeedDialLayout from '../../Components/SpeedDialLayout/SpeedDialLayout';
+import SearchBar from '../../Components/SearchPerBoard/SearchBar';
+import FilterButton from '../../Components/FilterPerBoard/FilterButton';
 import { getBoardDetails, deleteBoard } from '../../Services/BoardServices';
-import { getAllTasksOfBoardId } from '../../Services/TaskServices';
+import { getAllTasksOfBoardId, searchTasksByKeyword } from '../../Services/TaskServices';
 import { addColumnToBoard, updateColumnName } from '../../Services/ColumnServices';
 import { addColumnImg,helpImg,deleteBoardImg  } from '../../Components/IconComponent/Icon';
+
 
 
 function BoardDashboard()
@@ -18,38 +21,66 @@ function BoardDashboard()
    const navigate = useNavigate();
    const {boardId} = useParams();
 
+
    const [board, setBoard] = useState({columns: []});            // store baord data
    const [tasks, setTasks] = useState([]);        // store all task belongs to board
    const [loading, setLoading] = useState(true);       // track data loading status 
    
 
-   // fetch board and its tasks
+   const [searchTerm, setSearchTerm] = useState('');     // search compoenent since searching is done per board
+   const [filterOption, setFilterOption] = useState(false);     // filter task since filter is done per board
+
+
+   // fetch board and its tasks, handle searching 
    useEffect(() => {
      
-     const fetchBoard = async () => {
+     let active = true;                         // race condition -- boolean ensure updates only happen when compoenent is mounted
+
+     // delay serach by 500ms to avoid unnecessary api call since right now even small keystroke triggers search
+     const fetchBoard = setTimeout (async () => {
         
         try
         {
             // fetch board data (including column info)
             const boardData = await getBoardDetails(boardId);
 
-            // fetch all tasks data belong to baord
-            const taskData = await getAllTasksOfBoardId(boardId); 
-          
-            setBoard(boardData);
-            setTasks(taskData);
-            setLoading(false);
+            let taskData;
+
+            if(searchTerm.trim() !== "")
+            {
+               // search task by keyword
+               taskData = await searchTasksByKeyword(boardId, searchTerm);
+            }
+            else
+            {
+               // fetch all tasks data belong to board
+               taskData = await getAllTasksOfBoardId(boardId);
+            }
+
+            if(active)
+            {
+                setBoard(boardData);
+                setTasks(taskData);
+                setLoading(false);
+            }
+           
         }
         catch (error) 
         {
             enqueueSnackbar(error.response?.data|| "Failed to fetch board or tasks !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
         }
         
-    };    
+    },500);       // wait 500ms after typing stops before calling the API.   
 
-     fetchBoard();
+    
 
-   },[boardId, enqueueSnackbar]);
+     return () => {active = false // clean race condition
+                  clearTimeout(fetchBoard);    // If the user types again within 500ms, it cancels the previous API call.
+                  };           
+
+   },[boardId,searchTerm, filterOption]);
+
+
 
 
 
@@ -181,11 +212,20 @@ function BoardDashboard()
    return (<div>
 
           <Stack direction = "column" spacing={2}>
-              {/* Display Boad Info */}
+
+              {/* Display Board Info */}
               <InlineEditableBoardInfo board = {board} />
     
               {/* Helper Tools */}
-              <SpeedDialLayout actions = {actions} direction = "left"/>
+              <Box sx = {{display: "flex", gap: 1, jsutifyContent: "space-between", alignItems: "center"}}>
+
+                <SearchBar setSearchTerm = {setSearchTerm} />
+                
+                <FilterButton boardId = {boardId} setTasks = {setTasks} setFilterOption = {setFilterOption} />
+
+                <SpeedDialLayout actions = {actions} direction = "left"/>
+
+              </Box>
           </Stack>
           
           
@@ -194,21 +234,23 @@ function BoardDashboard()
               
              {/* filter tasks by columnid for each column card */}
              {
-                board.columns?.map( col => (
-                                                <ColumnCard key = {col.columnId}
-                                                            boardId = {boardId}
-                                                            column = {col} 
-                                                            tasks = {tasks.filter(t => t.columnId === col.columnId)}
-                                                            onColumnNameChange = {handleColumnNameChange}
-                                                            onColumnDelete = {handleColumnDelete}
-                                                            onTaskAdded = {handleTaskAdded}
-                                                            onTaskUpdate = {handleTaskUpdated}
-                                                            onTaskArchive = {handleTaskArchive}
-                                                            onTaskRestore = {handleTaskRestore}
-                                                            onTaskDelete = {handleTaskDeleted}
-                                                />
+                tasks.length === 0 ? ( <Typography variant = "h4" sx={{textAlign: "center", mt: 2, fontWeight: 900}}>No tasks found !!</Typography> )
+                                   : (
+                                        board.columns?.map( col => (
+                                                             <ColumnCard key = {col.columnId}
+                                                                         boardId = {boardId}
+                                                                         column = {col} 
+                                                                         tasks = {tasks.filter(t => t.columnId === col.columnId)}
+                                                                         onColumnNameChange = {handleColumnNameChange}
+                                                                         onColumnDelete = {handleColumnDelete}
+                                                                         onTaskAdded = {handleTaskAdded}
+                                                                         onTaskUpdate = {handleTaskUpdated}
+                                                                         onTaskArchive = {handleTaskArchive}
+                                                                         onTaskRestore = {handleTaskRestore}
+                                                                         onTaskDelete = {handleTaskDeleted}
+                                                             />
                                             
-                                           ))
+                                           )))
              }
      
            </div>

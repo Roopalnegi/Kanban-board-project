@@ -21,7 +21,7 @@ function NotificationCard({ notification, markClick })
                   onClick={() => markClick(notification.notificationId)}
                   sx={{"&:hover": { backgroundColor: "transparent"}}}>
         {
-          notification.isRead ? ( <CheckIcon sx={{ color: "blue" }} /> )
+          notification.read ? ( <CheckIcon sx={{ color: "blue" }} /> )
                               : ( <CircleIcon sx={{ color: "gray" }} /> )
         }
       </IconButton>

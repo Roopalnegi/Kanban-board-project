@@ -5,7 +5,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import styles from './Header.module.css';
 
 
-function Header({loginStatus, setLoginStatus, userData, unreadNotificationCount})
+function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifications, unreadNotificationCount, setUnreadNotificationCount})
 {
    
   const theme = useTheme();
@@ -14,6 +14,9 @@ function Header({loginStatus, setLoginStatus, userData, unreadNotificationCount}
 
   const logout = () => {
     setLoginStatus(false);
+    setUserData(null);
+    setNotifications([]);          // clear previous notifications
+    setUnreadNotificationCount(0);
     localStorage.removeItem("token");           // clear JWT token from localStorage
     console.log("token is removed");            // confirm message if token has removed successfully 
     navigate("/");

@@ -10,7 +10,9 @@ import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
 import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
 import NotificationPanel from "./Components/Notification/NotificationPanel.jsx";
 
+
 import { getAllNotifications } from "./Services/NotificationService.js";
+import { useErrorBoundary } from "react-error-boundary";
 
 import {Routes, Route} from 'react-router-dom';
 import {useState, useEffect} from 'react';
@@ -24,6 +26,9 @@ function App()
   const [notifications, setNotifications] = useState([]);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
+  const {showBoundary} = useErrorBoundary();                             // showBoundary -- to trigger fallback manually
+  const isError = false;
+
 
    // fetch all notifications whenever userData changes
   useEffect(() => {
@@ -32,24 +37,33 @@ function App()
       if (!userData?.email) return;
       try 
       {
+        if(isError)
+        {
+          throw new Error ("Simulated error during data fetching !");
+        }
+
         const list = await getAllNotifications(userData.email);
         setNotifications(list);
-        setUnreadNotificationCount(list.filter(n => !n.isRead).length);
+        setUnreadNotificationCount(list.filter(n => n.read === false).length);
       } 
       catch (error) 
       {
         console.error("Error fetching notifications:", error);
+        showBoundary(error);                                      // show fallback ui 
       }
     };
 
     fetchNotifications();
-  }, [userData]);
+  }, [userData, showBoundary, isError]);
 
 
    return(
          <div className = "AppLayout">
          
-           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} userData={userData} unreadNotificationCount = {unreadNotificationCount}/>  
+           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} 
+                   userData={userData} setUserData = {setUserData} 
+                   setNotifications = {setNotifications} 
+                   unreadNotificationCount = {unreadNotificationCount} setUnreadNotificationCount = {setUnreadNotificationCount} />  
             
             {/* Main content area between header & footer */} 
            

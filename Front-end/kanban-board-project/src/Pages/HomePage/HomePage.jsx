@@ -13,7 +13,7 @@ function HomePage()
 
             {/* Left side */}
             <Box component = "img"
-                 src = "./landing-page-image.png" alt = "home-page" 
+                 src = "../Images/landing-page-image.png" alt = "home-page" 
                  sx={{width: { xs: "100%", sm: "300px", md: "500px" },
                       height: "auto"}}
             />

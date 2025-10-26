@@ -14,13 +14,13 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 {
 
    // find notifications for a user (recipient)
-   @Query(value = "SELECT n.* FROM notification n " +
-           "JOIN notification_recipients nr " +
-           "ON n.notification_id = nr.notification_id " +
-           "WHERE nr.recipients = :recipient " +
-           "ORDER BY n.created_on DESC",
-           nativeQuery = true)
-   List<Notification> findAllByRecipient(@Param("recipient") String recipient);
+//   @Query(value = "SELECT n.* FROM notification n " +
+//           "JOIN notification_recipients nr " +
+//           "ON n.notification_id = nr.notification_id " +
+//           "WHERE nr.recipients = :recipient " +
+//           "ORDER BY n.created_on DESC",
+//           nativeQuery = true)
+   List<Notification> findByRecipientsContainsOrderByCreatedOnDesc(@Param("recipient") String recipient);
 
 
    // find notifications for a user on specific date

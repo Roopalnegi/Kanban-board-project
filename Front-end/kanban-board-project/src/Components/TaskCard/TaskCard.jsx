@@ -4,7 +4,6 @@ import { Card, CardContent, CardActions,
 import {useEffect, useState} from 'react';
 import { useSnackbar } from 'notistack';
 import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask} from '../../Services/TaskServices';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { Icon, pencilImg, deleteImg, restoreImg } from "../../Components/IconComponent/Icon";
 
 
@@ -179,32 +178,23 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
             </Box>
 
 
-            {/* Row 2: Due Date & Days Left */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              
-              
-            {/* Due Date  */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
-  
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CalendarMonthIcon fontSize="small" />
-                <Typography variant="body2" color="black"> <b> Due Date </b> </Typography>
-                </Box>
-  
-                <Typography variant="body2" color="black" sx={{ ml: 3 }}>
-                  {task.dueDate}
-                </Typography>
+            {/* Row 2: Start Date , Due Date & Days Left */}
 
-            </Box>
-              
-              
-            {/* Days Left */}
-              <Typography variant="body2" color="black">
-                {daysLeft} days left
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mt: 1,}}>
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                 📅 <b>Start:</b> {task.createdAt}
+              </Typography>
+
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                ⏰ <b>Due:</b> {task.dueDate}
+              </Typography>
+
+              <Typography variant="body2"sx={{color: daysLeft <= 2 ? "#E74C3C" : "#0d4379ff",fontWeight: 900}}>
+                {daysLeft <= 1 ? `( ${daysLeft} day left )` : `( ${daysLeft} days left )`} 
               </Typography>
             </Box>
 
-        
+              
 
         </CardContent>     
 
@@ -215,6 +205,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
         {/* if task in archive column -- show restore other wise edit & delete icon */}
         <CardActions sx = {{justifyContent: "flex-end", gap: 2}}>
             {
+               role === "admin" &&
                !isArchived ? (
                                 <>
                                     <Tooltip title = "Edit" arrow>

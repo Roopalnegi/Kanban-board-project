@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,23 +83,6 @@ public class TaskController
        {
            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
        }
-    }
-
-
-
-    // method to handle getting tasks by priority
-    @GetMapping("/getTaskByPriority/{priority}")
-    public ResponseEntity<?> handleGetTaskByPriority(@PathVariable String priority)
-    {
-        try
-        {
-            List<Task> foundTaskList = taskService.getTaskByPriority(priority);
-            return new ResponseEntity<>(foundTaskList,HttpStatus.OK);
-        }
-        catch (Exception e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 
@@ -309,5 +293,123 @@ public class TaskController
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    // ----------- searching and filtering endpoints  acc.per board -----------------
+
+    // method to handle filtering task by priority
+    @GetMapping("/filterTaskByPriority/{boardId}")
+    public ResponseEntity<?> handleFilterTaskByPriority(@PathVariable String boardId, @RequestParam("priority") String priority)
+    {
+        try
+        {
+            List<Task> tasks = taskService.filterTaskByPriority(boardId, priority);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle filtering task created on specific date -- user want to see how many task is created at particular date
+    @GetMapping("/filterTaskByCreatedAt/{boardId}")
+    public ResponseEntity<?> handleFilterTaskByCreatedDate(@PathVariable String boardId, @RequestParam("createdAt") LocalDate date)
+    {
+        try
+        {
+            List<Task> tasks = taskService.filterTaskByCreatedDate(boardId, date);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle filtering task due on specific date  -- user want to see how many task have deadline today
+    @GetMapping("/filterTaskByDueDate/{boardId}")
+    public ResponseEntity<?> handleFilterTaskByDueDate(@PathVariable String boardId, @RequestParam("dueDate") LocalDate date)
+    {
+        try
+        {
+            List<Task> tasks = taskService.filterTaskByDueDate(boardId, date);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle filtering task created on specific month and year
+    @GetMapping("/filterTaskByCreatedMonth/{boardId}")
+    public ResponseEntity<?> handleFilterTaskByCreatedMonth(@PathVariable String boardId, @RequestParam("month") int month, @RequestParam("year") int year)
+    {
+        try
+        {
+            List<Task> tasks = taskService.filterTaskByCreatedMonth(boardId, month, year);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle filtering task due on specific month and year
+    @GetMapping("/filterTaskByDueMonth/{boardId}")
+    public ResponseEntity<?> handleFilterTaskByDueMonth(@PathVariable String boardId, @RequestParam("month") int month, @RequestParam("year") int year)
+    {
+        try
+        {
+            List<Task> tasks = taskService.filterTaskByDueMonth(boardId, month, year);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle searching tasks  by any -- title / description / assigned to
+    @GetMapping("/{boardId}/searchTaskBy")
+    public ResponseEntity<?> handleSearchTask(@PathVariable String boardId, @RequestParam("keyword") String keyword)
+    {
+        try
+        {
+            List<Task> tasks = taskService.searchTasks(boardId, keyword);
+            if(tasks == null)
+                tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
+            return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
+
+
+
 }
 

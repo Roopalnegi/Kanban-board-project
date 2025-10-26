@@ -34,7 +34,7 @@ function NotificationPanel({ userData , notifications, setNotifications,setUnrea
 
         setNotifications(list);
         // update unread count
-         setUnreadNotificationCount(list.filter(n => !n.isRead).length);
+         setUnreadNotificationCount(list.filter(n => n.read === false).length);
     }    
     catch (error) 
     {
@@ -49,11 +49,11 @@ function NotificationPanel({ userData , notifications, setNotifications,setUnrea
     try 
     {
         await markNotificationAsRead(notificationId);
-        const updated = notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n);
+        const updated = notifications.map(n => n.notificationId === notificationId ? { ...n, read: true } : n);
         setNotifications(updated);
-
-       const unread = updated.filter(n => !n.isRead).length;
-       setUnreadNotificationCount(unread);
+        const unread = updated.filter(n => n.read === false).length;
+        setUnreadNotificationCount(unread);
+       
     } 
     catch (error) 
     {
