@@ -70,7 +70,7 @@ function BoardDashboard()
             enqueueSnackbar(error.response?.data|| "Failed to fetch board or tasks !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
         }
         
-    },500);       // wait 500ms after typing stops before calling the API.   
+    },700);       // wait 700ms after typing stops before calling the API.   
 
     
 

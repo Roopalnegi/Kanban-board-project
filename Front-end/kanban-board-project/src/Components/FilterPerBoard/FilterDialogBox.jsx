@@ -84,6 +84,22 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
   };
 
 
+  const handleResetFilters = async () => {
+     try 
+     {
+       const allTasks = await getAllTasksOfBoardId(boardId);
+       setTasks(allTasks);
+       setFilterOption(false);
+     } 
+      catch (error) 
+     {
+       console.log("Failed to reset filter : ", error);
+     }
+};
+
+
+
+
   return (
    
    <Dialog open={filterOpen} maxWidth="sm" fullWidth>
@@ -120,7 +136,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
             <Grid item xs={6}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography variant="body2" sx = {{color: "black", fontSize: "16px"}}><b>Created At:</b></Typography>
-                <Tooltip title="Show tasks created on this exact day." arrow>
+                <Tooltip title="Show tasks created on this exact day." arrow placement="bottom">
                     <IconButton size="small">
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -144,7 +160,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
             <Grid item xs={6}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography variant="body2"sx = {{color: "black", fontSize: "18px"}}><b>Due Date:</b></Typography>
-                <Tooltip title="Show tasks that need to be completed on this day." arrow>
+                <Tooltip title="Show tasks that need to be completed on this day." arrow placement="bottom">
                     <IconButton size="small">
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -207,7 +223,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
                       />
                     )}
                   />
-                  <Tooltip title="Show all tasks created in this month and year." arrow>
+                  <Tooltip title="Show all tasks created in this month and year." arrow placement="bottom">
                     <IconButton size="small">
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -257,7 +273,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
                       />
                     )}
                   />
-                  <Tooltip title="Show all tasks due in this month and year." arrow>
+                  <Tooltip title="Show all tasks due in this month and year." arrow placement="bottom">
                     <IconButton size="small">
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -269,6 +285,9 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
         </DialogContent>
 
         <DialogActions>
+          <Button type="submit" variant="contained" sx={{backgroundColor: theme.colors.buttons, borderRadius: "20px"}} onClick={handleResetFilters}>
+            Reset
+          </Button>
           <Button type="submit" variant="contained" sx={{backgroundColor: theme.colors.buttons, borderRadius: "20px"}}>
             Apply
           </Button>
