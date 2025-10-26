@@ -9,7 +9,7 @@ import EmployeeDashboard from "./Pages/EmployeeDashboard/EmployeeDashboard.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
 import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
 import NotificationPanel from "./Components/Notification/NotificationPanel.jsx";
-
+import PageNotFound from "./Pages/PageNotFound/PageNotFound.jsx";
 
 import { getAllNotifications } from "./Services/NotificationService.js";
 import { useErrorBoundary } from "react-error-boundary";
@@ -92,6 +92,7 @@ function App()
                 <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} notifications = {notifications}
                                                                                  setNotifications = {setNotifications}
                                                                                  setUnreadNotificationCount = {setUnreadNotificationCount} />} />
+                <Route path = "*" element = {<PageNotFound />} />                                                                 
 
              </Routes>
             </main>
