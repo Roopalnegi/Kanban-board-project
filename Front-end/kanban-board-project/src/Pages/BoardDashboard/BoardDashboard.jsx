@@ -234,7 +234,10 @@ function BoardDashboard()
               
              {/* filter tasks by columnid for each column card */}
              {
-                tasks.length === 0 ? ( <Typography variant = "h4" sx={{textAlign: "center", mt: 2, fontWeight: 900}}>No tasks found !!</Typography> )
+                (searchTerm.trim() !== "" && tasks.length === 0 )
+                                    ? ( <Typography variant = "h4" sx={{textAlign: "center", mt: 2, fontWeight: 900}}>No tasks found !!</Typography> 
+
+                                    )
                                    : (
                                         board.columns?.map( col => (
                                                              <ColumnCard key = {col.columnId}

@@ -205,7 +205,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
         {/* if task in archive column -- show restore other wise edit & delete icon */}
         <CardActions sx = {{justifyContent: "flex-end", gap: 2}}>
             {
-               role === "admin" &&
+               role === "admin" &&(
                !isArchived ? (
                                 <>
                                     <Tooltip title = "Edit" arrow>
@@ -224,7 +224,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
                                         <Icon src = {deleteImg} alt = "Delete Permantently Icon" onClick = {handleDeleteTask} sx = {{cursor: "pointer"}}/>
                                     </Tooltip>    
                                 </>   
-                               ) 
+                               ) )
             }            
         </CardActions>
     

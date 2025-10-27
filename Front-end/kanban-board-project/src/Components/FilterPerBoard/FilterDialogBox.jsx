@@ -6,7 +6,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton,
 import CloseIcon from "@mui/icons-material/Close";
 import InfoIcon from '@mui/icons-material/Info';
 import { enqueueSnackbar } from "notistack";
-import { filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth } from "../../Services/TaskServices";
+import { filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, getAllTasksOfBoardId } from "../../Services/TaskServices";
 
 function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFilterOpen}) 
 {
