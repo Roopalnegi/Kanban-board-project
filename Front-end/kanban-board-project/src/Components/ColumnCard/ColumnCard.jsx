@@ -1,17 +1,22 @@
 import { Card,CardContent,Box,Typography, Stack} from "@mui/material";
 import {useState, useEffect} from 'react';
 import { useSnackbar } from "notistack";
-import TaskCard from "../TaskCard/TaskCard";
 import AddTaskForm from "../../Forms/AddTask/AddTask";
 import SpeedDialLayout from '../SpeedDialLayout/SpeedDialLayout';
 import InlineEditableField from "../InlineEditableField/InlineEditableField";
 import styles from '../SpeedDialLayout/SpeedDialLayout.module.css';
 import { addTaskImg, deleteImg, pencilImg } from "../IconComponent/Icon";
 import { updateColumnName, deleteColumn, getArchiveColumnId} from "../../Services/ColumnServices";
+import DraggableTask from "../DragAndDrop/DraggableTask";
+import { useDroppable } from "@dnd-kit/core";
 
 
-function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete})
+function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete, userData})
 {
+   const isEmployee = userData?.role?.toLowerCase() === "employee";
+   
+   const {isOver, setNodeRef} = useDroppable({id: String(column.columnId)});       // give each droppable the column id
+                                                                                   // such that over.id will be columnId  
 
    const{enqueueSnackbar} = useSnackbar();
 
@@ -23,11 +28,19 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
 
    // function to get archive column id
    useEffect(() => {
-       const archiveId = async () => {
-         const id = await getArchiveColumnId(boardId);
-         setArchiveId(id);
+
+       const fetchArchiveId = async () => {
+         try
+         {
+          const id = await getArchiveColumnId(boardId);
+          setArchiveId(id);
+         }
+         catch(error)
+         {
+          console.error("Failed to fetch archive Id : ", error);
+         }
        };
-       archiveId();
+       fetchArchiveId();
    },[boardId]);
 
 
@@ -47,7 +60,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
     
 
     // function to get random rgba code 
-    const getRandomRGBA = (alpha = 0.3 ) => {
+    const getRandomRGBA = (alpha = 0.2 ) => {
          const r = Math.floor(Math.random() * 256); // Red: 0-255
          const g = Math.floor(Math.random() * 256); // Green: 0-255
          const b = Math.floor(Math.random() * 256); // Blue: 0-255
@@ -56,8 +69,13 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
 
 
 
-    // save column name
+    // rename column name
     const handleSaveColumnName = async (newName) => {
+         if(isEmployee)
+         {
+          enqueueSnackbar("Employees cannot rename columns.", { variant: "warning" });
+      return;
+         }
          try
          {
            const updatedColumn = { columnId: column.columnId, 
@@ -80,6 +98,10 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
 
     // delete column
     const handleDeleteColumn = async () => {
+        if (isEmployee) {
+      enqueueSnackbar("Employees cannot delete columns.", { variant: "warning" });
+      return;
+    }
         try
         {
            await deleteColumn (boardId, column.columnId);
@@ -125,7 +147,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
 
 
     // opeartions / actions perform on card
-    const actions = [
+    const actions = !isEmployee ? [
          {
            src : pencilImg,
            name: 'Edit Column Name',
@@ -141,32 +163,37 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
            name: 'Delete Column',
            onClick : handleDeleteColumn,
         }
-       ];
+       ] : [];  // employee see no actions
       
 
 
     return (
-      <Card sx = {{minWidth: 300, minHeight : 350, display: "flex", flexDirection: "column", backgroundColor: getColumnColor(column.columnName)}} raised>
+      <Card ref={setNodeRef}
+            sx = {{minWidth: 300, minHeight : 350, display: "flex", flexDirection: "column", backgroundColor: getColumnColor(column.columnName)}} raised>
 
-        {/* Card Header -- Editable Column Name */ }
+        {/* Card Header -- Editable Column Name for admin only */ }
         <Stack direction="row" alignItems="center" justifyContent="space-between" padding = "20px">
               <Typography variant="h4" noWrap>
                 {
-                 editing ? (
-                            <InlineEditableField
-                              value={column.columnName}
-                              onSave={handleSaveColumnName}
-                              forceEditMode
-                            />
-                           ) : (
-                                column.columnName
-                               )
+                 editing && !isEmployee ? (
+                                            <InlineEditableField
+                                              value={column.columnName}
+                                              onSave={handleSaveColumnName}
+                                              forceEditMode
+                                            />
+                                          ) : (
+                                               column.columnName
+                                              )
                 }
               </Typography>
 
             <Box sx={{ position: "relative", width: 40, height: 40 }}>
-               <SpeedDialLayout className={styles["transparent-speed-dial"]}
-                                actions={actions} direction="down" />
+               {/* Hide speed dial for employee */}
+                {
+                  !isEmployee  &&  <SpeedDialLayout className={styles["transparent-speed-dial"]}
+                                                            actions={actions} direction="down" />
+                }
+               
              </Box>
         </Stack>
 
@@ -174,7 +201,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
         {/* Add Task Form */}
 
          {
-           showTaskForm && (<AddTaskForm boardId = {boardId}
+           !isEmployee && showTaskForm && (<AddTaskForm boardId = {boardId}
                                          columnId = {column.columnId}
                                          task = {editingTask}            // pass task for edit mode 
                                          open = {showTaskForm}
@@ -190,12 +217,16 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
         
          {
            tasks.length > 0 ? (
-                                 tasks.map(t => <TaskCard key = {t.taskId} task = {t} 
-                                                          onTaskEdit = {handleEditTask}
-                                                          onTaskArchive = {onTaskArchive}
-                                                          onTaskRestore = {onTaskRestore}
-                                                          onTaskDelete = {onTaskDelete}
-                                                          archiveColumnId = {archiveId}
+                                 tasks.map(t => <DraggableTask draggable = {isEmployee}
+                                                               key = {t.taskId} 
+                                                               task = {t} 
+                                                               onTaskEdit = {handleEditTask}
+                                                               onTaskUpdate = {onTaskUpdate}
+                                                               onTaskRestore = {onTaskRestore}
+                                                               onTaskDelete = {onTaskDelete}
+                                                               archiveColumnId = {archiveId}
+                                                               readOnly = {isEmployee}             // employees can't edit / archive / delete
+
                                                  />)
                                )
                             : (

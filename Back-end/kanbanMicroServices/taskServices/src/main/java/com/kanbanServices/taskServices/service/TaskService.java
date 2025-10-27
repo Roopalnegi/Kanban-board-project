@@ -40,6 +40,10 @@ public interface TaskService
     // move task b/w columns -- to do, in-progress, done, archive
     Task moveTaskByColumn(String taskId, String newColumnId, String doneBy) throws TaskNotFoundException;
 
+    // get tasks of specific employee
+    List<Task> getTasksAssignedToEmployee(String email) throws TaskNotFoundException;
+
+
     // ----------- helper method -----------
 
     // count days before due date

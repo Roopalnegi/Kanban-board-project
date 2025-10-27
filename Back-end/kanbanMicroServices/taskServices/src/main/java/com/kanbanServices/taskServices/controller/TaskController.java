@@ -333,6 +333,28 @@ public class TaskController
     }
 
 
+    // get tasks of specific employee
+    @GetMapping("/getTasksByEmployee/{email}")
+    public ResponseEntity<?> handleGetTasksByEmployee(@PathVariable String email, HttpServletRequest request)
+    {
+        try
+        {
+            requestHelper.checkEmployeeRole(request); // verify token role is EMPLOYEE
+
+            List<Task> assignedTasks = taskService.getTasksAssignedToEmployee(email);
+            return new ResponseEntity<>(assignedTasks, HttpStatus.OK);
+        }
+        catch (TaskNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     // method to handle filtering task due on specific date  -- user want to see how many task have deadline today
     @GetMapping("/filterTaskByDueDate/{boardId}")
     public ResponseEntity<?> handleFilterTaskByDueDate(@PathVariable String boardId, @RequestParam("dueDate") LocalDate date)

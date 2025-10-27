@@ -290,13 +290,32 @@ public class TaskServiceImpl implements TaskService
         task.setPreviousColumnId(task.getColumnId());
         task.setColumnId(newColumnId);
 
+        // save task
+        Task savedTask = taskRepository.save(task);
 
         // send notification
         String newColumnName = boardValidationService.getColumnNameBy(task.getBoardId(), task.getColumnId());
         sendNotification(task, "Task moved to " + newColumnName, doneBy, List.of("All"));
 
+        return savedTask;
+    }
 
-        return task;
+    // get tasks of specific employee
+    @Override
+    public List<Task> getTasksAssignedToEmployee(String email) throws TaskNotFoundException
+    {
+        List<Task> allTasks = taskRepository.findAll();
+
+        List<Task> assignedTasks = allTasks.stream()
+                .filter(task -> task.getAssignedTo() != null && task.getAssignedTo().contains(email))
+                .toList();
+
+        if (assignedTasks.isEmpty())
+        {
+            throw new TaskNotFoundException("No tasks found assigned to " + email);
+        }
+
+        return assignedTasks;
     }
 
 
@@ -345,6 +364,8 @@ public class TaskServiceImpl implements TaskService
                           return val.trim();
                       })
                       .collect(Collectors.toList());
+
+              recipients.add("roopalnegi147@gmail.com"); // Add admin email(s) manually since there is only one admin ... later improve for scalability
           }
 
         Map<String, Object> notificationMap = new HashMap<>();

@@ -38,8 +38,10 @@ function LoginForm({setLoginStatus,setUserData})
       //destructure token + user 
       const {token,user}=response.data;
 
-      //save token in localstorage
+      //save token, role, email in localstorage
       localStorage.setItem("token",token);
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("email", user.email);
 
       // update app state
       setUserData(user);

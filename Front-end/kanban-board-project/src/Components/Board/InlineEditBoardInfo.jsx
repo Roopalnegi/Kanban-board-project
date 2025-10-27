@@ -4,14 +4,20 @@ import { handleUpdatingBoardInfo } from '../../Services/BoardServices';
 import { enqueueSnackbar } from 'notistack';
 import InlineEditableField from '../InlineEditableField/InlineEditableField';
 
-function InlineEditableBoardInfo({board})
+function InlineEditableBoardInfo({board,userData})
 {
-     
+    const isEmployee = userData?.role?.toLowerCase() === "employee"; 
+
     const [boardName, setBoardName] = useState(board.boardName);        // hold board name value
     const [description, setDescription] = useState(board.description);    // hold board description value 
 
     const handleSaveField = async (field, newValue) => {
        
+      if (isEmployee) 
+      {
+         enqueueSnackbar("Employees cannot modify board details.", {variant: "warning",});
+         return;
+      }
         const updatedData = {boardName, description, [field]: newValue};
         try
         {
@@ -40,12 +46,16 @@ function InlineEditableBoardInfo({board})
       <InlineEditableField label = "Board Name"
                            value = {boardName}
                            onSave = {(newValue) => handleSaveField("boardName", newValue)}
+                           readOnly={isEmployee}//for employee
+
        />                    
     
       {/* Description */}
       <InlineEditableField label = "Description"
                            value = {description}
                            onSave = {(newValue) => handleSaveField("description", newValue)}
+                           readOnly={isEmployee}//for employee
+
        />
     
  

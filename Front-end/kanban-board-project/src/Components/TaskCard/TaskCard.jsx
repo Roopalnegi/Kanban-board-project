@@ -4,10 +4,10 @@ import { Card, CardContent, CardActions,
 import {useEffect, useState} from 'react';
 import { useSnackbar } from 'notistack';
 import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask} from '../../Services/TaskServices';
-import { Icon, pencilImg, deleteImg, restoreImg } from "../../Components/IconComponent/Icon";
+import { Icon, pencilImg, deleteImg, restoreImg } from '../IconComponent/Icon';
 
 
-function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskDelete, archiveColumnId}) 
+function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, archiveColumnId, readOnly = false}) 
 {
 
    const {enqueueSnackbar} = useSnackbar();
@@ -15,7 +15,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
    const [daysLeft, setDaysLeft] = useState(null);
    // track if task in column archive
    const isArchived = task.columnId ===  archiveColumnId ;
-   
+  
 
 
    // function to calculate days left to complete task
@@ -54,19 +54,42 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
 
     
 
-    // function to get random rgb code 
-    const getRandomRGB = () => {
-         const r = Math.floor(Math.random() * 256); // Red: 0-255
-         const g = Math.floor(Math.random() * 256); // Green: 0-255
-         const b = Math.floor(Math.random() * 256); // Blue: 0-255
-         return `rgb(${r}, ${g}, ${b})`;
+    // function to generate color based on user email hash -- create a unqiue and consistent color for each user email
+    const getColorFromEmail = (email) => {
+         
+      let hash = 0;
+      
+      // convert email string into no.
+      for (let i=0 ; i < email.length; i++)
+      {
+         // hash is big no. slice it by using << / >> operators  
+         // email - char At (i) give no. like a - 97 , b - 98 | << bitwise shifts to changes the final no. slightly 
+         // why change hash no ? --- so that same email ---> same hash no.       ||| different email --> different hash no.
+         hash = email.charCodeAt(i) + ((hash<<5) - hash)          
+      }
+
+        // extract r g b values from that no.
+        const r =  (hash >> 24) & 0xff; 
+        const g =  (hash >> 16) & 0xff;
+        const b =  hash & 0xff;
+
+        return `rgb(${(Math.abs(r) + 225)/2}, ${(Math.abs(g) + 255)/2}, ${(Math.abs(b) + 255) / 2})`;
     };
 
+    
+       // block actions for employees
+  const blockAction = (message) => {
+    enqueueSnackbar(message || "You cannot perform this action.", {
+      variant: "warning",
+      anchorOrigin: { horizontal: "bottom", vertical: "right" },
+    });
+  };
 
 
 
     // archive task
     const handleArchiveTask = async () => {
+       if (readOnly) return  blockAction("Employees cannot archive tasks.");
        try 
        {
           const updatedTask = await archiveTask(task.taskId);
@@ -84,6 +107,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
 
     // restore task
     const handleRestoreTask = async () => {
+       if (readOnly) return blockAction("Employees cannot restore tasks.");
        try 
        {
           const updatedTask = await restoreTask(task.taskId);
@@ -101,6 +125,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
 
     // delete task permanent
     const handleDeleteTask = async () => {
+        if (readOnly) return blockAction("Employees cannot restore tasks.");
        try 
        {
           await deletePermanent(task.taskId);
@@ -117,6 +142,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
 
     // edit task
     const handleEditTask = () => {
+        if (readOnly) return blockAction("Employees cannot restore tasks.");
         if(onTaskEdit)
            onTaskEdit(task);
     };
@@ -164,7 +190,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
                  task.assignedTo?.map((email,index) => {
                                                          const initial = email ? email.charAt(0).toUpperCase() : "?" ;        // ? is fallback in email does not exist
                                                          return (<Tooltip key = {`${email}-${index}`} title = {email} arrow>
-                                                                    <Avatar sx={{ bgcolor: getRandomRGB(), width: 28, height: 28, fontSize: 14 }}>
+                                                                    <Avatar sx={{ bgcolor: getColorFromEmail(email), width: 28, height: 28, fontSize: 14 }}>
                                                                        {initial}
                                                                     </Avatar>
                                                                  </Tooltip>
@@ -193,6 +219,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
                 {daysLeft <= 1 ? `( ${daysLeft} day left )` : `( ${daysLeft} days left )`} 
               </Typography>
             </Box>
+            
 
               
 
@@ -205,7 +232,7 @@ function TaskCard({task, role, onTaskEdit, onTaskArchive, onTaskRestore, onTaskD
         {/* if task in archive column -- show restore other wise edit & delete icon */}
         <CardActions sx = {{justifyContent: "flex-end", gap: 2}}>
             {
-               role === "admin" &&(
+               !readOnly &&(
                !isArchived ? (
                                 <>
                                     <Tooltip title = "Edit" arrow>

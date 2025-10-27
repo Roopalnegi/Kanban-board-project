@@ -8,7 +8,7 @@ import {Icon, pencilImg} from '../IconComponent/Icon';
 */
 
 // If forceEditMode is true, start in edit mode
-function InlineEditableField( {label, value, onSave, multiline = false, forceEditMode = false} )
+function InlineEditableField( {label, value, onSave, multiline = false, forceEditMode = false, readOnly} )
 {
     // track which field is edited 
     const [editMode, setEditMode] = useState(forceEditMode);
@@ -74,11 +74,12 @@ function InlineEditableField( {label, value, onSave, multiline = false, forceEdi
                                       }
                                   {value}
                                 </span>  
-                               
-                               <Icon src = {pencilImg} alt = "Edit Icon" 
-                                     onClick = {handleFieldClick} sx = {{cursor: "pointer"}} />
-
-                            </Typography> 
+                               {
+                                 !readOnly &&     <Icon src = {pencilImg} alt = "Edit Icon" 
+                                                       onClick = {handleFieldClick} sx = {{cursor: "pointer"}} />
+                               }
+                           
+                           </Typography> 
                         )
          }    
         

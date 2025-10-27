@@ -84,11 +84,11 @@ function App()
                 {/* Employee route protected with ProtectedRoute */}
                <Route path = "/employee-dashboard" 
                       element = {<ProtectedRoute allowedRole = "employee" userData = {userData}>
-                                     <EmployeeDashboard/>
+                                     <EmployeeDashboard userData={userData}/>
                                  </ProtectedRoute> }
                 />
 
-                <Route path = "/board/:boardId" element = {<BoardDashboard/>} />
+                <Route path = "/board/:boardId" element = {<BoardDashboard userData = {userData}/>} />
                 <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} notifications = {notifications}
                                                                                  setNotifications = {setNotifications}
                                                                                  setUnreadNotificationCount = {setUnreadNotificationCount} />} />

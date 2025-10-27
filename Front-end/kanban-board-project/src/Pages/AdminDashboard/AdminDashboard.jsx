@@ -5,8 +5,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { getAllBoards, deleteBoard } from "../../Services/BoardServices";
-import { Icon } from "../../Components/IconComponent/Icon";
-import { deleteBoardImg } from "../../Components/IconComponent/Icon";
+import { Icon, deleteBoardImg } from "../../Components/IconComponent/Icon";
 import CreateBoardForm from "../../Components/Board/CreateBoardForm";
 
 

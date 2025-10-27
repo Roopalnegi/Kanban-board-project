@@ -8,19 +8,21 @@ import SpeedDialLayout from '../../Components/SpeedDialLayout/SpeedDialLayout';
 import SearchBar from '../../Components/SearchPerBoard/SearchBar';
 import FilterButton from '../../Components/FilterPerBoard/FilterButton';
 import { getBoardDetails, deleteBoard } from '../../Services/BoardServices';
-import { getAllTasksOfBoardId, searchTasksByKeyword } from '../../Services/TaskServices';
+import { getAllTasksOfBoardId, moveTaskByColumn, searchTasksByKeyword, updateTask } from '../../Services/TaskServices';
 import { addColumnToBoard, updateColumnName } from '../../Services/ColumnServices';
-import { addColumnImg,helpImg,deleteBoardImg  } from '../../Components/IconComponent/Icon';
+import { addColumnImg, helpImg, deleteBoardImg } from '../../Components/IconComponent/Icon';
+import { DndContext } from '@dnd-kit/core';
 
 
 
-function BoardDashboard()
+function BoardDashboard({userData})
 {
 
    const {enqueueSnackbar} = useSnackbar();
    const navigate = useNavigate();
    const {boardId} = useParams();
-
+   
+    const isEmployee = userData?.role?.toLowerCase() === "employee"; // ✅ check role
 
    const [board, setBoard] = useState({columns: []});            // store baord data
    const [tasks, setTasks] = useState([]);        // store all task belongs to board
@@ -30,62 +32,84 @@ function BoardDashboard()
    const [searchTerm, setSearchTerm] = useState('');     // search compoenent since searching is done per board
    const [filterOption, setFilterOption] = useState(false);     // filter task since filter is done per board
 
-
-   // fetch board and its tasks, handle searching 
+   
+   // fetch boards and task based on assignee
    useEffect(() => {
-     
-     let active = true;                         // race condition -- boolean ensure updates only happen when compoenent is mounted
 
-     // delay serach by 500ms to avoid unnecessary api call since right now even small keystroke triggers search
-     const fetchBoard = setTimeout (async () => {
-        
-        try
-        {
-            // fetch board data (including column info)
-            const boardData = await getBoardDetails(boardId);
+      let active = true;
 
-            let taskData;
+      const fetchBoardData = setTimeout(async () => {
 
-            if(searchTerm.trim() !== "")
+         try
+         {
+            let boardDetails = await getBoardDetails(boardId);
+            let taskData = [];
+
+
+            if(isEmployee)
             {
-               // search task by keyword
-               taskData = await searchTasksByKeyword(boardId, searchTerm);
+                // fetch all tasks and filter those assigned to this employee
+                const allTasks = await getAllTasksOfBoardId(boardId);
+                let employeeTasks = allTasks.filter(task => {
+                                                                if(Array.isArray(task.assignedTo))
+                                                                {
+                                                                    return task.assignedTo.includes(userData.email);
+                                                                }
+                                                                return task.assignedTo === userData.email;
+                                                            });
+               // apply search filter only to employees 's tasks
+               if(searchTerm.trim() !== "")
+                {
+                   employeeTasks = employeeTasks.filter(task => task.taskName.toLowerCase().includes(searchTerm.toLowerCase()));
+                }                                             
+
+                // show all columns, but only employee's tasks within them
+                 const filteredColumns = boardDetails.columns.map((col) => ({ ...col,
+                                                                              tasks: employeeTasks.filter((task) => task.columnId === col.columnId)}));
+
+                 setBoard({ ...boardDetails, columns: filteredColumns });
+                 taskData = employeeTasks;                                                             
             }
             else
             {
-               // fetch all tasks data belong to board
-               taskData = await getAllTasksOfBoardId(boardId);
+               // Admin - get all tasks (search applied fully)
+               taskData = searchTerm.trim() !== "" ? await searchTasksByKeyword(boardId, searchTerm)
+                                                   : await getAllTasksOfBoardId(boardId);
+               setBoard(boardDetails);
             }
-
             if(active)
             {
-                setBoard(boardData);
-                setTasks(taskData);
-                setLoading(false);
+               setTasks(taskData);
+               setLoading(false);
             }
-           
-        }
-        catch (error) 
+        }      
+        catch(error)
         {
-            enqueueSnackbar(error.response?.data|| "Failed to fetch board or tasks !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+               enqueueSnackbar(error.response?.data || "Failed to fetch board or tasks!",{ variant: "error", anchorOrigin: { horizontal: "bottom", vertical: "right" }});
         }
-        
-    },700);       // wait 700ms after typing stops before calling the API.   
+         
+      }, 700);
 
+      return () => { active = false;
+                       clearTimeout(fetchBoardData);
+                      };
+
+   },[boardId, searchTerm, filterOption, userData.email]);
+   
+  
     
-
-     return () => {active = false // clean race condition
-                  clearTimeout(fetchBoard);    // If the user types again within 500ms, it cancels the previous API call.
-                  };           
-
-   },[boardId,searchTerm, filterOption]);
-
 
 
 
 
    // add new column
    const handleAddColumn = async () => {
+     if (isEmployee) 
+     {
+      enqueueSnackbar("Employees cannot add columns.", { variant: "warning" });
+      return;
+     }
+
      try
      {
         const newColumn = {columnName : "Untitled"};   // create a deafult column name
@@ -103,6 +127,11 @@ function BoardDashboard()
 
     // delete board 
     const handleDeleteBoard = async (boardId) => {
+      if (isEmployee) 
+      {
+        enqueueSnackbar("Employees cannot delete boards.", { variant: "warning" });
+        return;
+      }
       try
       {
         await deleteBoard(boardId);
@@ -121,6 +150,11 @@ function BoardDashboard()
 
     // update column name  (app lift up state)
     const handleColumnNameChange = async (columnId, updatedColumn) => {
+      if (isEmployee) 
+      {
+        enqueueSnackbar("Employees cannot delete boards.", { variant: "warning" });
+        return;
+      }
       try
       {
         await updateColumnName(boardId, columnId, updatedColumn);
@@ -179,6 +213,49 @@ function BoardDashboard()
 
 
 
+    // handle dragging
+    const handleDragEnd = async ({active, over}) => {
+        if(!active || !over) return;
+
+        // only employee allowed to drag
+        if(!isEmployee)
+        {
+           enqueueSnackbar("Only employees can move tasks.", {variant: "error"});
+           return;
+        }
+
+        const taskId = String(active.id);             // dnd-kit compares ids strictly
+        const newColumnId = String(over.id);
+
+        // find current task and its column
+        const currentTask = tasks.find(t => String(t.taskId) === taskId);
+        if(!currentTask) return;
+
+        const prevColumnId = String(currentTask.columnId || '');
+
+        if(prevColumnId === newColumnId) return;      // nothing changed
+
+        // move task in local state
+        setTasks (prev => 
+                  prev.map(task => String(task.taskId) === taskId ? {...task, columnId: newColumnId}: task));
+        
+        // update task on backend
+        try
+        {
+          await moveTaskByColumn(taskId, newColumnId, userData.username);
+           enqueueSnackbar("Task moved successfully.", { variant: "success" });
+           // const updatedTasks = await getAllTasksOfBoardId(boardId);
+    // setTasks(updatedTasks);
+
+        } 
+        catch(error)
+        {
+           // rollback on failure
+           setTasks(prev => prev.map(t => (String(t.taskId) === taskId ? { ...t, columnId: prevColumnId } : t)));
+           enqueueSnackbar("Failed to update task on server !", {variant: "error"});
+        }
+    };
+
    // opeartions / actions perform on board
    const actions = [
      { src : addColumnImg, 
@@ -214,16 +291,19 @@ function BoardDashboard()
           <Stack direction = "column" spacing={2}>
 
               {/* Display Board Info */}
-              <InlineEditableBoardInfo board = {board} />
+              <InlineEditableBoardInfo board = {board} userData = {userData}/>
     
               {/* Helper Tools */}
-              <Box sx = {{display: "flex", gap: 1, jsutifyContent: "space-between", alignItems: "center"}}>
+              <Box sx = {{display: "flex", gap: 1, justifyContent: "space-between", alignItems: "center"}}>
 
                 <SearchBar setSearchTerm = {setSearchTerm} />
                 
                 <FilterButton boardId = {boardId} setTasks = {setTasks} setFilterOption = {setFilterOption} />
 
-                <SpeedDialLayout actions = {actions} direction = "left"/>
+                 {
+                   !isEmployee && <SpeedDialLayout actions = {actions} direction = "left"/>
+                 }
+              
 
               </Box>
           </Stack>
@@ -239,21 +319,29 @@ function BoardDashboard()
 
                                     )
                                    : (
-                                        board.columns?.map( col => (
-                                                             <ColumnCard key = {col.columnId}
-                                                                         boardId = {boardId}
-                                                                         column = {col} 
-                                                                         tasks = {tasks.filter(t => t.columnId === col.columnId)}
-                                                                         onColumnNameChange = {handleColumnNameChange}
-                                                                         onColumnDelete = {handleColumnDelete}
-                                                                         onTaskAdded = {handleTaskAdded}
-                                                                         onTaskUpdate = {handleTaskUpdated}
-                                                                         onTaskArchive = {handleTaskArchive}
-                                                                         onTaskRestore = {handleTaskRestore}
-                                                                         onTaskDelete = {handleTaskDeleted}
-                                                             />
-                                            
-                                           )))
+                                        <DndContext onDragEnd={handleDragEnd}>
+                                            <div style = {{display: "flex", gap: "40px", overflowX:"auto", padding: "16px 0"}}>
+
+                                                { board.columns?.map( col => (
+                                                                     <ColumnCard key = {col.columnId}
+                                                                                 boardId = {boardId}
+                                                                                 column = {col} 
+                                                                                 tasks = {tasks.filter(task => task.columnId === col.columnId)}
+                                                                                 onColumnNameChange = {handleColumnNameChange}
+                                                                                 onColumnDelete = {handleColumnDelete}
+                                                                                 onTaskAdded = {handleTaskAdded}
+                                                                                 onTaskUpdate = {handleTaskUpdated}
+                                                                                 onTaskArchive = {handleTaskArchive}
+                                                                                 onTaskRestore = {handleTaskRestore}
+                                                                                 onTaskDelete = {handleTaskDeleted}
+                                                                                 userData = {userData}
+                                                                     />
+                                                    
+                                                   ))}
+                                            </div>
+                                        </DndContext>   
+                                   )  
+                                              
              }
      
            </div>

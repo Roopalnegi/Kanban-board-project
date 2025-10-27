@@ -1,76 +1,127 @@
-import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import {Icon} from '../IconComponent/Icon';
-import { deleteBoardImg } from '../IconComponent/Icon';
-import {useNavigate} from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { getAllBoards } from "../../Services/BoardServices";
+import { getTasksByEmployee } from "../../Services/TaskServices";
+import { Box, Grid, Card, CardContent, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { deleteBoard } from "../../Services/BoardServices";
 
-
-export default function BoardList({boards, onBoardDeleted})
+export default function BoardList({ userData, boards: propBoards = [], onBoardDeleted }) 
 {
 
+  const [boards, setBoards] = useState(propBoards);
+  const [loading, setLoading] = useState(!propBoards.length);
+
   const navigate = useNavigate();
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const handleBoardOpen = (boardId) => {
-       navigate(`/board/${boardId}`);
-  };
+  const isEmployee = userData?.role?.toLowerCase() === "employee";
 
-
-  const handleDeleteBoard = async (boardId) => {
-     try
-     {
-       const response = await deleteBoard(boardId);
-       enqueueSnackbar(response || "Board Deleted Successfully !", {variant: "success"});    
-       
-      // tell parent to remove board from state (app lift state)
-      onBoardDeleted(boardId);                                                                                                                  
-     }
-     catch(error)
-     {
-      enqueueSnackbar(error?.message, {variant: "error"});
-     }
-  };
-
-
-  return(
-    <Box>
-      <Typography variant="h6"fontWeight="bold"mb={2} >
-        Board OverView
+  useEffect(() => {
+    if (!userData) return;
+    
+    // Only fetch boards if propBoards is empty (for admin)
+    if (propBoards.length > 0) 
+    {
+      setBoards(propBoards);
+      setLoading(false);
+      return;
+    }
+    
+    const fetchBoards = async () => {
+      try 
+      {
+        if (isEmployee) 
+        {
+          const tasks = await getTasksByEmployee(userData.email);
+          const uniqueBoards = [];
+          const boardMap = {};
+          tasks.forEach((task) => {
+            const board = task.board || task.boardId || null;
+            if (board && !boardMap[board.boardId]) {
+              boardMap[board.boardId] = true;
+              uniqueBoards.push(board);
+            }
+          });
+          setBoards(uniqueBoards);
+        } 
+        else 
+        {
+          const allBoards = await getAllBoards();
+          setBoards(allBoards);
+        }
+      } 
+      catch (error) 
+      {
+        enqueueSnackbar("Failed to load boards.", { variant: "error" });
+      } 
+      finally 
+      {
+        setLoading(false);
+      }
+    };
+    fetchBoards();
+  }, [propBoards, isEmployee, userData, enqueueSnackbar]);
+  
+  
+  if (!userData) {
+    return (
+      <Typography variant="h6" sx={{ textAlign: "center", mt: 3 }}>
+        Loading user data...
       </Typography>
-      <Grid container spacing={2}>
-        {boards.map((board)=>(
-          <Grid item xs={12} sm={6}key={board.boardId}>
-            <Card
-            sx={{
-              borderRadius:3,
-              boxShadow:2,
-              cursor:"pointer",
-              "&:hover":{boxShadow:5}
-            }}
-            onClick={() => handleBoardOpen(board.boardId)}
-            >
-              <CardContent>
-                <Box display="flex"alignItems="center"justifyContent="space-between">
-                  <Box display="flex"alignItems="center"gap={1}>
-                    <DashboardIcon color="primary"/>
-                    <Typography variant="subtitle1"fontWeight="bold">
-                      {board.boardName}
-                    </Typography>
-                  </Box>
-                  <Icon src = {deleteBoardImg} alt = "DeleteBoardIcon" onClick = {(e) => {e.stopPropagation();
-                                                                                handleDeleteBoard(board.boardId);}}
-                        sx = {{cursor: "pointer"}} />                                                        
+    );
+  }
 
-                </Box>
-                <Typography variant="body2"color="text.primary"mt={1}>
-                  {board.description||"No description provided"}
-                </Typography>
-              </CardContent>
-            </Card>
+  if (loading) {
+    return (
+      <Typography variant="h6" sx={{ textAlign: "center", mt: 3 }}>
+        Loading boards...
+      </Typography>
+    );
+  }
+  
+  const handleCreateBoard = () => navigate("/create-board");
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" mb={2}>
+        {isEmployee ? "Assigned Boards" : "All Boards"}
+      </Typography>
+      {!isEmployee && (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mb: 3 }}
+          onClick={handleCreateBoard}
+        >
+          + Create Board
+        </Button>
+      )}
+      <Grid container spacing={2}>
+        {boards.length > 0 ? (
+          boards.map((board) => (
+            <Grid item xs={12} sm={6} md={4} key={board.boardId}>
+              <Card
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": { backgroundColor: "rgba(0,0,0,0.05)" },
+                }}
+                onClick={() => navigate(`/board/${board.boardId}`)}
+              >
+                <CardContent>
+                  <Typography variant="h6">{board.boardName}</Typography>
+                  <Typography variant="body2">
+                    {board.description || "No description"}
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
-        ))}
+          ))
+        ) : (
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            {isEmployee
+              ? "No boards with tasks assigned to you yet !"
+              : "No boards created yet !"}
+          </Typography>
+        )}
       </Grid>
     </Box>
   );

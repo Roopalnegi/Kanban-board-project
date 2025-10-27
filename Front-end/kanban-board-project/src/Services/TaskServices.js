@@ -60,6 +60,20 @@ const updateTask = async (taskId, updatedData) => {
 };
 
 
+// move task within column
+const moveTaskByColumn = async (taskId, columnId, username) => {
+   const response = await axiosInstance.put(`${baseURL}/moveTaskByColumn/${taskId}/${columnId}`,{username});
+   return response.data;
+};
+
+
+// get tasks of assigned employee
+const getTasksByEmployee = async (email) => {
+  const response = await axiosInstance.get(`${baseURL}/getTasksByEmployee/${email}`);
+  return response.data;
+};
+
+
 
 // filter task by priority
 const filterTaskByPriority = async (boardId, priority) => {
@@ -106,7 +120,8 @@ const searchTasksByKeyword = async (boardId, keyword) => {
 
 
 export {getAllTasksOfBoardId, addTask, getEmployeeDetails, calculateNoOfDays, deletePermanent, archiveTask, restoreTask, updateTask,
-        filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, searchTasksByKeyword
+        filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, searchTasksByKeyword,
+        getTasksByEmployee, moveTaskByColumn
 };
 
 
