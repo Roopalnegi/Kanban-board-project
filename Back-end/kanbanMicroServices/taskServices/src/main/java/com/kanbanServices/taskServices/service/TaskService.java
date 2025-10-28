@@ -43,11 +43,14 @@ public interface TaskService
     // get tasks of specific employee
     List<Task> getTasksAssignedToEmployee(String email) throws TaskNotFoundException;
 
+    // check all tasks for upcoming or overdue deadlines
+    void checkDueDatesAndNotify();
 
     // ----------- helper method -----------
 
     // count days before due date
     Long countDaysBeforeDue(LocalDate updatedAt);
+
 
     // get all employee data for assigned To property of task
     Map<Long,String> getAllEmployeeDetails();

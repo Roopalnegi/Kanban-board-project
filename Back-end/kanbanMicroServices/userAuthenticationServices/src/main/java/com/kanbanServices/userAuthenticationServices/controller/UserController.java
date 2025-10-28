@@ -11,14 +11,19 @@ import com.kanbanServices.userAuthenticationServices.service.OtpService;
 import com.kanbanServices.userAuthenticationServices.service.SecurityTokenGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.mail.Multipart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")

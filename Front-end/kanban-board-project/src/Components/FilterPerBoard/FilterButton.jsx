@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 import FilterDialogBox from "./FilterDialogBox";
 
-function FilterButton({setTasks, boardId, setFilterOption})
+function FilterButton({setTasks, boardId, setFilterOption, userData})
 {
 
     const [open, setOpen] = useState(false);             // control opening and closing of filter dialog box
@@ -24,7 +24,8 @@ function FilterButton({setTasks, boardId, setFilterOption})
                                 boardId = {boardId}
                                 setFilterOption = {setFilterOption}
                                 filterOpen = {open}
-                                setFilterOpen = {setOpen} /> 
+                                setFilterOpen = {setOpen} 
+                                userData = {userData} /> 
              </>
             );
 }

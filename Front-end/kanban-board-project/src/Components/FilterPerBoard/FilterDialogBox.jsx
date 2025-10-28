@@ -8,7 +8,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { enqueueSnackbar } from "notistack";
 import { filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, getAllTasksOfBoardId } from "../../Services/TaskServices";
 
-function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFilterOpen}) 
+function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFilterOpen, userData}) 
 {
   
     const navigate = useNavigate();      
@@ -61,6 +61,18 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
            enqueueSnackbar("Select a valid filter option!", { variant: "error", anchorOrigin: {vertical: "top", horizontal: "bottom"} });
            return;
          }
+      
+      // Restrict employee results
+    if (userData.role.toLowerCase() === "employee") 
+    {
+      filteredData = filteredData.filter(task => 
+      {
+        if (Array.isArray(task.assignedTo)) {
+          return task.assignedTo.includes(userData.email);
+        }
+        return task.assignedTo === userData.email;
+      });
+    }   
 
       setTasks(filteredData);
       enqueueSnackbar("Filter Applied!", { variant: "success", anchorOrigin: {vertical: "top", horizontal: "bottom"} });
@@ -88,6 +100,18 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
      try 
      {
        const allTasks = await getAllTasksOfBoardId(boardId);
+
+       // restrict for employee
+       if(userData.role.toLowerCase() === "employee")
+       {
+         allTasks = allTasks.filter(task => { if(Array.isArray(task.assignedTo))
+                                               {
+                                                 return task.assignedTo.includes(userData.email);
+                                               }
+                                               return task.assignedTo === userData.email;
+
+                                            });
+       }
        setTasks(allTasks);
        setFilterOption(false);
      } 
@@ -285,7 +309,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
         </DialogContent>
 
         <DialogActions>
-          <Button type="submit" variant="contained" sx={{backgroundColor: theme.colors.buttons, borderRadius: "20px"}} onClick={handleResetFilters}>
+          <Button type="button" variant="contained" sx={{backgroundColor: theme.colors.buttons, borderRadius: "20px"}} onClick={handleResetFilters}>
             Reset
           </Button>
           <Button type="submit" variant="contained" sx={{backgroundColor: theme.colors.buttons, borderRadius: "20px"}}>

@@ -35,72 +35,51 @@ function BoardDashboard({userData})
    
    // fetch boards and task based on assignee
    useEffect(() => {
-
-      let active = true;
-
-      const fetchBoardData = setTimeout(async () => {
-
-         try
-         {
-            let boardDetails = await getBoardDetails(boardId);
-            let taskData = [];
-
-
-            if(isEmployee)
-            {
-                // fetch all tasks and filter those assigned to this employee
-                const allTasks = await getAllTasksOfBoardId(boardId);
-                let employeeTasks = allTasks.filter(task => {
-                                                                if(Array.isArray(task.assignedTo))
-                                                                {
-                                                                    return task.assignedTo.includes(userData.email);
-                                                                }
-                                                                return task.assignedTo === userData.email;
-                                                            });
-               // apply search filter only to employees 's tasks
-               if(searchTerm.trim() !== "")
-                {
-                   employeeTasks = employeeTasks.filter(task => task.taskName.toLowerCase().includes(searchTerm.toLowerCase()));
-                }                                             
-
-                // show all columns, but only employee's tasks within them
-                 const filteredColumns = boardDetails.columns.map((col) => ({ ...col,
-                                                                              tasks: employeeTasks.filter((task) => task.columnId === col.columnId)}));
-
-                 setBoard({ ...boardDetails, columns: filteredColumns });
-                 taskData = employeeTasks;                                                             
-            }
-            else
-            {
-               // Admin - get all tasks (search applied fully)
-               taskData = searchTerm.trim() !== "" ? await searchTasksByKeyword(boardId, searchTerm)
-                                                   : await getAllTasksOfBoardId(boardId);
-               setBoard(boardDetails);
-            }
-            if(active)
-            {
-               setTasks(taskData);
-               setLoading(false);
-            }
-        }      
-        catch(error)
-        {
-               enqueueSnackbar(error.response?.data || "Failed to fetch board or tasks!",{ variant: "error", anchorOrigin: { horizontal: "bottom", vertical: "right" }});
-        }
-         
-      }, 700);
-
-      return () => { active = false;
-                       clearTimeout(fetchBoardData);
-                      };
-
-   },[boardId, searchTerm, filterOption, userData.email]);
-   
-  
     
+    const fetchData = async () => {
 
+         try {
+         
+           // Always fetch board details first
+           const boardData = await getBoardDetails(boardId);
+           setBoard(boardData);
+     
+           let tasksData = [];
+     
+           // search 
+           if (searchTerm.trim() !== "") 
+           {
+             tasksData = await searchTasksByKeyword(boardId, searchTerm);
+           } 
+           else 
+           {
+             tasksData = await getAllTasksOfBoardId(boardId);
+           }
+     
+           // Role-based filtering (for employees)
+           if (isEmployee) 
+           {
+             tasksData = tasksData.filter(task => task.assignedTo?.includes(userData.email));
+           }
+     
+           setTasks(tasksData);
+         } 
+         catch (error) 
+         {
+           console.error("Error fetching board or tasks:", error);
+           enqueueSnackbar(error.response?.data || "Failed to fetch board or tasks!",{ variant: "error" });
+         } 
+         finally 
+         {
+           setLoading(false);
+         }
+  };
 
+  fetchData();
 
+}, [boardId, searchTerm, userData.email]);
+
+    
 
    // add new column
    const handleAddColumn = async () => {
@@ -298,7 +277,7 @@ function BoardDashboard({userData})
 
                 <SearchBar setSearchTerm = {setSearchTerm} />
                 
-                <FilterButton boardId = {boardId} setTasks = {setTasks} setFilterOption = {setFilterOption} />
+                <FilterButton boardId = {boardId} setTasks = {setTasks} setFilterOption = {setFilterOption} userData = {userData} />
 
                  {
                    !isEmployee && <SpeedDialLayout actions = {actions} direction = "left"/>
@@ -322,7 +301,11 @@ function BoardDashboard({userData})
                                         <DndContext onDragEnd={handleDragEnd}>
                                             <div style = {{display: "flex", gap: "40px", overflowX:"auto", padding: "16px 0"}}>
 
-                                                { board.columns?.map( col => (
+                                                { board.columns?.filter(col => { if (isEmployee && col.columnName.toLowerCase() === "archive")         // filter columns that are not archive for employee only 
+                                                                                    { return false;}
+                                                                                return true; 
+                                                                              })
+                                                                .map( col => (
                                                                      <ColumnCard key = {col.columnId}
                                                                                  boardId = {boardId}
                                                                                  column = {col} 

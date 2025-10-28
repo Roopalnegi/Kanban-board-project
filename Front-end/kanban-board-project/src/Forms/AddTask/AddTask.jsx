@@ -26,8 +26,11 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   
   //intialize from handling
-  const{ register, handleSubmit, formState:{errors}, trigger,reset} = useForm();
+  const{ register, handleSubmit, formState:{errors}, trigger,reset, watch} = useForm();
 
+  // track task_description length and near-limit warning after 45 characters
+  const descLength = watch("task_description")?.length || 0;
+  const isNearLimit = descLength > 45;                     
 
   // function to disable previous date
   useEffect(() => {
@@ -142,7 +145,9 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
                  label="Task Title"
                  variant="outlined"
                  fullWidth
-                 {...register("title", { required: "Title is required" })}
+                 {...register("title", { required: "Title is required",
+                                         pattern: {value: /^[A-Za-z].*$/, message: "Tiitle must start with a letter"}}
+                 )}
                  onBlur={() => trigger("title")}
                  error={!!errors.title}
                  helperText={errors.title?.message}
@@ -156,12 +161,15 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
                 multiline
                 rows={3}
                 fullWidth
-                {...register("task_description", {
-                  required: "Task description is required",
-                })}
+                {...register("task_description", {required: "Task description is required",
+                                                  maxLength: {value: 50, message: "Desciption cannot exceed 50 characters"}} 
+                )}
                 onBlur={() => trigger("task_description")}
                 error={!!errors.task_description}
-                helperText={errors.task_description?.message}
+                helperText={errors.task_description?.message || 
+                                                               <span style = {{color: isNearLimit ? "red" : "gray"}}>
+                                                                     Total Characters : {descLength} / 50
+                                                               </span> }
               />
 
 

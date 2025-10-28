@@ -8,6 +8,7 @@ import com.kanbanServices.taskServices.proxy.NotificationServiceClient;
 import com.kanbanServices.taskServices.proxy.UserAuthClient;
 import com.kanbanServices.taskServices.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -325,6 +326,12 @@ public class TaskServiceImpl implements TaskService
     @Override
     public Long countDaysBeforeDue(LocalDate dueDate)
     {
+        // check if due date of task is avialable
+        if(dueDate == null)
+        {
+            return null;
+        }
+
         // calculating current date
         LocalDate todayDate = LocalDate.now();
 
@@ -332,6 +339,39 @@ public class TaskServiceImpl implements TaskService
         long days = ChronoUnit.DAYS.between(todayDate,dueDate);
 
         return days < 0 ? -1 : days;
+    }
+
+
+    // check all tasks for upcoming or overdue deadlines
+    // since backend automatically check deadlines and send notifications , we going to use @Scheduled annotation
+    // @Scheduled -- automatically run once per day
+    // 0 0 9 -- run at 9 : 00 AM
+    // * * ? -- every day , every month , any day of the week
+    @Scheduled(cron = "0 0 0 * * ?")      // run every day at midnight
+    @Override
+    public void checkDueDatesAndNotify()
+    {
+        List<Task> tasks = taskRepository.findAll();
+
+        for (Task task : tasks)
+        {
+            LocalDate dueDate = task.getDueDate();
+
+            if(dueDate == null) continue;       // skip task if it doesn't have due date
+
+            Long daysLeft = countDaysBeforeDue(task.getDueDate());
+
+            System.out.println("[Scheduler] Checking due dates at " + LocalDate.now());
+
+            if(daysLeft == 1)
+            {
+                sendNotification(task, "Reminder : Only 1 day left to complete the task !", "System", task.getAssignedTo() );
+            }
+            else if (daysLeft < 0)
+            {
+                sendNotification(task, "Alert : The due date for the task has passed ! ", "Admin", task.getAssignedTo());
+            }
+        }
     }
 
 

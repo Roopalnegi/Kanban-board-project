@@ -158,7 +158,7 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
       
          {/* Alert message if task due date passed */}
          {
-           daysLeft <= 0 && <Alert severity = "warning" variant = "filled" sx = {{mb:2}}> <b>Due Date has already passed 😞! </b></Alert>
+           daysLeft < 0 && <Alert severity = "warning" variant = "filled" sx = {{mb:2}}> <b>Due Date has already passed 😞! </b></Alert>
          }
 
          {/* Card Header */}

@@ -222,6 +222,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
                                                                task = {t} 
                                                                onTaskEdit = {handleEditTask}
                                                                onTaskUpdate = {onTaskUpdate}
+                                                               onTaskArchive = {onTaskArchive}
                                                                onTaskRestore = {onTaskRestore}
                                                                onTaskDelete = {onTaskDelete}
                                                                archiveColumnId = {archiveId}
