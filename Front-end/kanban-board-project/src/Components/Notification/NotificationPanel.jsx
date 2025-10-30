@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, Box } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Box, Typography } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useNavigate } from "react-router-dom";
 import NotificationFilter from "./NotificationFilter";
@@ -70,7 +70,9 @@ function NotificationPanel({ userData , notifications, setNotifications,setUnrea
       
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "2px solid lightgray", }} >
        
-        <b>Notifications</b>
+        <Typography variant="h5" sx = {{color: "#6B4E23"}}>
+            <b> Notifications </b>
+        </Typography>
        
         <CancelIcon sx={{ cursor: "pointer", color: "red" }}
                     onClick={() => { setOpen(false);

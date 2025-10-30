@@ -52,7 +52,7 @@ export default function BoardList({ userData, boards: propBoards = [], onBoardDe
       } 
       catch (error) 
       {
-        enqueueSnackbar("Failed to load boards.", { variant: "error" });
+        enqueueSnackbar("Failed to load boards !", { variant: "error" });
       } 
       finally 
       {
@@ -83,7 +83,7 @@ export default function BoardList({ userData, boards: propBoards = [], onBoardDe
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" mb={2}>
-        {isEmployee ? "Assigned Boards" : "All Boards"}
+        {isEmployee ? "" : "All Boards"}
       </Typography>
       {!isEmployee && (
         <Button
@@ -102,12 +102,12 @@ export default function BoardList({ userData, boards: propBoards = [], onBoardDe
               <Card
                 sx={{
                   cursor: "pointer",
-                  "&:hover": { backgroundColor: "rgba(0,0,0,0.05)" },
+                  "&:hover": { backgroundColor: "rgba(231, 222, 222, 1)" },
                 }}
-                onClick={() => navigate(`/board/${board.boardId}`)}
+                onClick={() => navigate(`/board/${board.boardId}`)} raised
               >
                 <CardContent>
-                  <Typography variant="h6">{board.boardName}</Typography>
+                  <Typography variant="h6" sx={{py:2}}><b>{board.boardName}</b></Typography>
                   <Typography variant="body2">
                     {board.description || "No description"}
                   </Typography>

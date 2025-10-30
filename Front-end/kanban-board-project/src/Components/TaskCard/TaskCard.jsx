@@ -5,6 +5,7 @@ import {useEffect, useState} from 'react';
 import { useSnackbar } from 'notistack';
 import { calculateNoOfDays, deletePermanent, archiveTask, restoreTask} from '../../Services/TaskServices';
 import { Icon, pencilImg, deleteImg, restoreImg } from '../IconComponent/Icon';
+import styles from './TaskCard.module.css';
 
 
 function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, archiveColumnId, readOnly = false}) 
@@ -45,9 +46,9 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
             if (!priority) return "#75757554"; // fallback color for undefined/null
             switch ((priority).toLowerCase()) 
             {
-              case "high": return "#f5584dff"; // orange
-              case "medium": return "#ffda36"; // yellow
-              case "low": return "#9ada36"; // green
+              case "high": return "#df2417ff"; // orange
+              case "medium": return "#ffee00ff"; // yellow
+              case "low": return "#9dff00ff"; // green
               default: return "#75757554"; // light grey
             }
     };
@@ -79,10 +80,7 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
     
        // block actions for employees
   const blockAction = (message) => {
-    enqueueSnackbar(message || "You cannot perform this action.", {
-      variant: "warning",
-      anchorOrigin: { horizontal: "bottom", vertical: "right" },
-    });
+    enqueueSnackbar(message || "You cannot perform this action !", {variant: "warning"});
   };
 
 
@@ -95,11 +93,11 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
           const updatedTask = await archiveTask(task.taskId);
           // notify parent board state when task is archived
            if(onTaskArchive) onTaskArchive(updatedTask);
-          enqueueSnackbar("Task archived !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+          enqueueSnackbar("Task archived !", {variant: "success"});
        } 
        catch (error) 
        {
-         enqueueSnackbar(error.response?.data|| "Failed to archive task !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+         enqueueSnackbar(error.response?.data|| "Failed to archive task !", { variant: "error"});
        }
     };
 
@@ -113,11 +111,11 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
           const updatedTask = await restoreTask(task.taskId);
           // notify parent board state when task is restored 
           if(onTaskRestore) onTaskRestore(updatedTask);
-          enqueueSnackbar("Task restored !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+          enqueueSnackbar("Task restored !", {variant: "success"});
        } 
        catch (error) 
        {
-         enqueueSnackbar(error.response?.data|| "Failed to restore task !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+         enqueueSnackbar(error.response?.data|| "Failed to restore task !", { variant: "error"});
        }
     };
 
@@ -131,11 +129,11 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
           await deletePermanent(task.taskId);
           // notify parent board state when task is deleted
           if(onTaskDelete) onTaskDelete(task.taskId);
-          enqueueSnackbar("Task deleted permanently !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+          enqueueSnackbar("Task deleted permanently !", {variant: "success"});
        } 
        catch (error) 
        {
-         enqueueSnackbar(error.response?.data|| "Failed to delete task permanently !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+         enqueueSnackbar(error.response?.data|| "Failed to delete task permanently !", { variant: "error"});
        }
     };
 
@@ -151,36 +149,30 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
 
 
   return (
-         <Card sx={{ width: 250, borderRadius: 2, boxShadow: 3,      
-                     display: 'flex', flexDirection: 'column',p :2, mb:2,
-                  }} raised
-         >
+         <Card className={styles.card} raised>
       
          {/* Alert message if task due date passed */}
          {
-           daysLeft < 0 && <Alert severity = "warning" variant = "filled" sx = {{mb:2}}> <b>Due Date has already passed 😞! </b></Alert>
+           daysLeft < 0 && <Alert severity = "warning"  variant = "filled" className={styles.alert}> 
+                              <b>Due Date has already passed 😞! </b>
+                            </Alert>
          }
 
          {/* Card Header */}
-         <Typography sx={{ fontWeight: 'bolder', fontSize: 18}} > 
-          {task.title} 
-         </Typography>
+         <Typography className={styles.header} > {task.title} </Typography>
          
          {/* Card Content */}
-         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
-
+         <CardContent className={styles.cardContent}>
 
             {/* Task description */}
-            <Typography variant="body1">
-              {task.task_description}
-            </Typography>
+            <Typography variant="body1">{task.task_description}</Typography>
 
 
             {/* Row 1: Priority & Assigned To */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box className={styles.rowFlex}>
               
               {/* Priority Badge */}
-              <Box sx={{ bgcolor: getPriorityColor(task.priority), color: "black",
+              <Box sx={{ bgcolor: getPriorityColor(task.priority), color: task.priority === "high" ? "white" : "black",
                          px: 1.5, py: 0.3, borderRadius: 2, fontWeight: 'bold', fontSize: 14 }}
               > {task.priority} </Box>
               
@@ -206,17 +198,17 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
 
             {/* Row 2: Start Date , Due Date & Days Left */}
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mt: 1,}}>
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Box className={styles.rowDates}>
+              <Typography variant="body2" >
                  📅 <b>Start:</b> {task.createdAt}
               </Typography>
 
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="body2">
                 ⏰ <b>Due:</b> {task.dueDate}
               </Typography>
 
-              <Typography variant="body2"sx={{color: daysLeft <= 2 ? "#E74C3C" : "#0d4379ff",fontWeight: 900}}>
-                {daysLeft <= 1 ? `( ${daysLeft} day left )` : `( ${daysLeft} days left )`} 
+              <Typography variant="body2" className={styles.dueText} sx={{color: daysLeft <= 2 ? "#E74C3C" : "#0d4379ff",fontWeight: 900}}>
+                {daysLeft < 0 ? `( ${Math.abs(daysLeft)} day overdue )` : `( ${daysLeft} days left )`} 
               </Typography>
             </Box>
             
@@ -230,7 +222,7 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
 
         {/* Edit Button and delete button */}
         {/* if task in archive column -- show restore other wise edit & delete icon */}
-        <CardActions sx = {{justifyContent: "flex-end", gap: 2}}>
+        <CardActions className={styles.actions}>
             {
                !readOnly &&(
                !isArchived ? (

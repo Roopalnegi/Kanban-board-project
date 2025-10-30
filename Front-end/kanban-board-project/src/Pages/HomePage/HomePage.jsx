@@ -22,11 +22,11 @@ function HomePage()
             <Box className = {styles.boxContainer}>
 
               <Typography variant="h3" sx = {{fontWeight: 800, mb: 2,textAlign: {sm:"center",md: "right"} }}>
-                 Organize Chaos, Visualize Progress
+                 Organize Chaos,<br/>Visualize Progress
               </Typography>
 
-              <Typography component="p" sx={{ mt: 3,px:4,color: theme.colors.bodyText, textAlign: "center" }}>
-                  Tool used to manage tasks and workflow,making work processes transparent and manageable, helping individuals and 
+              <Typography component="p" sx={{ mt: 3}}>
+                  Tool used to manage tasks and workflow,making work processes transparent and manageable, helping 
                   teams organized work efficiently by limiting the number of tasks, maximize productivity.
               </Typography>
               
@@ -34,8 +34,8 @@ function HomePage()
                      onClick = {()=> navigate("/register")}>
                 Get Started
               </Button>
-             </Box>
-
+              
+            </Box>
          </Box>
 
     

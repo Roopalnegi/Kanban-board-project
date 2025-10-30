@@ -20,11 +20,7 @@ function ProtectedRoute({children, allowedRole, userData})
         if(accessDenied && !shownRef.current)
         {
             shownRef.current = true;
-            enqueueSnackbar("Permission Denied !", {variant: "error",
-                                                    autoHideDuration: 2000,
-                                                    anchorOrigin: {vertical: "top", horizontal: "right"}
-
-                                      });
+            enqueueSnackbar("Permission Denied !", {variant: "error"});
         }
     },[accessDenied, enqueueSnackbar]);
 

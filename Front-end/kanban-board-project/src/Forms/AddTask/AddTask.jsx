@@ -4,11 +4,11 @@ import { useSnackbar} from 'notistack';
 import{Dialog, DialogContent, DialogTitle,DialogActions,
        MenuItem, Select, InputLabel, FormControl,
        RadioGroup, FormControlLabel, Radio, FormLabel,
-       ListItemText, Checkbox, useTheme,TextField,Button} from "@mui/material";
+       ListItemText, Checkbox, useTheme,TextField,Button, Box } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { addTask, getEmployeeDetails, updateTask } from "../../Services/TaskServices";
 import formatEmployeeData from "../../Services/Utils/employeeUtil";
-
+import AISuggestionButton from "../../Components/AISuggestionInput.jsx/AISuggestionInput";
 
 
 
@@ -50,7 +50,7 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
        }
        catch(error)
        {
-         enqueueSnackbar("Failed to fetch employee data", {variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+         enqueueSnackbar("Failed to fetch employee data !", {variant: "error"});
        }
     }
     fetchEmployees();   
@@ -96,7 +96,7 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
            // notify parent board state to when task is updated (app lift up state)
            if(onTaskUpdated) 
               onTaskUpdated (updatedTask);
-           enqueueSnackbar("Task updated successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           enqueueSnackbar("Task updated successfully !", {variant: "success"});
         }
         else
         {
@@ -104,13 +104,13 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
           // notify parent to update board (app lift up state)
           if(onTaskAdded) 
              onTaskAdded(savedTask);
-           enqueueSnackbar("Task created successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           enqueueSnackbar("Task created successfully !", {variant: "success"});
         }
         handleClose();
     }
     catch(error)
     {
-      enqueueSnackbar(error.response?.data || error.response?.data?.message || "Failed to create / update task !", {variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+      enqueueSnackbar(error.response?.data || error.response?.data?.message || "Failed to create / update task !", {variant: "error"});
     }
   };
 
@@ -140,37 +140,48 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
 
             <DialogContent sx={{display:'flex',flexDirection:"column",gap:"20px"}}>
 
-               {/* Title */}
-               <TextField
-                 label="Task Title"
-                 variant="outlined"
-                 fullWidth
-                 {...register("title", { required: "Title is required",
-                                         pattern: {value: /^[A-Za-z].*$/, message: "Tiitle must start with a letter"}}
-                 )}
-                 onBlur={() => trigger("title")}
-                 error={!!errors.title}
-                 helperText={errors.title?.message}
-               />
+               {/* Title TextFeild with ai Suggestion */}
+               <Box display="flex" alignItems="center" gap={1}>
+                    <TextField
+                      label="Task Title"
+                      variant="outlined"
+                      fullWidth
+                      {...register("title", { required: "Title is required",
+                                              pattern: { value: /^[A-Za-z].*$/, message: "Title must start with a letter" },
+                      })}
+                      onBlur={() => trigger("title")}
+                      error={!!errors.title}
+                      helperText={errors.title?.message}
+                    />
+                    <AISuggestionButton value={watch("title")} 
+                                        onSelect={(s) => {   reset({ ...watch(), title: s }); }}/>
+              </Box>
          
 
-              {/* Description */}
-              <TextField
-                label="Task Description"
-                variant="outlined"
-                multiline
-                rows={3}
-                fullWidth
-                {...register("task_description", {required: "Task description is required",
-                                                  maxLength: {value: 50, message: "Desciption cannot exceed 50 characters"}} 
-                )}
-                onBlur={() => trigger("task_description")}
-                error={!!errors.task_description}
-                helperText={errors.task_description?.message || 
-                                                               <span style = {{color: isNearLimit ? "red" : "gray"}}>
-                                                                     Total Characters : {descLength} / 50
-                                                               </span> }
-              />
+              {/* Description TextField with ai suggestion */}
+             <Box display="flex" alignItems="center" gap={1}>
+                  <TextField
+                   label="Task Description"
+                   variant="outlined"
+                   multiline
+                   rows={3}
+                   fullWidth
+                   {...register("task_description", { required: "Task description is required",
+                                                      maxLength: { value: 50, message: "Description cannot exceed 50 characters" },
+                   })}
+                   onBlur={() => trigger("task_description")}
+                   error={!!errors.task_description}
+                   helperText={ errors.task_description?.message || (
+                                                                      <span style={{ color: isNearLimit ? "red" : "gray" }}>
+                                                                        Total Characters : {descLength} / 50
+                                                                      </span>
+                                                                    )
+                   }
+                  />
+                 <AISuggestionButton value={watch("task_description")}
+                                     onSelect={(s) => reset({ ...watch(), task_description: s })}
+                 />
+              </Box>
 
 
               {/* Priority */}

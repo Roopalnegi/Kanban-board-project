@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import AppThemeProvider from "./AppTheme/Theme.jsx";
-import {SnackbarProvider} from 'notistack';
 import { BrowserRouter } from 'react-router-dom';
 import ErrorFallback from './Components/ErrorFallback/ErrorFallback.jsx';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -14,13 +13,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <SnackbarProvider maxSnack={3}>
         <AppThemeProvider>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
              <App/>
           </ErrorBoundary>
         </AppThemeProvider>
-      </SnackbarProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

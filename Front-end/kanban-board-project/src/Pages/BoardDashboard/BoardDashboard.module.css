@@ -1,0 +1,55 @@
+.boardDashboardWrapper {
+  background-color: rgba(211, 211, 211, 0.1);
+  padding-left: 1rem;
+  padding-right: 6rem;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+
+/* Row containing board info and back icon */
+.boardHeaderRow {
+  display: flex;
+  gap: 4rem;
+}
+
+
+/* Search, filter, and speed dial section */
+.helperTools {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 6rem;
+}
+
+/* Container for all columns (scrollable) */
+.columnsContainer {
+  display: flex;
+  gap: 40px;
+  overflow-x: auto;
+  padding: 2px;
+  justify-content: center;
+  background-color: rgba(211, 211, 211, 0.1);
+}
+
+/* Column group (used inside DndContext) */
+.columnsGroup {
+  display: flex;
+  gap: 40px;
+  overflow-x: auto;
+  padding: 16px 0;
+}
+
+/* No tasks message */
+.noTasksText {
+  text-align: center;
+  margin-top: 2rem;
+  font-weight: 900;
+}
+
+/* Page background (to replace inline div) */
+.pageBackground {
+  padding-top: 100px;
+  background-color: rgba(211, 211, 211, 0.1);
+}

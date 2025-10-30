@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Typography, CircularProgress, Box, useTheme } from "@mui/material";
 import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 import { getTasksByEmployee } from "../../Services/TaskServices";
 import { getBoardDetails } from "../../Services/BoardServices";
 import BoardList from "../../Components/Board/BoardList";
+
 
 
 export default function EmployeeDashboard({ userData }) 
@@ -14,6 +16,7 @@ export default function EmployeeDashboard({ userData })
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   
   useEffect(() => {
   
@@ -34,7 +37,7 @@ export default function EmployeeDashboard({ userData })
         } 
         catch (error) 
         {
-        enqueueSnackbar(error.response?.data || "Failed to fetch assigned boards!",{ variant: "error" });
+        enqueueSnackbar(error.response?.data || "Failed to fetch assigned boards !",{ variant: "error" });
         } 
         finally 
         {
@@ -61,11 +64,36 @@ export default function EmployeeDashboard({ userData })
 
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3 , backgroundImage:`url("./Icons/employee-dashbaord-bg-1.png")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "bottom center",
+                      backgroundSize: "contain",
+                      backgroundAttachment: "fixed", // optional: creates a nice parallax effect
+                      backgroundColor: "rgba(255,255,255,0.9)", // adds transparency overlay
+                      backgroundBlendMode: "overlay", // blends color + image for transparency
+                      minHeight: "90vh",
+    }}>
+      
 
-      <Typography variant="h5" fontWeight="bold" mb={2} sx ={{textAlign: "center"}}>
-        Welcome, {userData.username} !
-      </Typography>
+      <Box sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", 
+                 textAlign: "center", p: 4, borderRadius: 3,marginTop: 4}}>
+
+
+          <Typography variant="h4" fontWeight={700} sx={{   color: "#2E2E2E",   letterSpacing: "0.5px",   mb: 1, }}>
+                  Welcome, {userData.username}!
+          </Typography>
+
+
+          <Typography variant="body1" sx={{ color: "#3b2f0d", opacity: 0.9, mb: 1 }}>
+                  Here are your<b> assigned boards </b>— let’s get things done!
+          </Typography>
+
+
+          <Typography variant="body2" sx={{   color: "#6B4E23",   fontStyle: "italic", }}>
+              Stay organized, stay productive 🚀
+          </Typography>
+          
+      </Box>
 
       {
         boards.length > 0 ? (

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllBoards, deleteBoard } from "../../Services/BoardServices";
 import { Icon, deleteBoardImg } from "../../Components/IconComponent/Icon";
 import CreateBoardForm from "../../Components/Board/CreateBoardForm";
-
+import styles from "./AdminDashboard.module.css";
 
 
 function AdminDashboard() 
@@ -38,12 +38,12 @@ function AdminDashboard()
     try 
     {
       const response = await deleteBoard(boardId);
-      enqueueSnackbar(response || "Board deleted successfully!", {variant: "success"});
+      enqueueSnackbar(response || "Board deleted successfully !", {variant: "success"});
       setBoards((prev) => prev.filter((b) => b.boardId !== boardId));     // so that immediately UI reflected if board is deleted 
     } 
     catch (error) 
     {
-      enqueueSnackbar(error?.message || "Delete failed", { variant: "error" });
+      enqueueSnackbar(error?.message || "Failed to delete board !", { variant: "error" });
     }
   };
 
@@ -60,66 +60,28 @@ function AdminDashboard()
 
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f4f6f9",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        py: 6,
-      }}
-    >
+    <Box className={styles.adminDashboardContainer}>
       
-      <Grid container spacing={4} maxWidth="lg">
+       <Grid container spacing={6}className={styles.dashboardGrid}>
       
         {/* LEFT SIDE */}
         <Grid item xs={12} md={5} lg={4}>
       
-          <Paper
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-              backgroundColor: "#fff",
-              transition: "all 0.3s ease",
-            }}
-          >
-            {!showCreateForm ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
-                onClick={() => setShowCreateForm(true)}
-              >
-                <Box
-                  sx={{
-                    border: "2px solid #7B61FF",
-                    borderRadius: "50%",
-                    p: 1,
-                    mr: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#7B61FF",
-                  }}
-                >
-                  <AddCircleOutlineIcon fontSize="medium" />
-                </Box>
+          <Paper className={styles.createBoardPaper}>
+
+            {
+            !showCreateForm ? (
+              <Box className={styles.createBoardBox} onClick={() => setShowCreateForm(true)}>
+                <Box className={styles.createIcon}>
+              <AddCircleOutlineIcon />
+            </Box>
                 <Box>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    color="#2E2E2E"
-                    sx={{ mb: 0.3 }}
-                  >
-                    Create Board
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Click here to create a new board and organize your tasks.
-                  </Typography>
+                  <Typography className={styles.createTitle}>
+                Create Board
+              </Typography>
+              <Typography className={styles.createSubtitle}>
+                Click here to create a new board and organize your tasks.
+              </Typography>
                 </Box>
               </Box>
             ) : (
@@ -131,54 +93,28 @@ function AdminDashboard()
 
         {/* RIGHT SIDE - Board Overview */}
         <Grid item xs={12} md={7} lg={8}>
-          <Paper
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-              backgroundColor: "#fff",
-              minHeight: 320,
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" mb={2}>
-              Board Overview
-            </Typography>
+         <Paper className={styles.boardPaper}>
+              <Typography className={styles.boardTitle}>Board Overview</Typography>
 
             {boards.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" color="text.secondary">
                 No boards created yet. Click “Create Board” to add one.
               </Typography>
             ) : (
               boards.map((board) => (
-                <Box
-                  key={board.boardId}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  p={1.5}
-                  mb={1.5}
-                  borderRadius={2}
-                  sx={{
-                    backgroundColor: "#fafafa",
-                    boxShadow: "0px 1px 3px rgba(0,0,0,0.08)",
-                    cursor: "pointer",
-                    transition: "0.2s",
-                    "&:hover": { boxShadow: "0px 2px 8px rgba(0,0,0,0.12)" },
-                  }}
-                  onClick={() => handleBoardOpen(board.boardId)}
-                >
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <DashboardIcon sx={{ color: "#7b61ff" }} />
+                 <Box
+              key={board.boardId}
+              className={styles.boardItem}
+              onClick={() => handleBoardOpen(board.boardId)}
+            >
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <DashboardIcon sx={{ color: " #2a71bdff" }} />
                     <Typography fontWeight="bold">{board.boardName}</Typography>
                   </Box>
                   <Icon
                     src={deleteBoardImg}
                     alt="Delete"
-                    sx={{
-                      cursor: "pointer",
-                      width: 20,
-                      "&:hover": { transform: "scale(1.1)" },
-                    }}
+                    className={styles.deleteIcon}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteBoard(board.boardId);

@@ -21,7 +21,11 @@ export const restoreImg = process.env.PUBLIC_URL + "/Icons/restore-icon.png";
 
 export const helpImg = process.env.PUBLIC_URL + "/Icons/help-icon.png";
 
+export const aisuggestIcon = process.env.PUBLIC_URL + "/Icons/purple-star-icon.png";
 
+export const userIcon = process.env.PUBLIC_URL + "/Icons/user-icon.png";
+
+export const backArrowIcon = process.env.PUBLIC_URL + "/Icons/back-arrow.png";
 
 /*
 process.env.PUBLIC_URL 

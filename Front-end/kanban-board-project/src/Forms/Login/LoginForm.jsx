@@ -4,7 +4,8 @@ import{useNavigate}from 'react-router-dom';
 import { useSnackbar} from 'notistack';
 import axios from 'axios';
 import{Dialog, DialogContent, DialogTitle, TextField,DialogActions,
-        useTheme,Button} from "@mui/material";
+        useTheme,Button,
+        Typography} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import OtpSection from "../../Components/OtpSection/OtpSection";
 
@@ -51,15 +52,7 @@ function LoginForm({setLoginStatus,setUserData})
       console.log("token : ", token);
 
       //show sucess message
-      enqueueSnackbar("login successfully",{
-                                               variant:"success",
-                                               autoHideDuration:2000, // redirect after 2 sec
-                                               anchorOrigin:
-                                               {
-                                                 vertical:"top",
-                                                 horizontal:"right"
-                                               },
-                                            });
+      enqueueSnackbar("Login successfully !",{variant: "success"});
       //close login form and redirect to dashboard based on role
       setFormOpen(false);
       
@@ -75,18 +68,7 @@ function LoginForm({setLoginStatus,setUserData})
     catch(error)
     {
       //show error message
-      enqueueSnackbar(
-        error.response?.data||"login failed please check credentials",{
-                                                                        variant:'error',
-                                                                        autoHideDuration:2000,
-                                                                        anchorOrigin:
-                                                                        {
-                                                                          vertical:"top",
-                                                                          horizontal:"right"
-                                                                        },
-                                                                  
-                                                                      }
-      );
+      enqueueSnackbar(error.response?.data||"Login failed, Please check credentials !",{variant: "error"});
     }
   };
 
@@ -96,7 +78,10 @@ function LoginForm({setLoginStatus,setUserData})
       <Dialog open={formOpen} onClose={()=>setFormOpen(false)} fullWidth maxWidth='sm'>
         {/*header of the dialog */}
         <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
-            <b>Login form</b>
+           <Typography variant="h4" sx = {{color: theme.colors.bodyText}}>
+              <b> Login Form </b>
+           </Typography>
+           
               {/* closeIcon */}
           <CancelIcon
                 sx={{cursor:'pointer',color:theme.palette.error.main}}

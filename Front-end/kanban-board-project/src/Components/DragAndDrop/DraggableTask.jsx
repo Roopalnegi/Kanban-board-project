@@ -15,8 +15,8 @@ function DraggableTask({task, onTaskEdit, onTaskArchive, onTaskRestore, onTaskDe
                     marginBottom: "20px",
                     opacity: isDragging ? 0.8 : 1,
                     transition: "transform 0.25s ease",
-                    zIndex: isDragging ? 999900 : "auto", // ✅ keeps dragged task above everything
-                    position: isDragging ? "absolute" : "static", // ✅ needed for z-index to apply
+                    zIndex: isDragging ? 999900 : "auto", // keeps dragged task above everything
+                    position: isDragging ? "absolute" : "static", // needed for z-index to apply
                   };
     
                   

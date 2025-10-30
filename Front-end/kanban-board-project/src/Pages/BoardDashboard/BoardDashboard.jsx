@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Typography,Stack, CircularProgress, Box } from '@mui/material';
+import {Typography,Stack, CircularProgress, Box, Tooltip} from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useParams, useNavigate } from 'react-router-dom';
 import InlineEditableBoardInfo from '../../Components/Board/InlineEditBoardInfo';
@@ -11,8 +11,9 @@ import { getBoardDetails, deleteBoard } from '../../Services/BoardServices';
 import { getAllTasksOfBoardId, moveTaskByColumn, searchTasksByKeyword, updateTask } from '../../Services/TaskServices';
 import { addColumnToBoard, updateColumnName } from '../../Services/ColumnServices';
 import { addColumnImg, helpImg, deleteBoardImg } from '../../Components/IconComponent/Icon';
+import { Icon, backArrowIcon } from '../../Components/IconComponent/Icon';
 import { DndContext } from '@dnd-kit/core';
-
+import styles from "./BoardDashboard.module.css";
 
 
 function BoardDashboard({userData})
@@ -67,7 +68,7 @@ function BoardDashboard({userData})
          catch (error) 
          {
            console.error("Error fetching board or tasks:", error);
-           enqueueSnackbar(error.response?.data || "Failed to fetch board or tasks!",{ variant: "error" });
+           enqueueSnackbar(error.response?.data || "Failed to fetch board or tasks !",{ variant: "error" });
          } 
          finally 
          {
@@ -85,7 +86,7 @@ function BoardDashboard({userData})
    const handleAddColumn = async () => {
      if (isEmployee) 
      {
-      enqueueSnackbar("Employees cannot add columns.", { variant: "warning" });
+      enqueueSnackbar("Employees cannot add columns !", { variant: "warning" });
       return;
      }
 
@@ -95,11 +96,11 @@ function BoardDashboard({userData})
         await addColumnToBoard(boardId, newColumn);
         const updatedBoard = await getBoardDetails(boardId);
         setBoard(updatedBoard);
-        enqueueSnackbar("New column added !", { variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        enqueueSnackbar("New column added !", { variant: "success"});
      }
      catch(error)
      {
-        enqueueSnackbar(error.response?.data || "Failed to fetch create column !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        enqueueSnackbar(error.response?.data || "Failed to fetch create column !", { variant: "error"});
      }
    };
 
@@ -108,18 +109,18 @@ function BoardDashboard({userData})
     const handleDeleteBoard = async (boardId) => {
       if (isEmployee) 
       {
-        enqueueSnackbar("Employees cannot delete boards.", { variant: "warning" });
+        enqueueSnackbar("Employees cannot delete boards !", { variant: "warning" });
         return;
       }
       try
       {
         await deleteBoard(boardId);
-        enqueueSnackbar("Board deleted successfully !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});    
+        enqueueSnackbar("Board deleted successfully !", {variant: "success"});    
         navigate("/admin-dashboard");                                                                                                          
       }
       catch(error)
       {
-        enqueueSnackbar(error.response?.data || "Failed to delete board !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        enqueueSnackbar(error.response?.data || "Failed to delete board !", { variant: "error"});
       }
    };
 
@@ -131,7 +132,7 @@ function BoardDashboard({userData})
     const handleColumnNameChange = async (columnId, updatedColumn) => {
       if (isEmployee) 
       {
-        enqueueSnackbar("Employees cannot delete boards.", { variant: "warning" });
+        enqueueSnackbar("Employees cannot delete boards. !", { variant: "warning" });
         return;
       }
       try
@@ -142,7 +143,7 @@ function BoardDashboard({userData})
       }
       catch(error)
       {
-        enqueueSnackbar(error.response?.data || "Failed to sync updated column name !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+        enqueueSnackbar(error.response?.data || "Failed to sync updated column name !", { variant: "error"});
       }
     };
 
@@ -199,7 +200,7 @@ function BoardDashboard({userData})
         // only employee allowed to drag
         if(!isEmployee)
         {
-           enqueueSnackbar("Only employees can move tasks.", {variant: "error"});
+           enqueueSnackbar("Only employees can move tasks !", {variant: "error"});
            return;
         }
 
@@ -222,7 +223,7 @@ function BoardDashboard({userData})
         try
         {
           await moveTaskByColumn(taskId, newColumnId, userData.username);
-           enqueueSnackbar("Task moved successfully.", { variant: "success" });
+           enqueueSnackbar("Task moved successfully !", { variant: "success" });
            // const updatedTasks = await getAllTasksOfBoardId(boardId);
     // setTasks(updatedTasks);
 
@@ -249,7 +250,7 @@ function BoardDashboard({userData})
     { 
      src : helpImg, 
      name: 'Help',
-     onClick : () => enqueueSnackbar("Contact ✉️ roopalnegi147@gmail.com for further query.", {variant: "info", anchorOrigin: {horizontal: "top", vertical: "right"}}),
+     onClick : () => enqueueSnackbar("Contact ✉️ roopalnegi147@gmail.com for further query.", {variant: "info"}),
     },
    ];
 
@@ -265,15 +266,27 @@ function BoardDashboard({userData})
    }
 
 
-   return (<div>
+   return (<div className={styles.pageBackground}>
 
-          <Stack direction = "column" spacing={2}>
+          <Stack direction = "column" spacing={2} className={styles.boardDashboardWrapper}>
 
-              {/* Display Board Info */}
-              <InlineEditableBoardInfo board = {board} userData = {userData}/>
-    
+              {/* Display Board Info  + Back Button*/}
+              <Box className={styles.boardHeaderRow}>
+                 
+                 <Tooltip title = "Back to Dashboard">
+                     <Icon src={backArrowIcon} alt = "Back Arrow Icon" width="38" height= "38"
+                       onClick={() => navigate(isEmployee ? "/employee-dashboard" : "/admin-dashboard")}/>
+                 </Tooltip>
+                
+                 <Box sx={{ flexGrow: 1}}>
+                    <InlineEditableBoardInfo board={board} userData={userData}/>
+                 </Box>
+              </Box>
+         
+                 
+  
               {/* Helper Tools */}
-              <Box sx = {{display: "flex", gap: 1, justifyContent: "space-between", alignItems: "center"}}>
+              <Box className={styles.helperTools}>
 
                 <SearchBar setSearchTerm = {setSearchTerm} />
                 
@@ -288,18 +301,22 @@ function BoardDashboard({userData})
           </Stack>
           
           
+          
           {/* overflowX -- allow horizontally acrolling if column overflow */}
-          <div style={{ display: "flex", gap: "40px", overflowX: "auto", padding: "16px 0"}}>
+          <div className={styles.columnsContainer}>
+
               
              {/* filter tasks by columnid for each column card */}
              {
                 (searchTerm.trim() !== "" && tasks.length === 0 )
-                                    ? ( <Typography variant = "h4" sx={{textAlign: "center", mt: 2, fontWeight: 900}}>No tasks found !!</Typography> 
+                                    ? ( <Typography variant = "h4" className={styles.noTasksText}>
+                                         No tasks found !!
+                                        </Typography> 
 
                                     )
                                    : (
                                         <DndContext onDragEnd={handleDragEnd}>
-                                            <div style = {{display: "flex", gap: "40px", overflowX:"auto", padding: "16px 0"}}>
+                                            <div className={styles.columnsGroup}>
 
                                                 { board.columns?.filter(col => { if (isEmployee && col.columnName.toLowerCase() === "archive")         // filter columns that are not archive for employee only 
                                                                                     { return false;}

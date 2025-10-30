@@ -1,32 +1,58 @@
-.stackContainer
+.stackContainer 
 {
-    margin: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-    gap: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 3rem;
+  min-height: calc(100vh - 60px);
+  padding: 0 2%;
+}
+
+.stackContainer > img 
+{
+  flex: 0.55;
+  width: 55%;
+  max-width: 530px;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.2);
+}
+
+.boxContainer 
+{
+  flex: 0.55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1.2rem 1rem;
+  text-align: right;
+}
+
+.boxContainer h3,
+.boxContainer .MuiTypography-h3 
+{
+  text-align: right;
+  font-weight: 900;
+  line-height: 1.2;
+  font-size: 2.8rem;
+  color: #6B4E23;
+}
+
+.boxContainer p,
+.boxContainer .MuiTypography-body1 
+{
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.65;
+  color: #6B4E23;
+  max-width: 800px;
+  padding: 0 1px 0 22px;
 }
 
 
-/* When screen width <= 768px (typical tablet/mobile) */
-@media (max-width: 768px) 
+.boxContainer button 
 {
-  .stackContainer 
-  {
-    flex-direction: column; /* stack vertically */
-    text-align: center; /* center text on small screens */
-  }
-
-}
-
-
-.boxContainer
-{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3cm;
-
+  align-self: center;
+  margin-top: 1.3rem;  
 }

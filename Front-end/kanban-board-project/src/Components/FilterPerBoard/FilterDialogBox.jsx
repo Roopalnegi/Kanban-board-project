@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton,
          FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
          TextField, Grid, Stack, MenuItem, Button, Typography, useTheme } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import CancelIcon from '@mui/icons-material/Cancel';
 import InfoIcon from '@mui/icons-material/Info';
 import { enqueueSnackbar } from "notistack";
 import { filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, getAllTasksOfBoardId } from "../../Services/TaskServices";
@@ -58,7 +58,7 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
          } 
          else 
          {
-           enqueueSnackbar("Select a valid filter option!", { variant: "error", anchorOrigin: {vertical: "top", horizontal: "bottom"} });
+           enqueueSnackbar("Select a valid filter option !", { variant: "error"});
            return;
          }
       
@@ -75,13 +75,13 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
     }   
 
       setTasks(filteredData);
-      enqueueSnackbar("Filter Applied!", { variant: "success", anchorOrigin: {vertical: "top", horizontal: "bottom"} });
+      enqueueSnackbar("Filter Applied !", { variant: "success"});
       setFilterOpen(false); // close the dialog 
       reset();   // clear fields
     } 
     catch (error) 
     {
-      enqueueSnackbar("Failed to apply filter!", { variant: "error",anchorOrigin: {vertical: "top", horizontal: "bottom"} });
+      enqueueSnackbar("Failed to apply filter !", { variant: "error"});
       setFilterOpen(false);  // close the dialog
     }
   };
@@ -129,11 +129,18 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
    <Dialog open={filterOpen} maxWidth="sm" fullWidth>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-    
-        <DialogTitle>
-          Filter Tasks
-          <CloseIcon onClick={handleClose} sx={{ cursor: "pointer", float: "right" , color : "error"}} />
-        </DialogTitle>
+
+         {/*header of the dialog */}
+         <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
+            <Typography variant="h5" sx = {{color: theme.colors.bodyText}}>
+               <b> Filter Tasks </b>
+            </Typography>
+            
+            {/* closeIcon */}
+           <CancelIcon
+                 sx={{cursor:'pointer',color:theme.palette.error.main}}
+                 onClick={handleClose} />
+         </DialogTitle>
 
         <DialogContent dividers>
     

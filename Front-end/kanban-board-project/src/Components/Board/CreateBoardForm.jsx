@@ -4,7 +4,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { createNewBoard } from "../../Services/BoardServices";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-
+import AISuggestionButton from "../AISuggestionInput.jsx/AISuggestionInput";
 
 function CreateBoardForm({ onBoardCreated ,onCancel}) 
 {
@@ -25,7 +25,7 @@ function CreateBoardForm({ onBoardCreated ,onCancel})
                                              createdBy: "admin",
                                             });
 
-    enqueueSnackbar("Board created successfully!", {variant: "success",autoHideDuration: 2000,anchorOrigin: { vertical: "top", horizontal: "right" }});
+    enqueueSnackbar("Board created successfully !", {variant: "success"});
     
     // notify parent admin dashboard wheneever new board is created
     if (onBoardCreated) onBoardCreated(newBoard);
@@ -35,7 +35,7 @@ function CreateBoardForm({ onBoardCreated ,onCancel})
     } 
     catch (error) 
     {
-      enqueueSnackbar(error?.response?.data?.message || "Failed to create board",{ variant: "error",autoHideDuration: 2000, anchorOrigin: { vertical: "top", horizontal: "right" }});
+      enqueueSnackbar(error?.response?.data?.message || "Failed to create board !",{ variant: "error"});
     }
   };
 
@@ -100,37 +100,52 @@ function CreateBoardForm({ onBoardCreated ,onCancel})
             flexDirection="column"
             gap={2.5}
           >
-            <TextField
-              label="Board Name *"
-              variant="outlined"
-              value={boardName}
-              onChange={(e) => setBoardName(e.target.value)}
-              required
-              fullWidth
-            />
+            {/* TextField Board Name + AI*/}
 
-            <TextField
-              label="Description"
-              variant="outlined"
-              multiline
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-            />
+            <Box display="flex" alignItems="center" gap={1}>
+            
+              <TextField
+                label="Board Name *"
+                variant="outlined"
+                value={boardName}
+                onChange={(e) => setBoardName(e.target.value)}
+                required
+                fullWidth
+              />
+              <AISuggestionButton value={boardName} onSelect={(s) => setBoardName(s)} />
+            </Box>
+
+             {/* Description + AI */}
+             <Box display="flex" alignItems="center" gap={1}>
+              <TextField
+                label="Description"
+                variant="outlined"
+                multiline
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                fullWidth
+              />
+              <AISuggestionButton value={description} onSelect={(s) => setDescription(s)} />
+            </Box>
 
             <Box display="flex" justifyContent="space-between" gap={2}>
               <Button
-                variant="contained"
+                variant="outlined"
                 type="submit"
                 fullWidth
                 sx={{
-                  backgroundColor: "#1976d2",
+                  borderColor: "#7B61FF",
+                  color: "#7B61FF",
                   textTransform: "none",
                   fontWeight: "bold",
                   borderRadius: 2,
-                  "&:hover": { backgroundColor: "#1565c0" },
+                  "&:hover": {
+                    backgroundColor: "rgba(123,97,255,0.05)",
+                    borderColor: "#7B61FF",
+                  },
                 }}
+                
               >
                 Create
               </Button>

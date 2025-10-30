@@ -1,20 +1,29 @@
-html, body, #root
+body 
 {
-    height: 100%;
-    margin: 0;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fffdf5;
+  color: #3b2f0d;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-.AppLayout
+.AppLayout 
 {
-    display: flex;           /* stack header, main, footer vertically */
-    flex-direction: column;
-    min-height: 100vh;         /* ensure footer remain at bottom even if content i short*/
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fffdf5 0%, #fefbf4 100%);
 }
 
-.AppMain
+.AppMain 
 {
-    flex-grow: 1;         /* fill available space b/w header and footer*/
-    background-color: #FFFFFF;
-    padding: 100px 80px 40px;    /* add top padding to compensate for fixed header */
-    overflow: visible;         /* allow whole page (not just main) to scroll*/
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-top: calc(var(--header-height) + 24px);
+  padding-bottom: calc(var(--footer-height) + 32px);
 }

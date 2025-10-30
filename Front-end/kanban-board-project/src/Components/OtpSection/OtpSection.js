@@ -22,21 +22,13 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
     {
       const response = await axios.post(`http://localhost:8081/api/v1/user/send-otp?email=${email}&context=${context}`);
 
-      enqueueSnackbar(response.data || "OTP sent successfully!", {
-                                                                  variant: 'success',
-                                                                  autoHideDuration: 2000,
-                                                                  anchorOrigin: { vertical: 'top', horizontal: 'right' }
-                                                                 });
+      enqueueSnackbar(response.data || "OTP sent successfully ! ", {variant: "success"});
      setOtpSent(true);       // allow user to enter OTP
      setOtp('');             // clear input field
     } 
     catch (error) 
     {
-      enqueueSnackbar(error.response?.data || "Failed to send OTP!", {
-                                                                      variant: 'error',
-                                                                      autoHideDuration: 2000,
-                                                                      anchorOrigin: { vertical: 'top', horizontal: 'right' }
-                                                                     });
+      enqueueSnackbar(error.response?.data || "Failed to send OTP !", {variant: "error"});
       setOtpSent(false);      // allow user to retry
       setIsOtpVerified(false);                                                               
     }
@@ -50,20 +42,12 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
     {
       const response = await axios.post(`http://localhost:8081/api/v1/user/verify-otp?email=${email}&otp=${otp}`);
       
-      enqueueSnackbar(response.data || "OTP verified successfully!", {
-                                                                      variant: 'success',
-                                                                      autoHideDuration: 2000,
-                                                                      anchorOrigin: { vertical: 'top', horizontal: 'right' }
-                                                                     });
+      enqueueSnackbar(response.data || "OTP verified successfully !",{variant: "success"});
       setIsOtpVerified(true);                                                               
     } 
     catch (error) 
     {
-      enqueueSnackbar(error.response?.data || "Invalid OTP!", {
-                                                              variant: 'error',
-                                                              autoHideDuration: 2000,
-                                                              anchorOrigin: { vertical: 'top', horizontal: 'right' }
-                                                              });
+      enqueueSnackbar(error.response?.data || "Invalid OTP !", {variant: "error"});
       // Reset OTP state to allow generating a new OTP
       setOtpSent(false);  // show "Generate OTP" button again
       setOtp('');         // clear the input field

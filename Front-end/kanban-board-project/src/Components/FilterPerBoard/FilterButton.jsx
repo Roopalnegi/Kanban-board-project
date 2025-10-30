@@ -15,7 +15,7 @@ function FilterButton({setTasks, boardId, setFilterOption, userData})
     return (
              <>
               <Button onClick = {handleOpen} 
-                      sx = {{boarderRadius: "6px", p:1, ml: 2}}
+                      sx = {{boarderRadius: "6px", px:3, ml: 2, backgroundColor:" #05aafc18"}}
                       endIcon = {<img src = "../Icons/filter-icon.png" alt = "Filter Icon" width = "25" height = "25"/>}
               >
                 Filter

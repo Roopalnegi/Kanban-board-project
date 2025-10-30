@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { TextField, Button, 
+import { TextField, Button, Typography, 
          Dialog, DialogActions, DialogContent, DialogTitle,
          useTheme} from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -35,14 +35,7 @@ function RegisterForm()
 
         let userName = response.data.username;
 
-        enqueueSnackbar(`${userName} Registered Successfully !`, {
-                                                              variant: "success",
-                                                              autoHideDuration: 2000,   // 2 sec
-                                                              anchorOrigin: {
-                                                                            vertical: "top",
-                                                                            horizontal: "right",
-                                                                           }
-                                                            });
+        enqueueSnackbar(`${userName} Registered Successfully !`, {variant: "success"});
         
         setFormOpen(false);    // close form after successfull registration
         navigate("/login");       
@@ -51,14 +44,7 @@ function RegisterForm()
     }
     catch(error)
     {
-        enqueueSnackbar(error.response?.data  || "Failed to Register !", {
-                                                                                  variant: "error",
-                                                                                  autoHideDuration: 2000,   // 2 sec
-                                                                                  anchorOrigin: {
-                                                                                                vertical: "top",
-                                                                                                horizontal: "right",
-                                                                                               }
-                                                                                })  ;
+        enqueueSnackbar(error.response?.data  || "Failed to Register !", {variant: "error"})  ;
     }
 
 
@@ -71,7 +57,9 @@ function RegisterForm()
 
 
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <b>Registration Form</b>
+            <Typography variant="h4" sx = {{color: theme.colors.bodyText}}>
+              <b> Registration Form </b>
+            </Typography>
          <CancelIcon sx={{ cursor: "pointer", color: theme.palette.error.main }} 
                     onClick={() => {setFormOpen(false); 
                                     navigate("/");}} />

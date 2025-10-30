@@ -13,9 +13,10 @@ import { useDroppable } from "@dnd-kit/core";
 
 function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete, userData})
 {
+  
    const isEmployee = userData?.role?.toLowerCase() === "employee";
    
-   const {isOver, setNodeRef} = useDroppable({id: String(column.columnId)});       // give each droppable the column id
+   const {setNodeRef} = useDroppable({id: String(column.columnId)});       // give each droppable the column id
                                                                                    // such that over.id will be columnId  
 
    const{enqueueSnackbar} = useSnackbar();
@@ -49,10 +50,10 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
             if (!columnName) return "#75757554"; // fallback color for undefined/null
             switch ((columnName).toLowerCase()) 
             {
-              case "to do": return "#64B5F6"; 
-              case "in progress": return "#FFD54F"; 
-              case "done": return "#81C784"; 
-              case "archive": return "#BDBDBD";
+              case "to do": return "rgba(145, 200, 245, 0.32)"; 
+              case "in progress": return "rgba(242, 217, 134, 0.33)"; 
+              case "done": return "rgba(131, 238, 136, 0.28)"; 
+              case "archive": return "rgba(127, 125, 125, 0.11)";
               default: return getRandomRGBA();
             }
     };
@@ -60,7 +61,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
     
 
     // function to get random rgba code 
-    const getRandomRGBA = (alpha = 0.2 ) => {
+    const getRandomRGBA = (alpha = 0.1 ) => {
          const r = Math.floor(Math.random() * 256); // Red: 0-255
          const g = Math.floor(Math.random() * 256); // Green: 0-255
          const b = Math.floor(Math.random() * 256); // Blue: 0-255
@@ -73,7 +74,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
     const handleSaveColumnName = async (newName) => {
          if(isEmployee)
          {
-          enqueueSnackbar("Employees cannot rename columns.", { variant: "warning" });
+          enqueueSnackbar("Employees cannot rename columns !", { variant: "warning" });
       return;
          }
          try
@@ -83,7 +84,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
                                    columnOrder: column.columnOrder};
 
            await updateColumnName(boardId, column.columnId, updatedColumn);
-           enqueueSnackbar("Column name updated !", {variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           enqueueSnackbar("Column name updated !", {variant: "success"});
            setEditing(false);
     
            // notify parent board state when column name change
@@ -91,7 +92,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
          }
          catch(error)
          {
-            enqueueSnackbar(error.response?.data|| "Failed to update column name !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+            enqueueSnackbar(error.response?.data|| "Failed to update column name !", { variant: "error"});
          }
     };
 
@@ -99,19 +100,19 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
     // delete column
     const handleDeleteColumn = async () => {
         if (isEmployee) {
-      enqueueSnackbar("Employees cannot delete columns.", { variant: "warning" });
+      enqueueSnackbar("Employees cannot delete columns !", { variant: "warning" });
       return;
     }
         try
         {
            await deleteColumn (boardId, column.columnId);
-           enqueueSnackbar("Column deleted successfully !", { variant: "success", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+           enqueueSnackbar("Column deleted successfully !", { variant: "success"});
            // notify parent board state when column get deleted
            if(onColumnDelete) onColumnDelete(column.columnId);   
         }
         catch(error)
         {
-          enqueueSnackbar(error.response?.data|| "Failed to delete column !", { variant: "error", anchorOrigin: {horizontal: "bottom", vertical: "right"}});
+          enqueueSnackbar(error.response?.data|| "Failed to delete column !", { variant: "error"});
         }
     };
 

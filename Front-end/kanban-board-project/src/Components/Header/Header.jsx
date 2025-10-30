@@ -1,14 +1,13 @@
-import {Box,useTheme, Badge} from '@mui/material';
+import {Box, Badge} from '@mui/material';
 import {useNavigate,Link} from 'react-router-dom';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import styles from './Header.module.css';
+import { Icon, userIcon} from '../IconComponent/Icon';
 
 
 function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifications, unreadNotificationCount, setUnreadNotificationCount})
 {
    
-  const theme = useTheme();
   const navigate = useNavigate();
 
 
@@ -25,10 +24,7 @@ function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifica
    
 
    return(
-           <Box component="header" 
-                sx={{backgroundColor: theme.colors.header, color: theme.colors.headerFooterSidebarText}}
-                className={styles['header-bar']}
-            >    
+           <Box component="header" className={styles['header-bar']}>    
                 {/* Left Side - App Name */}
                 
                 <Box component="h3" sx={{ m: 0, p: 0, fontSize: "1.5rem"}}>
@@ -43,8 +39,8 @@ function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifica
                     {
                       loginStatus ? (<>
                                        <li className={styles['user-info']}>
-                                         <AccountCircleIcon className={styles['user-icon']}/> 
-                                         <span> Hi {userData?.username} </span>
+                                         <Icon src = {userIcon} alt = "user-icon" className={styles['user-icon']}/> 
+                                         <span><b> Hi {userData?.username} </b></span>
                                        </li>
                                        <li>
                                         <Badge color = "white" badgeContent = {unreadNotificationCount || 0}>

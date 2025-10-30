@@ -15,7 +15,7 @@ function InlineEditableBoardInfo({board,userData})
        
       if (isEmployee) 
       {
-         enqueueSnackbar("Employees cannot modify board details.", {variant: "warning",});
+         enqueueSnackbar("Employees cannot modify board details !", {variant: "warning",});
          return;
       }
         const updatedData = {boardName, description, [field]: newValue};
@@ -40,7 +40,7 @@ function InlineEditableBoardInfo({board,userData})
 
     
     return (
-    <Box sx={{ boxShadow: 3, p: 2, mb: 3, position: "relative" }}>
+    <Box sx={{ boxShadow: 3, p: 2, mb: 3, position: "relative", backgroundColor: "white" }}>
 
       {/* Board Name */}
       <InlineEditableField label = "Board Name"

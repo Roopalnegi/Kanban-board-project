@@ -8,7 +8,7 @@ function NotificationCard({ notification, markClick })
   return (
 
     <Card sx={{ minHeight: 60, display: "flex", alignItems: "center", padding: 1, gap: 2, 
-                backgroundColor: notification.isRead ? "#f9f9f9" : "#e0f0ff",}}>
+                backgroundColor: notification.isRead ? "#f9f9f9" : "#e0f0ffff",}}>
 
       <Box flexGrow={1}>
         <Typography variant="h6" sx = {{pb:1}}>{notification.taskName}</Typography>
