@@ -1,10 +1,11 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import {SnackbarProvider} from 'notistack';
+import {SnackbarProvider, MaterialDesignContent} from 'notistack';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import {styled} from '@mui/material/styles';
 
 
 const theme = createTheme({
@@ -19,10 +20,10 @@ const theme = createTheme({
     headerFooterSidebarText: "#6B4E23",
   },
   palette: {
-    success: { main: "rgba(11, 167, 76, 0.36)"},
-    error: { main: "rgba(243, 10, 10, 0.36)"},
-    info: {main: "rgba(29, 155, 245, 0.36)"},
-    warning: {main: "rgba(225, 130, 14, 0.36)"},
+    success: { main: "rgb(25, 195, 96)"},
+    error: { main: "rgb(243, 10, 10)"},
+    info: {main: "rgb(29, 155, 245)"},
+    warning: {main: "rgb(225, 130, 14)"},
   },
   components: {
     MuiButton: {
@@ -39,6 +40,40 @@ const theme = createTheme({
 });
 
 
+// to override the snackbar style
+const StyledMaterialDesignContent = styled(MaterialDesignContent) ( () => ({
+   padding: "8px 12px",
+   fontWeight: "bold",
+   borderWidth: "2px",
+   borderStyle: "solid",
+   borderRadius: "2px",
+
+   '&.notistack-MuiContent-success':{
+      color: "#385a22ff",
+      backgroundColor: "#abeb83ff",
+      borderColor: "#4e9a06",
+   },
+   '&.notistack-MuiContent-error':{
+      color: "#8c1c13",
+      backgroundColor: "#ec9c96ff",
+      borderColor: "#d93025",
+
+   },
+   '&.notistack-MuiContent-warning':{
+      color: "#ff9900ff",
+      backgroundColor: "#ebdabdff",
+      borderColor: "#ec960c",
+
+   },
+   '&.notistack-MuiContent-info':{
+      color: "#184f80",
+      backgroundColor: "#d9ecff",
+      borderColor: "#1d6fb8",
+    
+   }
+
+}));
+
 function AppThemeProvider({children})
 {
     return(
@@ -48,34 +83,16 @@ function AppThemeProvider({children})
                               autoHideDuration={2000}
                               anchorOrigin={{vertical: "bottom", horizontal: "right"}}
                               iconVariant={{
-                                              success: <CheckCircleIcon sx={{ mr: 1, color: "green" }} />,
-                                              error: <ErrorIcon sx={{ mr: 1, color: "red" }} />,
-                                              info: <InfoIcon sx={{ mr: 1, color: "blue" }} />,
-                                              warning: <ReportProblemIcon sx={{mr:1, color: "orange"}} />
+                                              success: <CheckCircleIcon sx={{ mr: 1, color: "black" }} />,
+                                              error: <ErrorIcon sx={{ mr: 1, color: "black" }} />,
+                                              info: <InfoIcon sx={{ mr: 1, color: "black" }} />,
+                                              warning: <ReportProblemIcon sx={{mr:1, color: "black"}} />
                                            }}
-                              sx= {{
-                                     "& .SnackbarContent-root" :{
-                                                                  padding: "8px 12px",
-                                                                  fontWeight: "bold",
-                                                                  color: "black",
-                                                                  borderWidth: "4px",
-                                                                  borderStyle: "solid",
-                                                                  borderRadius: "4px",
-                                                                },
-                                     "& .SnackbarItem-variantSuccess": {backgroundColor: theme.palette.success.main,
-                                                                        borderColor: "green",
-                                                                       },
-                                     "& .SnackbarItem-variantError": {backgroundColor: theme.palette.error.main,
-                                                                        borderColor: "red",
-                                                                       }, 
-                                     "& .SnackbarItem-variantInfo": {backgroundColor: theme.palette.info.main,
-                                                                        borderColor: "blue",
-                                                                       }, 
-                                     "& .SnackbarItem-variantWarning": {backgroundColor: theme.palette.info.main,
-                                                                        borderColor: "orange",
-                                                                       }                                                                 
-                                                                                                  
-                                  }}
+                              Components={{ success: StyledMaterialDesignContent,
+                                            error: StyledMaterialDesignContent,
+                                            warning: StyledMaterialDesignContent,
+                                            info: StyledMaterialDesignContent,
+                                          }}             
             >
             
             {children}

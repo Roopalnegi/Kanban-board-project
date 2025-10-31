@@ -57,10 +57,10 @@ function RegisterForm()
 
 
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Typography variant="h4" sx = {{color: theme.colors.bodyText}}>
+            <Typography variant="h4" component="span" sx = {{color: theme.colors.bodyText}}>
               <b> Registration Form </b>
             </Typography>
-         <CancelIcon sx={{ cursor: "pointer", color: theme.palette.error.main }} 
+         <CancelIcon sx={{ cursor: "pointer", color: "red" }} 
                     onClick={() => {setFormOpen(false); 
                                     navigate("/");}} />
       </DialogTitle>

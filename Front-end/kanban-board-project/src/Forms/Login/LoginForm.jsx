@@ -78,13 +78,13 @@ function LoginForm({setLoginStatus,setUserData})
       <Dialog open={formOpen} onClose={()=>setFormOpen(false)} fullWidth maxWidth='sm'>
         {/*header of the dialog */}
         <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
-           <Typography variant="h4" sx = {{color: theme.colors.bodyText}}>
+           <Typography variant="h4" component="span" sx = {{color: theme.colors.bodyText}}>
               <b> Login Form </b>
            </Typography>
            
               {/* closeIcon */}
           <CancelIcon
-                sx={{cursor:'pointer',color:theme.palette.error.main}}
+                sx={{cursor:'pointer',color:"red"}}
                 onClick={() => {setFormOpen(false); 
                                     navigate("/");}} 
           />

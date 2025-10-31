@@ -70,7 +70,7 @@ function NotificationPanel({ userData , notifications, setNotifications,setUnrea
       
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "2px solid lightgray", }} >
        
-        <Typography variant="h5" sx = {{color: "#6B4E23"}}>
+        <Typography variant="h5" component="span" sx = {{color: "#6B4E23"}}>
             <b> Notifications </b>
         </Typography>
        

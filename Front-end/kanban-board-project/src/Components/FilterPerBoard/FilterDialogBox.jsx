@@ -132,13 +132,13 @@ function FilterDialogBox({ setTasks, boardId, setFilterOption, filterOpen, setFi
 
          {/*header of the dialog */}
          <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
-            <Typography variant="h5" sx = {{color: theme.colors.bodyText}}>
+            <Typography variant="h5" component= "span" sx = {{color: theme.colors.bodyText}}>
                <b> Filter Tasks </b>
             </Typography>
             
             {/* closeIcon */}
            <CancelIcon
-                 sx={{cursor:'pointer',color:theme.palette.error.main}}
+                 sx={{cursor:'pointer',color:"red"}}
                  onClick={handleClose} />
          </DialogTitle>
 

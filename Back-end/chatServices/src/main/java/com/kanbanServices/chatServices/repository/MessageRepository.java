@@ -14,4 +14,6 @@ public interface MessageRepository extends MongoRepository<Message, String>
     //OR
     //(sender = mary AND receiver = john)
     List<Message> findBySenderAndReceiverOrReceiverAndSender(String sender, String receiver, String sender2, String receiver2);
+
+
 }

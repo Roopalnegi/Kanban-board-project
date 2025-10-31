@@ -131,7 +131,7 @@ function AddTaskForm({boardId, columnId, task, onTaskAdded, onTaskUpdated, open,
         <DialogTitle sx={{display:'flex',justifyContent:'space-between',alignItems:"center"}}>
             <b> {task ? "Update Task Form" : "Create Task Form"}  </b>
             <CancelIcon
-                sx={{cursor:'pointer',color:theme.palette.error.main}}
+                sx={{cursor:'pointer',color:"red"}}
                 onClick={() => handleClose()} 
             />
         </DialogTitle>
