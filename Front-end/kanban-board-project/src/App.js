@@ -10,6 +10,7 @@ import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute.jsx";
 import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
 import NotificationPanel from "./Components/Notification/NotificationPanel.jsx";
 import PageNotFound from "./Pages/PageNotFound/PageNotFound.jsx";
+import ChatPage from "./Components/ChatRoomSetup/ChatRoomSetup.jsx";
 import { getAllNotifications } from "./Services/NotificationService.js";
 import { useErrorBoundary } from "react-error-boundary";
 
@@ -24,6 +25,7 @@ function App()
   const [userData, setUserData] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [showHeaderFooter, setShowHeaderFooter] = useState(true);                    // hide header and footer for chat room 
 
   const {showBoundary} = useErrorBoundary();                             // showBoundary -- to trigger fallback manually
   const isError = false;
@@ -59,11 +61,13 @@ function App()
    return(
          <div className = "AppLayout">
          
-           <Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} 
-                   userData={userData} setUserData = {setUserData} 
-                   setNotifications = {setNotifications} 
-                   unreadNotificationCount = {unreadNotificationCount} setUnreadNotificationCount = {setUnreadNotificationCount} />  
-            
+          { showHeaderFooter && (<Header loginStatus = {loginStatus} setLoginStatus = {setLoginStatus} 
+                                          userData={userData} setUserData = {setUserData} 
+                                          setNotifications = {setNotifications} 
+                                          unreadNotificationCount = {unreadNotificationCount} setUnreadNotificationCount = {setUnreadNotificationCount} />  
+          
+          )}
+
             {/* Main content area between header & footer */} 
            
             <main className = "AppMain">
@@ -76,14 +80,14 @@ function App()
                {/* Admin route protected with ProtectedRoute */}
                <Route path = "/admin-dashboard" 
                       element = {<ProtectedRoute allowedRole = "admin" userData = {userData}>
-                                     <AdminDashboard/>
+                                     <AdminDashboard setShowHeaderFooter={setShowHeaderFooter}/>
                                  </ProtectedRoute> }
                 />
 
                 {/* Employee route protected with ProtectedRoute */}
                <Route path = "/employee-dashboard" 
                       element = {<ProtectedRoute allowedRole = "employee" userData = {userData}>
-                                     <EmployeeDashboard userData={userData}/>
+                                     <EmployeeDashboard userData={userData} setShowHeaderFooter={setShowHeaderFooter}/>
                                  </ProtectedRoute> }
                 />
 
@@ -91,13 +95,13 @@ function App()
                 <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} notifications = {notifications}
                                                                                  setNotifications = {setNotifications}
                                                                                  setUnreadNotificationCount = {setUnreadNotificationCount} />} />
-                                                                             
+                <Route path = "/chatroom" element = {<ChatPage setShowHeaderFooter={setShowHeaderFooter}/>} />                                                                                                                        
                 <Route path = "*" element = {<PageNotFound />} />                                                                 
 
              </Routes>
             </main>
           
-        <Footer/> 
+         { showHeaderFooter && <Footer/> }
          </div>
          );
   

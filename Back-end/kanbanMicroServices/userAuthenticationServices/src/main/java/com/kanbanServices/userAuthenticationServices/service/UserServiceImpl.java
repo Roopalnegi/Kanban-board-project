@@ -8,6 +8,7 @@ import com.kanbanServices.userAuthenticationServices.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,6 +77,30 @@ public class UserServiceImpl implements IUserService
 
 
         return employeeDetails;
+    }
+
+
+    // return like that
+    // {
+    //    "id": 1,
+    //    "username": "Alice",
+    //    "email": "alice@example.com"
+    //  },
+    @Override
+    public List<Map<String,Object>> getAllRegisteredUsers()
+    {
+
+        return userRepository.findAll()
+                .stream()
+                .map(u -> {
+                                 Map<String, Object> map = new HashMap<>();
+                                 map.put("id", u.getUserId());
+                                 map.put("username", u.getUsername());
+                                 map.put("email", u.getEmail());
+                                 return map;
+                               })
+                .collect(Collectors.toList());
+
     }
 
 

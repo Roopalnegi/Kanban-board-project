@@ -54,8 +54,8 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
     };
 
     
-
-    // function to generate color based on user email hash -- create a unqiue and consistent color for each user email
+    
+     // function to generate color based on user email hash -- create a unqiue and consistent color for each user email
     const getColorFromEmail = (email) => {
          
       let hash = 0;
@@ -77,6 +77,7 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
         return `rgb(${(Math.abs(r) + 225)/2}, ${(Math.abs(g) + 255)/2}, ${(Math.abs(b) + 255) / 2})`;
     };
 
+    
     
        // block actions for employees
   const blockAction = (message) => {

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { Typography, CircularProgress, Box, useTheme } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
 import { getTasksByEmployee } from "../../Services/TaskServices";
 import { getBoardDetails } from "../../Services/BoardServices";
 import BoardList from "../../Components/Board/BoardList";
+import ChatButton from "../../Components/ChatRoomSetup/ChatButton/ChatButton";
 
 
-
-export default function EmployeeDashboard({ userData }) 
+export default function EmployeeDashboard({ setShowHeaderFooter, userData }) 
 {
 
   const theme = useTheme();
@@ -16,7 +15,7 @@ export default function EmployeeDashboard({ userData })
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
+
   
   useEffect(() => {
   
@@ -107,6 +106,10 @@ export default function EmployeeDashboard({ userData })
           No boards assigned to you yet !.
         </Typography>
       )}
+        
+    {/* Chat icon */}
+     <ChatButton setShowHeaderFooter={setShowHeaderFooter} />
+                           
     </Box>
   );
 

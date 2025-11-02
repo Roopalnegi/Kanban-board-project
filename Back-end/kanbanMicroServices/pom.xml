@@ -18,6 +18,7 @@
 		<module>taskServices</module>
 		<module>NotificationService</module>
 		<module>suggestionServices</module>
+		<module>chatServices</module>
 	</modules>
 	<name>kanbanMicroServices</name>
 	<description>Demo project for Spring Boot</description>

@@ -1,0 +1,9 @@
+.leftColumn {
+  background-color: #262837ff;
+  color: white;
+  box-shadow: 3px 0 5px rgba(0, 0, 0, 0.2);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+// this class is mainly used for message persistence and reterival ,, for saving message in db and reteriveing old message from db
+// the frontend call this class right after sending message via web socket, to store it in databse
+// Token validation happens via AuthFeignClient → ensures the sender is a real, logged-in user.
+// “WebSocket sends the message instantly to users;
+//REST saves the same message for history.”
 @RestController
 @RequestMapping("/chat")
 public class MessageController
@@ -26,8 +31,8 @@ public class MessageController
 
 
     // Send a message
-    @PostMapping("/sendMessage")
-    public Message sendMessage(@RequestHeader("Authorization") String token, @RequestBody Message message)
+    @PostMapping("/saveMessage")
+    public Message saveMessage(@RequestHeader("Authorization") String token, @RequestBody Message message)
     {
 
         // Validate token using Feign client call
@@ -45,6 +50,7 @@ public class MessageController
 
 
     // Fetch chat history between two users
+    // Used when user opens a private chat to load chat history between those two users.
     @GetMapping("/fetchMessages/{user1}/{user2}")
     public List<Message> getMessages(@RequestHeader("Authorization") String token, @PathVariable String user1, @PathVariable String user2)
     {

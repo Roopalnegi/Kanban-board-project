@@ -1,23 +1,27 @@
 import { Typography, Box } from "@mui/material";
+import { Link } from 'react-router-dom';
+import styles from './PageNotFound.module.css';
 
 function PageNotFound()
 {
      return (
-       <Box sx = {{display: "flex", flexDirection: "column", gap: 2, justifyContent: "center", alignItems : "center"}}>
+       <Box className={styles.stackContainer}>
 
-          {/* 1st column */}
-          <div>
-            <img src = "../Images/error-page.png" alt = "404 Error"/>
-          </div>
+          {/* Left Side */}
+          <Box component="img"
+               src = "../Images/error-page.png" alt = "404 Error"
+               sx={{width: { xs: "100%", sm: "500px", md: "600px" },
+                      height: "auto"}} 
+          />
 
-          {/* 2nd column */}
-          <Box sx = {{display: "flex", flexDirection: "column", gap: 3, justifyContent: "center", alignItems: "center"}}>
+          {/* Right side */}
+          <Box className={styles.boxContainer}>
             <Typography variant = "h1"> 404 </Typography>
             <Typography variant = "h5" component="p">
                   We're sorry, the page you requested could not be found.
             </Typography>
              <Typography variant = "h5" component="p">
-                  Please go back to HomePage.
+                  Please go back to <Link to="/">HomePage.</Link>
             </Typography>
           </Box>
 

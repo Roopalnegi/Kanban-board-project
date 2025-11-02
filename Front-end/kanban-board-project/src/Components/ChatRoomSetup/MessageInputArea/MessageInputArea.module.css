@@ -1,0 +1,18 @@
+.messageInputContainer 
+{
+  padding: 16px;
+  background-color: #9c959544;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+
+.messageTextField 
+{
+  background-color: #ececf5a2;
+}

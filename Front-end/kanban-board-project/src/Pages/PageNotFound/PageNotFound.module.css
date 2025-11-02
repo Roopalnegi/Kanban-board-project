@@ -1,0 +1,19 @@
+.stackContainer 
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 3rem;
+  min-height: calc(100vh - 60px);
+  padding: 0 2%;
+}
+
+.boxContainer 
+{
+  display: flex;
+  flex-direction: column;
+  gap: "30px";
+  align-items: center;
+  justify-content: center;
+}

@@ -5,6 +5,7 @@ import com.kanbanServices.userAuthenticationServices.exception.InvalidPasswordEx
 import com.kanbanServices.userAuthenticationServices.exception.UserAlreadyExistsException;
 import com.kanbanServices.userAuthenticationServices.exception.UserNotFoundException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public interface IUserService
    //----------------- helper method -------------------------
    // return userid map with email for task service assignedTo property
    Map<Long,String> fetchAllEmployees ();
+
+   // fetch all registered users for chat
+   List<Map<String,Object>> getAllRegisteredUsers();
 
 
 }

@@ -8,7 +8,7 @@ import{Dialog, DialogContent, DialogTitle,DialogActions,
 import CancelIcon from '@mui/icons-material/Cancel';
 import { addTask, getEmployeeDetails, updateTask } from "../../Services/TaskServices";
 import formatEmployeeData from "../../Services/Utils/employeeUtil";
-import AISuggestionButton from "../../Components/AISuggestionInput.jsx/AISuggestionInput";
+import AISuggestionButton from "../../Components/AISuggestionInput/AISuggestionInput";
 
 
 

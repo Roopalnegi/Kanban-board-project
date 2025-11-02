@@ -2,6 +2,7 @@ package com.kanbanServices.chatServices.config;
 
 
 import com.kanbanServices.chatServices.service.JwtHandshakeInterceptor;
+import com.kanbanServices.chatServices.service.UserHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -34,6 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
     {
         registry.addEndpoint("/ws-chat")       // Defines WebSocket endpoint (client connects to /ws)
                 .addInterceptors(jwtHandshakeInterceptor)
+                .setHandshakeHandler(new UserHandshakeInterceptor())        // connect custom handshake handler to endpoint
                 .setAllowedOrigins("http://localhost:3000")
                 .withSockJS();                  // Enables SockJS fallback for browsers that don't support WebSocket
     }
@@ -44,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
     public void configureMessageBroker(MessageBrokerRegistry config)
     {
         // for all clients /topic i.e. server to client
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic", "/queue");
 
         // for client to sever
         config.setApplicationDestinationPrefixes("/app");

@@ -1,0 +1,25 @@
+.chatIconBox 
+{
+  position: fixed;
+  bottom: 75px;
+  right: 20px;
+  background-color: #103a68ff;
+  color: white;
+  padding: 16px; /* same as p: 2 */
+  border-radius: 50%;
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.chatIconBox:hover 
+{
+  transform: scale(1.1);
+  background-color: #90b2d6ff;
+}
+
+.chatIconBox:active 
+{
+  transform: scale(0.95);
+}

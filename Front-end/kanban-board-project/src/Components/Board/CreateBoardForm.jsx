@@ -4,7 +4,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { createNewBoard } from "../../Services/BoardServices";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import AISuggestionButton from "../AISuggestionInput.jsx/AISuggestionInput";
+import AISuggestionButton from "../AISuggestionInput/AISuggestionInput";
 
 function CreateBoardForm({ onBoardCreated ,onCancel}) 
 {

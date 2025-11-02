@@ -8,9 +8,9 @@ import { getAllBoards, deleteBoard } from "../../Services/BoardServices";
 import { Icon, deleteBoardImg } from "../../Components/IconComponent/Icon";
 import CreateBoardForm from "../../Components/Board/CreateBoardForm";
 import styles from "./AdminDashboard.module.css";
+import ChatButton from "../../Components/ChatRoomSetup/ChatButton/ChatButton";
 
-
-function AdminDashboard() 
+function AdminDashboard({setShowHeaderFooter}) 
 {
   const [boards, setBoards] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -126,6 +126,10 @@ function AdminDashboard()
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Chat icon */}
+      <ChatButton setShowHeaderFooter={setShowHeaderFooter} />
+
     </Box>
   );
 }

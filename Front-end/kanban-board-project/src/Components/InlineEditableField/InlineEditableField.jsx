@@ -1,7 +1,7 @@
 import { Typography, TextField, Box } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import { Icon, pencilImg } from "../IconComponent/Icon";
-import AISuggestionButton from "../AISuggestionInput.jsx/AISuggestionInput";
+import AISuggestionButton from "../AISuggestionInput/AISuggestionInput";
 
 /*
  editable inline when user click on edit icon saves changes to backend automatically on blur or pressing enter

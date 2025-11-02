@@ -11,19 +11,13 @@ import com.kanbanServices.userAuthenticationServices.service.OtpService;
 import com.kanbanServices.userAuthenticationServices.service.SecurityTokenGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import jakarta.mail.Multipart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -229,6 +223,22 @@ public class UserController
         catch (Exception e)
         {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to fetch all users registered in system
+    @GetMapping("/fetchAllRegisteredUsers")
+    public ResponseEntity<?> fetchAllRegisteredUsers()
+    {
+        try
+        {
+            List<Map<String,Object>> registeredUser = userService.getAllRegisteredUsers();
+            return new ResponseEntity<>(registeredUser, HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

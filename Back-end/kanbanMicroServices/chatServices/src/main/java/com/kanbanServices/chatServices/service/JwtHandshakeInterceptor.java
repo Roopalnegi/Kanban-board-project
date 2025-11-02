@@ -47,6 +47,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor
                    // attach user info to connect with websocket
                    attributes.put("email", userData.get("email"));
 
+                   System.out.println("Connected to user : " + userData.get("email"));
+
                    return true;
                }
                else
