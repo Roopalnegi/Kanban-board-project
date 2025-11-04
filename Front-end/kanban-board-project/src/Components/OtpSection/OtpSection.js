@@ -1,6 +1,6 @@
 import { TextField, Button, Box, useTheme } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSnackbar } from 'notistack';
 
@@ -16,8 +16,24 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
    const [otp, setOtp] = useState('');
 
 
+   // automatically mark OTP as sent in login context (since backend already sends it)
+  useEffect(() => {
+    if (context === "login") 
+    {
+      setOtpSent(true);
+      enqueueSnackbar("OTP has been sent to your registered email.", { variant: "info" });
+    }
+  }, [context]);
+
+
    // function to send OTP
   const sendOTP = async (email, context) => {
+    if(!email)
+    {
+      enqueueSnackbar("Please enter email first !", {variant: "error"});
+      return;
+    }
+
     try 
     {
       const response = await axios.post(`http://localhost:8081/api/v1/user/send-otp?email=${email}&context=${context}`);
@@ -38,6 +54,11 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
 
   // function to verify OTP
   const verifyOTP = async (email, otp) => {
+     if (!otp) 
+     {
+      enqueueSnackbar("Please enter OTP first!", { variant: "warning" });
+      return;
+     }
     try 
     {
       const response = await axios.post(`http://localhost:8081/api/v1/user/verify-otp?email=${email}&otp=${otp}`);

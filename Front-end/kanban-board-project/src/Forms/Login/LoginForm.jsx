@@ -4,7 +4,7 @@ import{useNavigate}from 'react-router-dom';
 import { useSnackbar} from 'notistack';
 import axios from 'axios';
 import{Dialog, DialogContent, DialogTitle, TextField,DialogActions,
-        useTheme,Button,
+        useTheme,Button, Box,
         Typography} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import OtpSection from "../../Components/OtpSection/OtpSection";
@@ -28,13 +28,39 @@ function LoginForm({setLoginStatus,setUserData})
   // to disable register button, until OTP is verfied
   const [isOtpVerified, setIsOtpVerified] = useState(false);
 
+  const [credentialsValid, setCredentialsValid] = useState(false);
 
-  //handle login from submission
-  const  loginSubmit=async(useData)=>{
+
+  // step1 - validate credentials - then sent otp 
+  const handleCredentials = async () => {
+
+    const email = watch("email");
+    const password = watch("password");
+
+    if (!email || !password) 
+    {
+      enqueueSnackbar("Please fill both Email and Password!", { variant: "warning" });
+      return;
+    }
+
     try
     {
-      //call backend login api
-      const response=await axios.post("http://localhost:8081/api/v1/user/login",useData);
+       const response = await axios.post("http://localhost:8081/api/v1/user/verify-credentials", {email,password});
+       enqueueSnackbar(response.data || "Credentials verified ! You can now generate OTP.!", {variant: "success"});
+       setCredentialsValid(true);
+    }
+    catch(error)
+    {
+      enqueueSnackbar(error.response?.data || "Invalid Credentails !", {variant: "error"});
+    }
+  };
+
+
+  // step2 - login after otp verified 
+  const  loginSubmit = async(userData)=>{
+    try
+    {
+      const response=await axios.post(`http://localhost:8081/api/v1/user/login`,userData);
       
       //destructure token + user 
       const {token,user}=response.data;
@@ -68,7 +94,7 @@ function LoginForm({setLoginStatus,setUserData})
     catch(error)
     {
       //show error message
-      enqueueSnackbar(error.response?.data||"Login failed, Please check credentials !",{variant: "error"});
+      enqueueSnackbar(error.response?.data||"Login failed ! Check OTP .",{variant: "error"});
     }
   };
 
@@ -116,20 +142,30 @@ function LoginForm({setLoginStatus,setUserData})
               fullWidth
               {...register('password',{
                 required:"password is required",
-                minLength:{
-                  value:8,
-                  message:"Password must be at least 8 character"
-                }
               })}
               onBlur={()=>trigger('password')}
               error={!!errors.password}
               helperText={errors.password?.message}
               />
              
+
+             {/* show OTP section if credentials are valid*/}
+             { credentialsValid ? (
+                                     <OtpSection email = {watch("email")} context = "login"
+                                                 isOtpVerified = {isOtpVerified} setIsOtpVerified = {setIsOtpVerified} />
+                                   )
+                                   :(
+                                     <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+                                            <Button type="button" variant="outlined"
+                                              sx={{ backgroundColor: theme.colors.buttons, color: "white", width: "40%",}}
+                                              onClick={handleCredentials}
+                                            >
+                                           Validate Credentials
+                                          </Button>
+                                      </Box>
+                                   )
+             }
              
-             {/* OTP section*/}
-             <OtpSection email = {watch("email")} context = "login"
-                         isOtpVerified = {isOtpVerified} setIsOtpVerified = {setIsOtpVerified} />
 
 
 

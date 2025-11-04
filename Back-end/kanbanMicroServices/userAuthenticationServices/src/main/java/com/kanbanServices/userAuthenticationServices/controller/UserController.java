@@ -40,7 +40,7 @@ public class UserController
 
 
    // method to login
-   @PostMapping("/login")
+   @PostMapping("/verify-credentials")
    public ResponseEntity<?> loginUser(@RequestBody User user)
    {
        try
@@ -48,13 +48,13 @@ public class UserController
            User foundUser = userService.loginUser(user);
            Map<String,String> token = securityTokenGenerator.generateToken(foundUser);
 
-           // create a response map containing token + user info
-           Map<String, Object> responseMap = new HashMap<>();
-           responseMap.put("token", token.get("token"));         // contain jwt token
-           responseMap.put("user", foundUser);                   // contain user complete info i.e. id, name, email, role
+           // if credentials is valid, send otp
+           String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
+           otpService.saveOtp(foundUser.getEmail(), otp);
 
-           return new ResponseEntity<>(responseMap,HttpStatus.OK);      // 200 OK -- success
-
+           // send OTP via email
+           emailService.sendEmail(foundUser.getEmail(), "Kanban Board OTP", "Your OTP is : " + otp);
+           return new ResponseEntity<>("OTP is send to " + foundUser.getEmail() + " . Please verify to continue login.",HttpStatus.OK);
        }
        catch(UserNotFoundException e)
        {
@@ -73,6 +73,29 @@ public class UserController
        }
    }
 
+
+    // method to return jwt token after otp verification is done
+    @PostMapping("/login")
+    public ResponseEntity<?> verifyLoginOtp(@RequestBody User user)
+    {
+        try
+        {
+            User foundUser = userService.loginUser(user);
+            Map<String,String> token = securityTokenGenerator.generateToken(foundUser);
+
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token.get("token"));
+            response.put("user", foundUser);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     // method to register
     @PostMapping("/register")
@@ -95,6 +118,7 @@ public class UserController
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     // method to decode jwt token and return email + role

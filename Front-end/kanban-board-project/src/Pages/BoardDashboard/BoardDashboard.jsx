@@ -245,7 +245,7 @@ function BoardDashboard({userData})
     { 
        src : deleteBoardImg, 
        name: 'Delete Board',
-       onClick : handleDeleteBoard,
+       onClick : () => handleDeleteBoard(boardId),
     },
     { 
      src : helpImg, 

@@ -48,6 +48,13 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent) ( () => ({
    borderStyle: "solid",
    borderRadius: "2px",
 
+  '&. SnackbarContainer-root':{
+     position: 'fixed !important',
+     top: '50% !important',
+     left: '50% !important',
+     tarnsform: 'translate(-50%, -50%) !important',
+     zIndex: 2000,
+  }, 
    '&.notistack-MuiContent-success':{
       color: "#385a22ff",
       backgroundColor: "#abeb83ff",
@@ -60,8 +67,8 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent) ( () => ({
 
    },
    '&.notistack-MuiContent-warning':{
-      color: "#ff9900ff",
-      backgroundColor: "#ebdabdff",
+      color: "#7e500bff",
+      backgroundColor: "#ffffffff",
       borderColor: "#ec960c",
 
    },
@@ -80,8 +87,8 @@ function AppThemeProvider({children})
           <ThemeProvider theme = {theme}>
             <CssBaseline/> {/* normalize browser default styles */}
             <SnackbarProvider maxSnack={3}
-                              autoHideDuration={2000}
-                              anchorOrigin={{vertical: "bottom", horizontal: "right"}}
+                              autoHideDuration={3000}
+                              anchorOrigin={{vertical: "top", horizontal: "center"}}
                               iconVariant={{
                                               success: <CheckCircleIcon sx={{ mr: 1, color: "black" }} />,
                                               error: <ErrorIcon sx={{ mr: 1, color: "black" }} />,
