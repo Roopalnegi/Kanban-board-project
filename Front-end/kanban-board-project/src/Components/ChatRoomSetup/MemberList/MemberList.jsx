@@ -2,7 +2,7 @@ import { Box, Divider, Button,
          List, ListItemText, ListItemButton,
          Tooltip, Typography, Avatar, Badge,} from "@mui/material";
 import { styled } from "@mui/material/styles";
-import styles from "./MembersList.module.css";
+import styles from './MemberList.module.css';
 
 function MembersList({ membersList, senderEmail, onlineUserList, avatarColors, handleReceiver, navigate, role, setShowHeaderFooter}) 
 {
@@ -22,7 +22,7 @@ function MembersList({ membersList, senderEmail, onlineUserList, avatarColors, h
   return (
     <Box className={styles.leftColumn}>
       
-      <Typography variant="h4" sx={{ textAlign: "center", p: 2 }}>
+      <Typography variant="h4" sx={{ textAlign: "center", p: 2 , mb:1}}>
         Members
       </Typography>
 
@@ -30,8 +30,8 @@ function MembersList({ membersList, senderEmail, onlineUserList, avatarColors, h
 
       <List>
         {
-         membersList .filter((mem) => mem.email !== senderEmail)
-                     .map((mem) => (
+         membersList.filter((mem) => mem.email !== senderEmail)
+                    .map((mem) => (
                                       <Tooltip key={mem.email} title={mem.email} placement="right"
                                                componentsProps={{ tooltip: {sx: {bgcolor: "whitesmoke",color: "black",fontSize: 14,}}}}>
                                         

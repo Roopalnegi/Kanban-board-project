@@ -1,3 +1,4 @@
+import {Box, Typography, Divider} from '@mui/material';
 import styles from "./ChatWindow.module.css";
 
 function ChatWindow({senderEmail, receiver, filteredMessages, getUserName})
