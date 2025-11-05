@@ -1,14 +1,24 @@
-import {Box, Badge} from '@mui/material';
+import {Box, Badge, Popover} from '@mui/material';
+import {useState} from 'react';
 import {useNavigate,Link} from 'react-router-dom';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import styles from './Header.module.css';
 import { Icon, userIcon} from '../IconComponent/Icon';
+import UploadImage from '../UserProfileImageUpload/UploadImage';
 
 
-function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifications, unreadNotificationCount, setUnreadNotificationCount})
+function Header({loginStatus, setLoginStatus, userData, setUserData, profileImage, setProfileImage, setNotifications, unreadNotificationCount, setUnreadNotificationCount})
 {
    
   const navigate = useNavigate();
+  
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  // Popover open/close
+  const handlePopoverOpen = (event) => setAnchorEl(event.currentTarget);
+  const handlePopoverClose = () => setAnchorEl(null);
+  const open = Boolean(anchorEl);
+
 
 
   const logout = () => {
@@ -39,7 +49,11 @@ function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifica
                     {
                       loginStatus ? (<>
                                        <li className={styles['user-info']}>
-                                         <Icon src = {userIcon} alt = "user-icon" className={styles['user-icon']}/> 
+                                        
+                                        {/* Avatar Icon click opens popover  */}
+
+                                         <Icon src = {profileImage || userIcon} alt = "user-icon" onClick = {handlePopoverOpen}
+                                               className={styles['user-icon']}/> 
                                          <span><b> Hi {userData?.username} </b></span>
                                        </li>
                                        <li>
@@ -58,6 +72,25 @@ function Header({loginStatus, setLoginStatus, userData, setUserData, setNotifica
                   </ul>
                  
                 </Box>
+
+                {/* Popover for uploading image */}
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+      >
+        <UploadImage
+          userData={userData}
+          profileImage={profileImage}
+          setProfileImage={setProfileImage}
+          onClose={handlePopoverClose}
+        />
+      </Popover>
+
      
              </Box>
           );

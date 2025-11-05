@@ -94,15 +94,21 @@ public class BoardServiceImpl implements BoardService
 
     //delete board
     @Override
-    public boolean deleteBoard(String boardId) throws BoardNotFoundExecption
+    public boolean deleteBoard(String boardId, String token) throws BoardNotFoundExecption
     {
         if (!boardRepository.existsById(boardId))
         {
             throw new BoardNotFoundExecption("Board not found with Id : " + boardId);
         }
 
+        try {
+            taskClient.handleDeleteAllTasksOfBoard(boardId, token);
+        } catch (Exception e) {
+            System.err.println("Warning: Failed to delete tasks for board " + boardId + " -> " + e.getMessage());
+            // Optionally log it but don’t stop the response
+        }
+
         boardRepository.deleteById(boardId);
-        taskClient.handleDeleteAllTasksOfBoard(boardId);
         return true;
     }
 

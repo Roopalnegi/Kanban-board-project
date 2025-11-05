@@ -15,10 +15,18 @@
 
 .header-links ul {
   display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 1.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.header-links li {
+  display: flex;
+  align-items: center;         /* ✅ vertical center for each item */
+  gap: 0.4rem;
 }
 
 .header-links li a {
@@ -44,7 +52,16 @@
   gap: 0.5rem;
 }
 
+
 .user-icon {
-  font-size: 1.8em;
-  color: black;
+  width: 40px;    /* increase width */
+  height: 40px;   /* increase height */
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.user-icon:hover {
+  transform: scale(1.05);
 }

@@ -2,19 +2,19 @@ package com.kanbanServices.userAuthenticationServices.controller;
 
 
 import com.kanbanServices.userAuthenticationServices.domain.User;
+import com.kanbanServices.userAuthenticationServices.domain.UserProfileImage;
+import com.kanbanServices.userAuthenticationServices.exception.ImageNotFoundException;
 import com.kanbanServices.userAuthenticationServices.exception.InvalidPasswordException;
 import com.kanbanServices.userAuthenticationServices.exception.UserAlreadyExistsException;
 import com.kanbanServices.userAuthenticationServices.exception.UserNotFoundException;
-import com.kanbanServices.userAuthenticationServices.service.EmailService;
-import com.kanbanServices.userAuthenticationServices.service.IUserService;
-import com.kanbanServices.userAuthenticationServices.service.OtpService;
-import com.kanbanServices.userAuthenticationServices.service.SecurityTokenGenerator;
+import com.kanbanServices.userAuthenticationServices.service.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.*;
@@ -25,17 +25,19 @@ import java.util.*;
 public class UserController
 {
    private final IUserService userService;
+   private final UserProfileImageService profileService;
    private final SecurityTokenGenerator securityTokenGenerator;
    private final EmailService emailService;
    private final OtpService otpService;
 
    @Autowired
-   public UserController(IUserService userService, SecurityTokenGenerator securityTokenGenerator, EmailService emailService, OtpService otpService)
+   public UserController(IUserService userService, SecurityTokenGenerator securityTokenGenerator, EmailService emailService, OtpService otpService, UserProfileImageService profileService)
    {
         this.userService = userService;
         this.securityTokenGenerator = securityTokenGenerator;
         this.emailService = emailService;
         this.otpService = otpService;
+        this.profileService = profileService;
    }
 
 
@@ -262,6 +264,48 @@ public class UserController
         }
         catch (Exception e)
         {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to save profile image in db
+    @PostMapping("/uploadProfileImage")
+    public ResponseEntity<?> uploadProfileImage(@RequestParam("file") MultipartFile file, @RequestParam("userId") Long userId)
+    {
+        try
+        {
+            Boolean success = profileService.saveImage(file,userId);
+
+            return new ResponseEntity<>(success,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to get uploaded profile image
+    @GetMapping("/getProfileImage")
+    public ResponseEntity<?> getProfileImage(@RequestParam("userId") Long userId)
+    {
+        try
+        {
+            UserProfileImage image = profileService.getImage(userId);
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", image.getContentType())
+                    .body(image.getImageData());
+        }
+        catch (ImageNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

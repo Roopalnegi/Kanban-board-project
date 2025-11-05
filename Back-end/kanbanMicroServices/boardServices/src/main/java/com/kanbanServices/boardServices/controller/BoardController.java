@@ -109,7 +109,9 @@ public class BoardController
         {
             // check if user is admin
             requestHelper.checkAdminRole(request);
-            boolean deleted = boardService.deleteBoard(boardId);
+            // ✅ Extract token
+            String token = request.getHeader("Authorization");
+            boolean deleted = boardService.deleteBoard(boardId, token);
             return new ResponseEntity<>("Board deleted successfully", HttpStatus.OK);
         }
         catch (AccessDeniedException e)
@@ -242,6 +244,7 @@ public class BoardController
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

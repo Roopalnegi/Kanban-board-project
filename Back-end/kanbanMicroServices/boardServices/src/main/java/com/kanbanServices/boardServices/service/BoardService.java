@@ -24,7 +24,7 @@ public interface BoardService
     List<Board> getAllBoard();
 
     // delete board
-    boolean deleteBoard(String boardId) throws BoardNotFoundExecption;
+    boolean deleteBoard(String boardId, String token) throws BoardNotFoundExecption;
 
     // update board details
     Board updateBoard (String boardId, Board updateBoardData) throws BoardNotFoundExecption;

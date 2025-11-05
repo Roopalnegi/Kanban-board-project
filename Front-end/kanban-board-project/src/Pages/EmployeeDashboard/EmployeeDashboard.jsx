@@ -44,6 +44,9 @@ export default function EmployeeDashboard({ setShowHeaderFooter, userData })
         }
     };
     fetchBoards();
+    //So when admin deletes, employee’s dashboard auto-updates within 15 seconds.
+    const interval = setInterval(fetchBoards, 15000); // refresh every 15s
+  return () => clearInterval(interval);
   }, [userData, enqueueSnackbar]);
 
 

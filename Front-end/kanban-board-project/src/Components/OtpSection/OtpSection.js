@@ -21,7 +21,6 @@ function OtpSection({ email, context, isOtpVerified, setIsOtpVerified })
     if (context === "login") 
     {
       setOtpSent(true);
-      enqueueSnackbar("OTP has been sent to your registered email.", { variant: "info" });
     }
   }, [context]);
 
