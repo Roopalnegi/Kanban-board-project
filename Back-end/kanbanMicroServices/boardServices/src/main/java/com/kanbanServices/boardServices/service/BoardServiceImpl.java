@@ -101,9 +101,12 @@ public class BoardServiceImpl implements BoardService
             throw new BoardNotFoundExecption("Board not found with Id : " + boardId);
         }
 
-        try {
+        try
+        {
             taskClient.handleDeleteAllTasksOfBoard(boardId, token);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Warning: Failed to delete tasks for board " + boardId + " -> " + e.getMessage());
             // Optionally log it but don’t stop the response
         }

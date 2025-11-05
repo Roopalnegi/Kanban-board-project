@@ -130,11 +130,11 @@ function App()
                                  </ProtectedRoute> }
                 />
 
-                <Route path = "/board/:boardId" element = {<BoardDashboard userData = {userData}/>} />
+                <Route path = "/board/:boardId" element = {<BoardDashboard userData = {userData} profileImage={profileImage}/>} />
                 <Route path = "/notificationpanel" element = {<NotificationPanel userData = {userData} notifications = {notifications}
                                                                                  setNotifications = {setNotifications}
                                                                                  setUnreadNotificationCount = {setUnreadNotificationCount} />} />
-                <Route path = "/chatroom" element = {<ChatRoomSetup setShowHeaderFooter={setShowHeaderFooter}/>} />                                                                                                                    
+                <Route path = "/chatroom" element = {<ChatRoomSetup setShowHeaderFooter={setShowHeaderFooter} profileImage={profileImage}/>} />                                                                                                                    
                 <Route path = "*" element = {<PageNotFound />} />                                                                 
 
              </Routes>

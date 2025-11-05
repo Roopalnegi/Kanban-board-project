@@ -20,30 +20,32 @@ export default function EmployeeDashboard({ setShowHeaderFooter, userData })
   useEffect(() => {
   
     const fetchBoards = async () => {
-      
-        if (!userData?.email) return;                // if user email is not exist 
-        console.log(userData);
-         
-        try 
-        {
-         const tasks = await getTasksByEmployee(userData.email);    // Step 1: fetch all tasks assigned to employee
-     
-         const boardIds = [...new Set(tasks.map((t) => t.boardId))];      // Step 2: extract unique boardIds from tasks
-       
-         const boardPromises = boardIds.map((id) => getBoardDetails(id));    // Step 3: fetch full board details for each boardId
-         const boardsData = await Promise.all(boardPromises);
-         setBoards(boardsData);
-        } 
-        catch (error) 
-        {
-        enqueueSnackbar(error.response?.data || "Failed to fetch assigned boards !",{ variant: "error" });
-        } 
-        finally 
-        {
-        setLoading(false);
-        }
-    };
-    fetchBoards();
+  if (!userData?.email) return;
+  console.log(userData);
+
+  try {
+    const tasks = await getTasksByEmployee(userData.email);
+    console.log("Tasks fetched for employee:", tasks);
+
+    const boardIds = [...new Set(tasks.map(t => t.boardId))];
+    console.log("🧩 Extracted board IDs:", boardIds);
+
+    const boardPromises = boardIds.map(id => getBoardDetails(id));
+    const boardsSettled = await Promise.allSettled(boardPromises);
+
+    const boardsData = boardsSettled
+      .filter(result => result.status === "fulfilled")
+      .map(result => result.value);
+
+    console.log("✅ Boards successfully fetched:", boardsData);
+    setBoards(boardsData);
+  } catch (error) {
+    enqueueSnackbar(error.response?.data || "Failed to fetch assigned boards!", { variant: "error" });
+  } finally {
+    setLoading(false);
+  }
+};
+
     //So when admin deletes, employee’s dashboard auto-updates within 15 seconds.
     const interval = setInterval(fetchBoards, 15000); // refresh every 15s
   return () => clearInterval(interval);
@@ -59,7 +61,7 @@ export default function EmployeeDashboard({ setShowHeaderFooter, userData })
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: "100px"}}>
         <CircularProgress />
       </Box>
     );

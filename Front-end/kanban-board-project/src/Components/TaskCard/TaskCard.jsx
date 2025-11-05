@@ -8,7 +8,7 @@ import { Icon, pencilImg, deleteImg, restoreImg } from '../IconComponent/Icon';
 import styles from './TaskCard.module.css';
 
 
-function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, archiveColumnId, readOnly = false}) 
+function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, archiveColumnId, readOnly = false, profileImage}) 
 {
 
    const {enqueueSnackbar} = useSnackbar();
@@ -183,9 +183,15 @@ function TaskCard({task, onTaskEdit, onTaskArchive,onTaskRestore, onTaskDelete, 
                  task.assignedTo?.map((email,index) => {
                                                          const initial = email ? email.charAt(0).toUpperCase() : "?" ;        // ? is fallback in email does not exist
                                                          return (<Tooltip key = {`${email}-${index}`} title = {email} arrow>
-                                                                    <Avatar sx={{ bgcolor: getColorFromEmail(email), width: 28, height: 28, fontSize: 14 }}>
-                                                                       {initial}
-                                                                    </Avatar>
+                                                                    {
+                                                                      profileImage ? <Avatar src= {profileImage} alt = {email} sx={{width: 28 , height : 28}} />
+                                                                                   :(
+                                                                                       <Avatar sx={{ bgcolor: getColorFromEmail(email), width: 28, height: 28, fontSize: 14 }}>
+                                                                                          {initial}
+                                                                                       </Avatar>
+                                                                                    )
+                                                                    }
+                                                                    
                                                                  </Tooltip>
 
                                                                 );

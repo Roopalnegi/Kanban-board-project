@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "TaskService", url = "http://localhost:8083/api/v1/task")
 public interface TaskClient
 {
-    @DeleteMapping("/deleteAllTasksByBoard/{BoardId}")
-    ResponseEntity<?> handleDeleteAllTasksOfBoard(@PathVariable String BoardId,@RequestHeader("Authorization") String token);
+    @DeleteMapping("/deleteAllTasksByBoard/{boardId}")
+    ResponseEntity<?> handleDeleteAllTasksOfBoard(@PathVariable String boardId,@RequestHeader("Authorization") String token);
 }

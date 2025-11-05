@@ -11,7 +11,7 @@ import DraggableTask from "../DragAndDrop/DraggableTask";
 import { useDroppable } from "@dnd-kit/core";
 
 
-function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete, userData})
+function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete, onTaskAdded, onTaskUpdate, onTaskArchive, onTaskRestore, onTaskDelete, userData, profileImage})
 {
   
    const isEmployee = userData?.role?.toLowerCase() === "employee";
@@ -228,6 +228,7 @@ function ColumnCard({boardId, column, tasks, onColumnNameChange, onColumnDelete,
                                                                onTaskDelete = {onTaskDelete}
                                                                archiveColumnId = {archiveId}
                                                                readOnly = {isEmployee}             // employees can't edit / archive / delete
+                                                               profileImage = {profileImage}
 
                                                  />)
                                )

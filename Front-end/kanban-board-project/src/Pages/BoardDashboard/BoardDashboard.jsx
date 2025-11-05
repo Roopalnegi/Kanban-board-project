@@ -16,14 +16,14 @@ import { DndContext } from '@dnd-kit/core';
 import styles from "./BoardDashboard.module.css";
 
 
-function BoardDashboard({userData})
+function BoardDashboard({userData, profileImage})
 {
 
    const {enqueueSnackbar} = useSnackbar();
    const navigate = useNavigate();
    const {boardId} = useParams();
    
-    const isEmployee = userData?.role?.toLowerCase() === "employee"; // ✅ check role
+    const isEmployee = userData?.role?.toLowerCase() === "employee"; // check role
 
    const [board, setBoard] = useState({columns: []});            // store baord data
    const [tasks, setTasks] = useState([]);        // store all task belongs to board
@@ -259,7 +259,7 @@ function BoardDashboard({userData})
    // custom message if baord data or task data is failed to fetch
    if(loading)
    {
-      return ( <Typography variant = "h4" sx = {{m:3, textAlign: "center"}}> 
+      return ( <Typography variant = "h4" sx = {{mt: "100px", textAlign: "center"}}> 
                      <CircularProgress size = "30px" color = "inherit" /> Loading ....
                </Typography>
              );  
@@ -335,6 +335,7 @@ function BoardDashboard({userData})
                                                                                  onTaskRestore = {handleTaskRestore}
                                                                                  onTaskDelete = {handleTaskDeleted}
                                                                                  userData = {userData}
+                                                                                 profileImage = {profileImage}
                                                                      />
                                                     
                                                    ))}

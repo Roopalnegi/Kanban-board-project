@@ -10,18 +10,23 @@ import CreateBoardForm from "../../Components/Board/CreateBoardForm";
 import styles from "./AdminDashboard.module.css";
 import ChatButton from "../../Components/ChatRoomSetup/ChatButton/ChatButton";
 
-function AdminDashboard({ setShowHeaderFooter }) {
+function AdminDashboard({ setShowHeaderFooter }) 
+{
   const [boards, setBoards] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllBoards = async () => {
-      try {
+      try 
+      {
         const allBoards = await getAllBoards();
         setBoards(allBoards);
-      } catch (error) {
+      } 
+      catch (error) 
+      {
         console.error("Error fetching boards:", error.message);
       }
     };
@@ -29,17 +34,18 @@ function AdminDashboard({ setShowHeaderFooter }) {
   }, []);
 
   const handleDeleteBoard = async (boardId) => {
-    try {
+    try 
+    {
       const response = await deleteBoard(boardId);
       enqueueSnackbar(response || "Board deleted successfully!", {
         variant: "success",
       });
 
       // Remove from UI instantly
-      setBoards((prev) =>
-        prev.filter((b) => String(b.boardId) !== String(boardId))
-      );
-    } catch (error) {
+      setBoards((prev) =>prev.filter((b) => b.boardId !== boardId));
+    } 
+    catch (error) 
+    {
       enqueueSnackbar(error?.message || "Failed to delete board!", {
         variant: "error",
       });

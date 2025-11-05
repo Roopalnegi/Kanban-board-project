@@ -109,7 +109,6 @@ public class BoardController
         {
             // check if user is admin
             requestHelper.checkAdminRole(request);
-            // ✅ Extract token
             String token = request.getHeader("Authorization");
             boolean deleted = boardService.deleteBoard(boardId, token);
             return new ResponseEntity<>("Board deleted successfully", HttpStatus.OK);

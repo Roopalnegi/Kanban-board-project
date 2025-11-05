@@ -264,19 +264,26 @@ public class TaskServiceImpl implements TaskService
     @Override
     public Boolean deleteAllTasksOfBoard(String boardId) throws TaskNotFoundException
     {
-        List<Task> tasks = getTasksOfBoardId(boardId);
+        try
+        {
+            System.out.println("Board id " + boardId);
+            List<Task> tasks = getTasksOfBoardId(boardId);
 
-        if(tasks.isEmpty())
+            if (tasks.isEmpty())
+                return true;
+
+            List<String> taskIds = tasks.stream()
+                    .map(Task::getTaskId)
+                    .collect(Collectors.toList());
+
+            taskRepository.deleteAllById(taskIds);
+
             return true;
-
-        // extract id's because deleteAllById accept List of id's
-        List<String> taskIds = tasks.stream()
-                                    .map(Task::getTaskId)
-                                    .collect(Collectors.toList());
-
-        taskRepository.deleteAllById(taskIds);
-
-        return true;
+        } catch (Exception e) {
+            // log error
+            System.out.println("Error deleting tasks: " + e.getMessage());
+            throw new TaskNotFoundException("Failed to delete tasks for board: " + boardId);
+        }
     }
 
 

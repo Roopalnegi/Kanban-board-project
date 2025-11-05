@@ -209,7 +209,7 @@ public class TaskController
 
 
     // method to handle deleting all task of a board
-    @DeleteMapping("/deleteAllTasksByBoard/{BoardId}")
+    @DeleteMapping("/deleteAllTasksByBoard/{boardId}")
     public ResponseEntity<?> handleDeleteAllTasksOfBoard(@PathVariable String boardId)
     {
         try
