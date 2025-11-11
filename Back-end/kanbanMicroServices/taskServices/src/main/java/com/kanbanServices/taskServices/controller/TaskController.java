@@ -4,6 +4,7 @@ import com.kanbanServices.taskServices.domain.Task;
 import com.kanbanServices.taskServices.exception.MaxTaskLimitReachedException;
 import com.kanbanServices.taskServices.exception.TaskAlreadyExistsException;
 import com.kanbanServices.taskServices.exception.TaskNotFoundException;
+import com.kanbanServices.taskServices.service.EmpProgressReportService;
 import com.kanbanServices.taskServices.service.TaskService;
 import com.kanbanServices.taskServices.utility.RequestHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,12 +25,14 @@ public class TaskController
 {
     private final TaskService taskService;
     private final RequestHelper requestHelper;
+    private final EmpProgressReportService reportService;
 
     @Autowired
-    public TaskController(TaskService taskService, RequestHelper requestHelper)
+    public TaskController(TaskService taskService, RequestHelper requestHelper, EmpProgressReportService reportService)
     {
         this.taskService = taskService;
         this.requestHelper = requestHelper;
+        this.reportService = reportService;
     }
 
 
@@ -419,6 +422,29 @@ public class TaskController
             if(tasks == null)
                 tasks = new ArrayList<>();       // return empty list if no task is found instead of 404 (Not Found)
             return new ResponseEntity<>(tasks,HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // method to handle getting employee progress report
+    @GetMapping("/employeeProgressReport")
+    public ResponseEntity<?> getEmployeeProgressReport(HttpServletRequest request)
+    {
+        try
+        {
+            // check if user is admin
+            requestHelper.checkAdminRole(request);
+
+            Map<String, Map<String, Object>> report = reportService.getReport();
+            return new ResponseEntity<>(report, HttpStatus.OK);
+        }
+        catch (TaskNotFoundException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         catch (Exception e)
         {

@@ -3,12 +3,13 @@ import { Box, Grid, Paper, Typography } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAllBoards, deleteBoard } from "../../Services/BoardServices";
-import { Icon, deleteBoardImg } from "../../Components/IconComponent/Icon";
+import { Icon, deleteBoardImg, reportGif } from "../../Components/IconComponent/Icon";
 import CreateBoardForm from "../../Components/Board/CreateBoardForm";
 import styles from "./AdminDashboard.module.css";
 import ChatButton from "../../Components/ChatRoomSetup/ChatButton/ChatButton";
+
 
 function AdminDashboard({ setShowHeaderFooter }) 
 {
@@ -91,6 +92,13 @@ function AdminDashboard({ setShowHeaderFooter })
               />
             )}
           </Paper>
+
+          {/* Employee Progress Report link */}
+          <Box className={styles.reportBoard}>
+            <Link to = "/employeeProgressReport">
+             See How the Employee Is Progressing <Icon src={reportGif} width="50" height= "50"/>
+            </Link>
+          </Box>
         </Grid>
 
         {/* RIGHT SIDE */}

@@ -28,7 +28,6 @@ public class Task
     private LocalDate createdAt;       // when the task was created
     @LastModifiedDate
     private LocalDate updatedAt;       // when it was last modified
-    private String comments;           // employee comments on tasks
 
 
     // empty constructor
@@ -37,7 +36,7 @@ public class Task
 
 
     // parameterized constructor
-    public Task(String taskId, String title, String task_description, String columnId, String previousColumnId, String boardId, String priority, List<String> assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt, String comments)
+    public Task(String taskId, String title, String task_description, String columnId, String previousColumnId, String boardId, String priority, List<String> assignedTo, LocalDate dueDate, LocalDate createdAt, LocalDate updatedAt)
     {
         this.taskId = taskId;
         this.title = title;
@@ -50,7 +49,6 @@ public class Task
         this.dueDate = dueDate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.comments = comments;
     }
 
 
@@ -77,8 +75,6 @@ public class Task
     public void setCreatedAt(LocalDate createdAt) {this.createdAt = createdAt;}
     public LocalDate getUpdatedAt() {return updatedAt;}
     public void setUpdatedAt(LocalDate updatedAt) {this.updatedAt = updatedAt;}
-    public String getComments() {return comments;}
-    public void setComments(String comments) {this.comments = comments;}
 
     // toString()
 
@@ -96,7 +92,6 @@ public class Task
                 ", dueDate=" + dueDate +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", comments='" + comments + '\'' +
                 '}';
     }
 

@@ -320,7 +320,8 @@ public class TaskServiceImpl implements TaskService
 
         if (assignedTasks.isEmpty())
         {
-            throw new TaskNotFoundException("No tasks found assigned to " + email);
+            assignedTasks = new ArrayList<>();
+            //throw new TaskNotFoundException("No tasks found assigned to " + email);
         }
 
         return assignedTasks;

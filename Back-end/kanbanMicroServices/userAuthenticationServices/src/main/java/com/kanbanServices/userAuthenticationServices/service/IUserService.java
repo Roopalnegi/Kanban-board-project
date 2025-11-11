@@ -29,5 +29,7 @@ public interface IUserService
    // fetch all registered users for chat
    List<Map<String,Object>> getAllRegisteredUsers();
 
+   // update password
+   Boolean updatePassword(User user);
 
 }

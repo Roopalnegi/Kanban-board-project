@@ -117,11 +117,16 @@ const searchTasksByKeyword = async (boardId, keyword) => {
 };
 
 
+// get employee progress report
+const getEmployeeProgressReport = async () => {
+   const response = await axiosInstance.get(`${baseURL}/employeeProgressReport`);
+   return response.data;
+};
 
 
 export {getAllTasksOfBoardId, addTask, getEmployeeDetails, calculateNoOfDays, deletePermanent, archiveTask, restoreTask, updateTask,
         filterTaskByPriority, filterTaskByCreatedAt, filterTaskByDueDate, filterTaskByCreatedMonth, filterTaskByDueMonth, searchTasksByKeyword,
-        getTasksByEmployee, moveTaskByColumn
+        getTasksByEmployee, moveTaskByColumn, getEmployeeProgressReport
 };
 
 

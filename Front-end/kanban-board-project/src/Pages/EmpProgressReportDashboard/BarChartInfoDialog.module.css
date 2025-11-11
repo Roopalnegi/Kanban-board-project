@@ -1,0 +1,25 @@
+.listStyle
+{
+  list-style: none;
+  padding: 0;
+}
+
+.listStyle li 
+{
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.listStyle img 
+{
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+}
+
+.hintStyle
+{
+    color: red;
+    font-weight: bolder;
+}

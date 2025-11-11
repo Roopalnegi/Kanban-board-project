@@ -27,6 +27,15 @@ export const userIcon = process.env.PUBLIC_URL + "/Icons/user-icon.png";
 
 export const backArrowIcon = process.env.PUBLIC_URL + "/Icons/back-arrow.png";
 
+export const barChartGif = process.env.PUBLIC_URL + "/Gif/growth.gif";
+
+export const PieChartGif = process.env.PUBLIC_URL + "/Gif/pie-chart.gif";
+
+export const reportGif = process.env.PUBLIC_URL + "/Gif/report.gif";
+
+export const starBullet = process.env.PUBLIC_URL + "/Icons/star.png";
+
+
 /*
 process.env.PUBLIC_URL 
  ---> PUBLIC_URL -- a special variable in React , points to public folder at runtime

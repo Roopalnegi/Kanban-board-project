@@ -104,4 +104,18 @@ public class UserServiceImpl implements IUserService
     }
 
 
+    @Override
+    public Boolean updatePassword(User user)
+    {
+        // if user not found
+        return userRepository.findByEmail(user.getEmail())
+                .map(u -> { u.setPassword(user.getPassword());
+                                 userRepository.save(u);
+                                 return true;
+                               })
+                .orElse(false);
+
+    }
+
+
 }

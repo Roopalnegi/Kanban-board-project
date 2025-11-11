@@ -310,6 +310,29 @@ public class UserController
         }
     }
 
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody User user)
+    {
+        try
+        {
+            Boolean success = userService.updatePassword(user);
+
+            if(success)
+                return new ResponseEntity<>("Password updated successfully !", HttpStatus.OK);
+            else
+                return new ResponseEntity<>("Failed to update password !", HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
 }
 
 

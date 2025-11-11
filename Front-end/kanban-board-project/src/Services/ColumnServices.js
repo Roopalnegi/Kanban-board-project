@@ -33,4 +33,11 @@ const getArchiveColumnId = async (boardId) => {
 };
 
 
-export {addColumnToBoard, updateColumnName, deleteColumn, getArchiveColumnId};
+
+// fetch done column id
+const getDoneColumnId = async (boardId) => {
+     const response = await axiosInstance.get(`${baseURL}/calculateDoneColumnId/${boardId}`);
+     return response.data;
+};
+
+export {addColumnToBoard, updateColumnName, deleteColumn, getArchiveColumnId, getDoneColumnId};

@@ -11,6 +11,7 @@ import BoardDashboard from "./Pages/BoardDashboard/BoardDashboard.jsx";
 import NotificationPanel from "./Components/Notification/NotificationPanel.jsx";
 import PageNotFound from "./Pages/PageNotFound/PageNotFound.jsx";
 import ChatRoomSetup from './Components/ChatRoomSetup/ChatRoomSetup.jsx';
+import EmpProgressDashboard from "./Pages/EmpProgressReportDashboard/EmpProgressDashboard.jsx";
 import { getAllNotifications } from "./Services/NotificationService.js";
 import { useErrorBoundary } from "react-error-boundary";
 
@@ -135,6 +136,7 @@ function App()
                                                                                  setNotifications = {setNotifications}
                                                                                  setUnreadNotificationCount = {setUnreadNotificationCount} />} />
                 <Route path = "/chatroom" element = {<ChatRoomSetup setShowHeaderFooter={setShowHeaderFooter} profileImage={profileImage}/>} />                                                                                                                    
+                <Route path = "/employeeProgressReport" element = {<EmpProgressDashboard />} />
                 <Route path = "*" element = {<PageNotFound />} />                                                                 
 
              </Routes>
