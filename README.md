@@ -7,76 +7,68 @@ The system includes real-time updates, analytics (pie & bar charts), chat functi
 
   
 ## 🧩 Features
-- Role based access control (employee / admin)
-- Easy Task Management with limitation
-- AI Task Assistant 
-- Basic Chat System
-- JWT Authentication
-- Microservices integration
-- Responsive React UI
+- Role based access control (Admin / Employee)
+- Task creation, assignment and tracking
+- AI-powered Task Assistant 
+- Real-time chat system
+- JWT based authentication
+- Microservices architecture
+- Responsive UI using React
 
 
 ## ❗Problem Statement
 
-Many teams struggle with inefficient task tracking, lack of real-time visbility and poor coummnication across members.
-Traditional tools often fails to provide a clear workflow structure, resulting in delays, miscommunication and reduced productivity.
-
-Additionally, managing tasks across roles (admin and employees) without proper access control and insights becomes difficult in growing teams. 
+Many teams struggle with inefficient task tracking, lack of real-time visbility and poor communication.
+Traditional tools often fail to provide a clear workflow structure, leading to delays and reduced productivity. 
 
 
 ## 💡Solution
 
-It solves the problem of poor task visibility, delayed communication, and inefficient workflow tracking in teams. 
-By providing real-time task updates, chat system, authentication security, and chart analytics, the system helps teams deliver projects faster with better clarity and reduced manual effort.
+This system improves workflow visibility and team collaboration through real-time updates, role-based access, chat functionality and analytics dashboards.
 
 
 ## 🛠️ Tech Stack
-- React
-- Material UI
-- Spring Boot
-- MySQL & MongoDB
-- Gemini 2.0 Flash AI Integration
+- Frontend: React, Material UI
+- Backend: Spring Boot (Microservices)
+- Databases: MySQL, MongoDB
+- Authentication: JWT
+- AI Integration: Gemini API
 
 
 ## ⚙️ How the application works
-1. Users register/login using JWT-based authentication.
-2. Based on role (Admin/Employee), access to features is granted.
-3. Admin can:
-   - Create boards
-   - Assign tasks to employees
-   - Monitor progress using charts
-4. Employees can:
-   - View assigned tasks
-   - Update task status (To Do → In Progress → Done)
-5. Tasks are managed visually using a Kanban board system.
-6. Real-time updates and communication are supported via chat module.
-7. AI Task Assistant helps in generating or improving task descriptions.
-8. Data is managed through multiple microservices ensuring scalability and modularity.
+1. Users register/login using JWT authentication
+2. Role based access is applied (Admin / Employee)
+3. Admin can create boards and assign tasks
+4. Employee update task status (To Do → In Progress → Done)
+5. Tasks are visualized using Kanban board
+6. Chat system enables communication
+7. AI Assistant helps generate task content
+8. Microservices handle different modules independently
 
 
-## ▶️ How to run the code you provided
+## ▶️ How to Run the Project
 ### Pre-requisites 
     Java 17+, Node.js, MongoDB, MySQL, Maven
 ### Steps
 1. Clone the repository
-2. Start each backend microservice and run via mvn::run
-3. Update application.properties: MongoDB, MySQL configs
-4. Start Frontend: npm install , then npm start
-5. Open in browser: http://localhost:3000
+2. Start backend service: mvn spring-boot:run
+3. Start Frontend: npm install , then npm start
+4. Open in browser: http://localhost:3000
 
 
 ## 📸 Output Screenshots
 ### Home Page
 ![Home Page](Project Showcase/Screenshots/Home Page.png)
 
-### Board Dashabord (Admin View)
-![Admin Board Dashbaord](Project Showcase/Screenshots/Admin Board Dashboard Pic.png)
+### Board Dashboard (Admin View)
+![Admin Board Dashboard](Project Showcase/Screenshots/Admin Board Dashboard Pic.png)
 
-### Task View 
+### Task Board 
 ![Task Pic](Project Showcase/Screenshots/Task Pic.png)
 
-### Chat Window
+### Chat System
 ![Chat Pic](Project Showcase/Screenshots/Chat Pic.png)
+
 
 ## 🏗️ Architecture Diagram
 ![Architecture](Project Showcase/Screenshots/Architecture Diagram.png)
@@ -87,23 +79,11 @@ Watch here: https://youtu.be/D7Hubh9FUaI
 
 
 ## ⚡ Challenges I Faced
-- **Microservices Architecture Complexity**  
-  Managing communication between multiple services and ensuring proper data flow was challenging.
-
-- **JWT Authentication Implementation**  
-  Securing APIs and maintaining token-based authentication across services required careful handling.
-
-- **AI Integration (Gemini API)**  
-  Integrating AI features and handling API responses effectively was complex and required multiple iterations.
-
-- **Real-time Chat using WebSockets**  
-  Implementing real-time communication and handling message synchronization was technically challenging.
-
-- **State Management in Frontend**  
-  Maintaining consistent UI updates with backend data required careful design.
-
-- **Debugging Distributed System Issues**  
-  Identifying bugs across multiple services was time-consuming compared to monolithic applications.
+- Managing microservices communication
+- Implementing secure JWT authentication
+- Integrating AI (Gemini API)
+- Building real-time chat using WebSockets
+- Debugging distributed system issues
 
 
 ## 🚀 Future Improvements
@@ -111,6 +91,5 @@ Watch here: https://youtu.be/D7Hubh9FUaI
 - AI-based task prioritization and time estimation
 - Real-time notifications for task updates and deadlines
 - Advanced analytics dashboards
-- Improved chat system with private channels
-- WebSocket-based full real-time updates
-- Role-based advanced permissions system
+- Private chat channels
+- Full WebSocket based updates
