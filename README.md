@@ -61,7 +61,7 @@ This system improves workflow visibility and team collaboration through real-tim
 ![Home Page](Project Showcase/Screenshots/Home Page.png)
 
 ### Board Dashboard (Admin View)
-![Admin Board Dashboard](Project Showcase/Screenshots/Admin Board Dashboard Pic.png)
+![Admin Board Dashboard](Screenshots/Admin-Board-Dashboard-Pic.png)
 
 ### Task Board 
 ![Task Pic](Project Showcase/Screenshots/Task Pic.png)
