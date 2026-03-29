@@ -58,20 +58,20 @@ This system improves workflow visibility and team collaboration through real-tim
 
 ## 📸 Output Screenshots
 ### Home Page
-![Home Page](Project Showcase/Screenshots/Home Page.png)
+![Home Page](Screenshots/Home-Page.png)
 
 ### Board Dashboard (Admin View)
 ![Admin Board Dashboard](Screenshots/Admin-Board-Dashboard-Pic.png)
 
 ### Task Board 
-![Task Pic](Project Showcase/Screenshots/Task Pic.png)
+![Task Pic](Screenshots/Task-Pic.png)
 
 ### Chat System
-![Chat Pic](Project Showcase/Screenshots/Chat Pic.png)
+![Chat Pic](Screenshots/Chat-Pic.png)
 
 
 ## 🏗️ Architecture Diagram
-![Architecture](Project Showcase/Screenshots/Architecture Diagram.png)
+![Architecture](Screenshots/Architecture-Diagram.png)
 
 
 ## 🎥 Project Demo
