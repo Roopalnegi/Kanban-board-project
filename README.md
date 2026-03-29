@@ -66,8 +66,21 @@ By providing real-time task updates, chat system, authentication security, and c
 
 
 ## 📸 Output Screenshots
+### Home Page
+![Home Page](Project Showcase/Screenshots/Home Page.png)
+
+### Board Dashabord (Admin View)
+![Admin Board Dashbaord](Project Showcase/Screenshots/Admin Board Dashboard Pic.png)
+
+### Task View 
+![Task Pic](Project Showcase/Screenshots/Task Pic.png)
+
+### Chat Window
+![Chat Pic](Project Showcase/Screenshots/Chat Pic.png)
 
 ## 🏗️ Architecture Diagram
+![Architecture](Project Showcase/Screenshots/Architecture Diagram.png)
+
 
 ## 🎥 Project Demo
 Watch here: https://youtu.be/D7Hubh9FUaI
