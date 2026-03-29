@@ -38,7 +38,6 @@ public class BoardServiceImpl implements BoardService
     @Override
     public Board createBoard(Board board) throws BoardAlreadyExistsException
     {
-        // check if task already exists by its title and boardId as two tasks can have same title but live in different boards
         if(boardRepository.findByBoardName(board.getBoardName()).isPresent())
         {
             throw new BoardAlreadyExistsException("Board already exists with name : " + board.getBoardName());
@@ -108,7 +107,6 @@ public class BoardServiceImpl implements BoardService
         catch (Exception e)
         {
             System.err.println("Warning: Failed to delete tasks for board " + boardId + " -> " + e.getMessage());
-            // Optionally log it but don’t stop the response
         }
 
         boardRepository.deleteById(boardId);

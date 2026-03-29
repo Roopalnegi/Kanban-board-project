@@ -6,7 +6,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-public class BoardServicesApplication
+public class
+BoardServicesApplication
 {
 
 	public static void main(String[] args) {

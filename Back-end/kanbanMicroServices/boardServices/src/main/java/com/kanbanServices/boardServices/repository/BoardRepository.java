@@ -14,7 +14,6 @@ public interface BoardRepository extends MongoRepository<Board,String>
 
     // ------- board related ---------
 
-    // Find a specific board by both boardId and boardName (used to prevent duplicate boards)
     Optional<Board> findByBoardName( String boardName);
 
     // find board by id

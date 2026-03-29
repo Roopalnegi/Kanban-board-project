@@ -6,16 +6,22 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="suggestionServices" />
         <module name="boardServices" />
         <module name="userAuthenticationServices" />
+        <module name="NotificationService" />
         <module name="taskServices" />
+        <module name="chatServices" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="NotificationService" options="-parameters" />
       <module name="boardServices" options="-parameters" />
+      <module name="chatServices" options="-parameters" />
       <module name="kanbanMicroServices" options="" />
+      <module name="suggestionServices" options="-parameters" />
       <module name="taskServices" options="-parameters" />
       <module name="userAuthenticationServices" options="-parameters" />
     </option>

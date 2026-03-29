@@ -2,23 +2,25 @@ package com.kanbanServices.suggestionServices.proxy;
 
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
-@FeignClient(name = "vertexAIClient", url = "https://generativelanguage.googleapis.com/v1beta")
+
+@FeignClient(name = "vertexAIClient", url = "${gemini.base.url}")
 public interface VertexAIClient
 {
 
     // Gemini supports x-goog-api-key header ... so put key in header rather than url
 
-    @PostMapping(value = "/models/{model}:generateContent",  consumes = "application/json", produces = "application/json")
+    @PostMapping(
+            value = "/v1/models/{model}:generateContent",
+            consumes = "application/json"
+    )
     String generateContent(
-            @RequestHeader("x-goog-api-key") String apiKey,
             @PathVariable("model") String model,
-            @RequestBody String requestBody
+            @RequestParam("key") String apiKey,
+            @RequestBody Map<String, Object> request
     );
 }
-

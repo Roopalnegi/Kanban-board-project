@@ -9,4 +9,8 @@ public class FailedToGenerateSuggestionException extends RuntimeException
     public FailedToGenerateSuggestionException(String message) {
         super(message);
     }
+
+    public FailedToGenerateSuggestionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

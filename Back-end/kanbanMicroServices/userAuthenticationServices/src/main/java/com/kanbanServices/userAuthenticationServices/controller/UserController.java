@@ -41,14 +41,14 @@ public class UserController
    }
 
 
-   // method to login
+   // method to validate credentials amd send otp to email
    @PostMapping("/verify-credentials")
    public ResponseEntity<?> loginUser(@RequestBody User user)
    {
        try
        {
            User foundUser = userService.loginUser(user);
-           Map<String,String> token = securityTokenGenerator.generateToken(foundUser);
+           //Map<String,String> token = securityTokenGenerator.generateToken(foundUser);
 
            // if credentials is valid, send otp
            String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
@@ -76,7 +76,7 @@ public class UserController
    }
 
 
-    // method to return jwt token after otp verification is done
+    // method to validates otp , return jwt token & user data
     @PostMapping("/login")
     public ResponseEntity<?> verifyLoginOtp(@RequestBody User user)
     {
@@ -99,7 +99,7 @@ public class UserController
         }
     }
 
-    // method to register
+    // method to register new user
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User newUser)
     {
@@ -123,7 +123,7 @@ public class UserController
 
 
 
-    // method to decode jwt token and return email + role
+    // method to decode jwt token & extract user details (email + role)
     @GetMapping("/validateToken")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token)
     {
@@ -160,7 +160,7 @@ public class UserController
     }
 
 
-    // method to generate 6 digit OTP , stores it in memory and sends email
+    // method to generate 6 digit OTP , stores it in memory and sends otp for regiaration / login / password reset
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp (@RequestParam String email, @RequestParam String context)
     {
@@ -205,7 +205,7 @@ public class UserController
     }
 
 
-    // method to check OTP correctness and expiration
+    // method to validate otp that entered by user
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp)
     {
@@ -237,7 +237,7 @@ public class UserController
     }
 
 
-    // method to fetch all employee based user for assigned To property of task
+    // method to fetch all employee names for assigned To property of task
     @GetMapping("/fetchAllEmployeeDetails")
     public ResponseEntity<?> fetchAllEmployeeDetails()
     {
@@ -253,7 +253,7 @@ public class UserController
     }
 
 
-    // method to fetch all users registered in system
+    // method to fetch all registered users in system
     @GetMapping("/fetchAllRegisteredUsers")
     public ResponseEntity<?> fetchAllRegisteredUsers()
     {
@@ -311,6 +311,8 @@ public class UserController
     }
 
 
+
+    // method to update user's password
     @PostMapping("/updatePassword")
     public ResponseEntity<?> updatePassword(@RequestBody User user)
     {
